@@ -49,8 +49,8 @@
     {
       "id": "1",
       "name": "مدیر سیستم",
-      "email": "admin@koorosh.com",
-      "password": "123456",
+      "codmeli": "1234",
+      "password": "1234",
       "role": "admin"
     }
   ]
