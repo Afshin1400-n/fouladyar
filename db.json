@@ -1,0 +1,57 @@
+{
+  "customers": [
+    {
+      "id": "1",
+      "name": "حسین گل محمدی",
+      "phone": "09121234567",
+      "address": "تهران، خیابان آزادی، پلاک ۱۲",
+      "economicCode": "12345678901",
+      "createdAt": "2026-01-15T00:00:00.000Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "1",
+      "orderNumber": "1405051235",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "customerPhone": "09121234567",
+      "customerAddress": "تهران، خیابان آزادی، پلاک ۱۲",
+      "date": "2026-08-15T00:00:00.000Z",
+      "status": "باز",
+      "productType": "ورق سیاه",
+      "brand": "مبارکه",
+      "thickness": 0.5,
+      "width": 1.25,
+      "length": 2.5,
+      "unit": "برگ",
+      "quantity": 2,
+      "weightPerUnit": 12.27,
+      "totalWeight": 24.54,
+      "unitPrice": 45000,
+      "totalPrice": 1104300,
+      "discount": 0,
+      "finalPrice": 1104300,
+      "paid": false,
+      "paymentDate": null,
+      "shipped": false,
+      "shippedDate": null,
+      "invoiceIssued": false,
+      "invoiceNumber": null,
+      "invoiceDate": null,
+      "notes": "ورق نازک برای پروژه ساختمانی",
+      "createdAt": "2026-08-15T00:00:00.000Z",
+      "updatedAt": "2026-08-15T00:00:00.000Z"
+    }
+  ],
+  "invoice": [],
+  "users": [
+    {
+      "id": "1",
+      "name": "مدیر سیستم",
+      "email": "admin@koorosh.com",
+      "password": "123456",
+      "role": "admin"
+    }
+  ]
+}
