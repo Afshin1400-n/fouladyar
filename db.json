@@ -5,7 +5,6 @@
       "name": "حسین گل محمدی",
       "phone": "09121234567",
       "address": "تهران، خیابان آزادی، پلاک ۱۲",
-      "economicCode": "12345678901",
       "nationalId": "1234",
       "password": "1234",
       "createdAt": "2026-01-15T00:00:00.000Z"
@@ -19,6 +18,15 @@
       "nationalId": "5678",
       "password": "5678",
       "createdAt": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "zabRyuLu1_g",
+      "name": "افشین نوروزی",
+      "nationalId": "1372",
+      "phone": "09191309158",
+      "address": "تهران -شهرری - بلوار ایرانیت",
+      "password": "1372",
+      "createdAt": "2026-08-29T05:36:31.014Z"
     }
   ],
   "orders": [
@@ -124,5 +132,6 @@
       "password": "5678",
       "role": "user"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
