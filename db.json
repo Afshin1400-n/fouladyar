@@ -6,7 +6,19 @@
       "phone": "09121234567",
       "address": "تهران، خیابان آزادی، پلاک ۱۲",
       "economicCode": "12345678901",
+      "nationalId": "1234",
+      "password": "1234",
       "createdAt": "2026-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "علی رضایی",
+      "phone": "09129876543",
+      "address": "اصفهان، خیابان امام، پلاک ۴۵",
+      "economicCode": "98765432109",
+      "nationalId": "5678",
+      "password": "5678",
+      "createdAt": "2026-02-01T00:00:00.000Z"
     }
   ],
   "orders": [
@@ -42,16 +54,75 @@
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-08-15T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "orderNumber": "1405051236",
+      "customerId": "2",
+      "customerName": "علی رضایی",
+      "customerPhone": "09129876543",
+      "customerAddress": "اصفهان، خیابان امام، پلاک ۴۵",
+      "date": "2026-08-16T00:00:00.000Z",
+      "status": "خارج شده",
+      "productType": "میلگرد",
+      "brand": "ذوب آهن",
+      "diameter": 16,
+      "length": 12,
+      "unit": "شاخه",
+      "quantity": 5,
+      "weightPerUnit": 15.08,
+      "totalWeight": 75.4,
+      "unitPrice": 52000,
+      "totalPrice": 3920800,
+      "discount": 200000,
+      "finalPrice": 3720800,
+      "paid": true,
+      "paymentDate": "2026-08-16T00:00:00.000Z",
+      "shipped": true,
+      "shippedDate": "2026-08-17T00:00:00.000Z",
+      "invoiceIssued": true,
+      "invoiceNumber": "F-1405-001",
+      "invoiceDate": "2026-08-16T00:00:00.000Z",
+      "notes": "پرداخت کامل - تحویل داده شد",
+      "createdAt": "2026-08-16T00:00:00.000Z",
+      "updatedAt": "2026-08-17T00:00:00.000Z"
     }
   ],
-  "invoice": [],
+  "invoice": [
+    {
+      "id": "INV-001",
+      "orderId": "2",
+      "invoiceNumber": "F-1405-001",
+      "customerId": "2",
+      "customerName": "علی رضایی",
+      "date": "2026-08-16T00:00:00.000Z",
+      "productType": "میلگرد",
+      "brand": "ذوب آهن",
+      "diameter": 16,
+      "length": 12,
+      "quantity": 5,
+      "weight": 75.4,
+      "unitPrice": 52000,
+      "totalPrice": 3920800,
+      "discount": 200000,
+      "finalPrice": 3720800,
+      "createdAt": "2026-08-16T00:00:00.000Z"
+    }
+  ],
   "users": [
     {
       "id": "1",
       "name": "مدیر سیستم",
-      "codmeli": "1234",
+      "nationalId": "1234",
       "password": "1234",
       "role": "admin"
+    },
+    {
+      "id": "2",
+      "name": "علی رضایی",
+      "nationalId": "5678",
+      "password": "5678",
+      "role": "user"
     }
   ]
 }

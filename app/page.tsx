@@ -1,25 +1,33 @@
 "use client"
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import useStore from './store/store';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [codmeli, setCodmeli] = useState('');
+  const [nationalId, setNationalId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { login, isAuthenticated, loading } = useStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // موقتاً فقط چک میکنه
-    if (email && password) {
+    const result = await login(nationalId, password);
+
+    if (result.success) {
       router.push('/dashboard');
     } else {
-      setError('لطفاً ایمیل و رمز عبور را وارد کنید');
+      setError(result.message);
     }
   };
 
@@ -39,40 +47,35 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              ایمیل
-            </label>
+            <label className="block text-sm font-medium mb-2">کد ملی</label>
             <input
               type="text"
-              value={codmeli}
-              onChange={(e) => setCodmeli(e.target.value)}
-              placeholder="......."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2
-               focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
+              value={nationalId}
+              onChange={(e) => setNationalId(e.target.value)}
+              placeholder="•••••••••"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              رمز عبور
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">رمز عبور</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600
-               focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
               required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+            disabled={loading}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg transition"
           >
-            ورود
+            {loading ? 'در حال بررسی...' : 'ورود'}
           </button>
         </form>
 
