@@ -1,89 +1,56 @@
+// src/app/page.js
+
 "use client"
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useStore from './store/store';
 
-export default function LoginPage() {
+export default function HomePage() {
+  const { isAuthenticated } = useStore();
   const router = useRouter();
-  const [nationalId, setNationalId] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login, isAuthenticated, loading } = useStore();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
-    }
-  }, [isAuthenticated, router]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    const result = await login(nationalId, password);
-
-    if (result.success) {
-      router.push('/dashboard');
-    } else {
-      setError(result.message);
-    }
-  };
+  // اگه لاگین بود بره داشبورد
+  if (isAuthenticated) {
+    router.push('/dashboard');
+    return null;
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4" dir="rtl">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">گروه فولادیار کوروش</h1>
-          <p className="text-gray-500 mt-2">ورود به سیستم مدیریت حواله</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-l from-blue-900 to-blue-700 p-4" dir="rtl">
+      <div className="max-w-2xl w-full text-center">
+        {/* لوگو یا آیکون */}
+        <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+          <span className="text-4xl text-white">🏗️</span>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+        {/* عنوان */}
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          به سامانه مشتریان فولادیار کوروش خوش آمدید
+        </h1>
+        <p className="text-blue-100 mb-8 text-lg">
+          مدیریت حواله‌ها و صورت‌برش‌های شما
+        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">کد ملی</label>
-            <input
-              type="text"
-              value={nationalId}
-              onChange={(e) => setNationalId(e.target.value)}
-              placeholder="•••••••••"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">رمز عبور</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg transition"
+        {/* دکمه‌ها */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/login"
+            className="px-8 py-4 bg-white text-blue-700 font-semibold rounded-xl hover:bg-blue-50 transition shadow-lg text-lg"
           >
-            {loading ? 'در حال بررسی...' : 'ورود'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          حساب کاربری ندارید؟{' '}
-          <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+            ورود
+          </Link>
+          <Link
+            href="/register"
+            className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-500 transition shadow-lg text-lg border border-white/20"
+          >
             ثبت‌نام
           </Link>
+        </div>
+
+        {/* فوتر */}
+        <p className="text-blue-200/60 text-sm mt-8">
+          گروه فولادیار کوروش © ۱۴۰۵
         </p>
       </div>
     </div>

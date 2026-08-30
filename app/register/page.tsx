@@ -77,7 +77,7 @@ export default function RegisterPage() {
 
       // ۴. بعد از ۲ ثانیه رفتن به صفحه ورود
       setTimeout(() => {
-        router.push('/');
+        router.push('./login');
       }, 2000);
 
     } catch (error) {
@@ -203,7 +203,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           قبلاً ثبت‌نام کردید؟{' '}
-          <Link href="/" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="./login" className="text-blue-600 hover:text-blue-700 font-medium">
             ورود
           </Link>
         </p>
