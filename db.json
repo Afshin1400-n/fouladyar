@@ -32,22 +32,20 @@
   "orders": [
     {
       "id": "1",
-      "orderNumber": "1405051235",
+      "orderNumber": "140505135",
       "customerId": "1",
       "customerName": "حسین گل محمدی",
-      "customerPhone": "09121234567",
-      "customerAddress": "تهران، خیابان آزادی، پلاک ۱۲",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "باز",
+      "status": "صورت‌برش شده",
       "productType": "ورق سیاه",
       "brand": "مبارکه",
       "thickness": 0.5,
       "width": 1.25,
       "length": 2.5,
       "unit": "برگ",
-      "quantity": 2,
+      "quantity": 30,
       "weightPerUnit": 12.27,
-      "totalWeight": 24.54,
+      "totalWeight": 500,
       "unitPrice": 45000,
       "totalPrice": 1104300,
       "discount": 0,
@@ -56,16 +54,16 @@
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
-      "invoiceIssued": false,
-      "invoiceNumber": null,
-      "invoiceDate": null,
+      "invoiceIssued": true,
+      "invoiceNumber": "INV-1788066865780",
+      "invoiceDate": "2026-08-30T05:14:25.798Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-08-15T00:00:00.000Z"
     },
     {
       "id": "1",
-      "orderNumber": "1405051235",
+      "orderNumber": "140504123",
       "customerId": "1",
       "customerName": "حسین گل محمدی",
       "customerPhone": "09121234567",
@@ -129,27 +127,7 @@
       "updatedAt": "2026-08-17T00:00:00.000Z"
     }
   ],
-  "invoice": [
-    {
-      "id": "INV-001",
-      "orderId": "2",
-      "invoiceNumber": "F-1405-001",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-08-16T00:00:00.000Z",
-      "productType": "میلگرد",
-      "brand": "ذوب آهن",
-      "diameter": 16,
-      "length": 12,
-      "quantity": 5,
-      "weight": 75.4,
-      "unitPrice": 52000,
-      "totalPrice": 3920800,
-      "discount": 200000,
-      "finalPrice": 3720800,
-      "createdAt": "2026-08-16T00:00:00.000Z"
-    }
-  ],
+  
   "users": [
     {
       "id": "1",

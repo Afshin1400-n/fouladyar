@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalWeight: 0,
@@ -23,6 +24,39 @@ export default function DashboardPage() {
     shippedOrders: 0
   });
 
+  // تابع دریافت دیتا
+  const fetchOrders = async () => {
+    if (!currentUser) return;
+    
+    try {
+      const res = await axios.get('http://localhost:4000/orders');
+      const allOrders = res.data;
+      
+      const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
+      
+      setOrders(userOrders);
+      setFilteredOrders(userOrders);
+
+      const totalOrders = userOrders.length;
+      const totalWeight = userOrders.reduce((sum, o) => sum + (o.totalWeight || 0), 0);
+      const totalPrice = userOrders.reduce((sum, o) => sum + (o.finalPrice || 0), 0);
+      const pendingOrders = userOrders.filter(o => o.status === 'باز').length;
+      const shippedOrders = userOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
+
+      setStats({
+        totalOrders,
+        totalWeight,
+        totalPrice,
+        pendingOrders,
+        shippedOrders
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('./login');
@@ -30,38 +64,6 @@ export default function DashboardPage() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!currentUser) return;
-      
-      try {
-        const res = await axios.get('http://localhost:4000/orders');
-        const allOrders = res.data;
-        
-        const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
-        
-        setOrders(userOrders);
-        setFilteredOrders(userOrders);
-
-        const totalOrders = userOrders.length;
-        const totalWeight = userOrders.reduce((sum, o) => sum + (o.totalWeight || 0), 0);
-        const totalPrice = userOrders.reduce((sum, o) => sum + (o.finalPrice || 0), 0);
-        const pendingOrders = userOrders.filter(o => o.status === 'باز').length;
-        const shippedOrders = userOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
-
-        setStats({
-          totalOrders,
-          totalWeight,
-          totalPrice,
-          pendingOrders,
-          shippedOrders
-        });
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-        setLoading(false);
-      }
-    };
-
     if (isAuthenticated && currentUser) {
       fetchOrders();
     }
@@ -84,7 +86,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     logout();
-    router.push('/');
+    router.push('./login');
   };
 
   if (!isAuthenticated) {
@@ -95,35 +97,69 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
       {/* Header */}
       <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
               ف
             </div>
             <h1 className="text-2xl font-bold text-gray-900">گروه فولادیار کوروش</h1>
           </div>
+
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full">
-              <span className="text-blue-600 text-sm font-medium hidden sm:inline">
-                {currentUser?.name}
-              </span>
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                {currentUser?.name?.charAt(0) || 'م'}
-              </div>
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-full hover:bg-blue-100 transition"
+              >
+                <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  {currentUser?.name?.charAt(0) || 'م'}
+                </div>
+                <div className="hidden sm:block text-right">
+                  <p className="text-sm font-semibold text-gray-900">{currentUser?.name}</p>
+                  <p className="text-xs text-gray-500">{currentUser?.phone || 'شماره ثبت نشده'}</p>
+                </div>
+                <svg
+                  className={`w-4 h-4 text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showUserMenu && (
+                <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-bold text-gray-900">{currentUser?.name}</p>
+                    <p className="text-xs text-gray-500">کد ملی: {currentUser?.nationalId}</p>
+                    <p className="text-xs text-gray-500">تلفن: {currentUser?.phone || '---'}</p>
+                    <p className="text-xs text-gray-500">آدرس: {currentUser?.address || '---'}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-right px-4 py-3 text-red-600 hover:bg-red-50 transition font-medium text-sm flex items-center gap-2"
+                  >
+                    <span>🚪</span>
+                    خروج از حساب
+                  </button>
+                </div>
+              )}
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition text-sm font-medium shadow-sm hover:shadow-md"
-            >
-              خروج
-            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-
+        {/* Welcome */}
+        <div className="mb-8 bg-gradient-to-l from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg">
+          <h2 className="text-3xl font-bold">
+            سلام {currentUser?.name} 👋
+          </h2>
+          <p className="text-blue-100 mt-1">به داشبورد مدیریت حواله خوش آمدید</p>
+        </div>
 
         {/* Stats Cards */}
         {loading ? (
@@ -194,6 +230,12 @@ export default function DashboardPage() {
               <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
                 {filteredOrders.length} مورد
               </span>
+              <button
+                onClick={fetchOrders}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline"
+              >
+                🔄 بروزرسانی
+              </button>
               <Link href="/orders" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
                 مشاهده همه →
               </Link>
