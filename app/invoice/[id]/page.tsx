@@ -1,3 +1,5 @@
+// src/app/invoice/[id]/page.js
+
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -32,23 +34,57 @@ export default function InvoicePage() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/orders/${params.id}`);
-        setOrder(res.data);
+        const id = params.id;
+        console.log('🔍 ID from URL:', id);
         
-        if (res.data) {
+        // ۱. اول با id مستقیم میگیریم
+        try {
+          const res = await axios.get(`http://localhost:4000/orders/${id}`);
+          console.log('✅ Found by ID:', res.data);
+          setOrder(res.data);
+          
+          if (res.data) {
+            setInvoiceData({
+              length: res.data.length || '',
+              width: res.data.width || '',
+              thickness: res.data.thickness || '',
+              quantity: res.data.quantity || '',
+              bundle: '',
+              weight: res.data.totalWeight || 0
+            });
+          }
+          
+          setLoading(false);
+          return;
+        } catch (idError) {
+          console.log('❌ Not found by ID, trying orderNumber...');
+        }
+        
+        // ۲. اگه با id پیدا نشد، با orderNumber پیدا کن
+        const allOrdersRes = await axios.get('http://localhost:4000/orders');
+        const allOrders = allOrdersRes.data;
+        const foundOrder = allOrders.find((o) => o.orderNumber === id);
+        
+        if (foundOrder) {
+          console.log('✅ Found by orderNumber:', foundOrder);
+          setOrder(foundOrder);
+          
           setInvoiceData({
-            length: res.data.length || '',
-            width: res.data.width || '',
-            thickness: res.data.thickness || '',
-            quantity: res.data.quantity || '',
+            length: foundOrder.length || '',
+            width: foundOrder.width || '',
+            thickness: foundOrder.thickness || '',
+            quantity: foundOrder.quantity || '',
             bundle: '',
-            weight: res.data.totalWeight || 0
+            weight: foundOrder.totalWeight || 0
           });
+        } else {
+          console.log('❌ Order not found by ID or orderNumber');
+          setOrder(null);
         }
         
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching order:', error);
+        console.error('❌ Error fetching order:', error);
         setLoading(false);
       }
     };
@@ -84,7 +120,6 @@ export default function InvoicePage() {
     setSubmitting(true);
 
     try {
-      // محاسبه قیمت جدید
       const newWeight = parseFloat(invoiceData.weight) || 0;
       const unitPrice = parseFloat(order.unitPrice) || 0;
       const newPrice = newWeight * unitPrice;
@@ -117,17 +152,14 @@ export default function InvoicePage() {
         createdAt: new Date().toISOString()
       };
 
-      // ۱. ذخیره در invoice
       await axios.post('http://localhost:4000/invoice', invoicePayload);
 
-      // محاسبه وزن و قیمت باقی‌مونده
       const currentWeight = parseFloat(order.totalWeight) || 0;
       const currentPrice = parseFloat(order.totalPrice) || 0;
       
       const remainingWeight = currentWeight - newWeight;
       const remainingPrice = currentPrice - newPrice;
 
-      // ۲. بروزرسانی وضعیت حواله
       await axios.patch(`http://localhost:4000/orders/${order.id}`, {
         status: 'صورت‌برش شده',
         totalWeight: remainingWeight > 0 ? remainingWeight : 0,
@@ -178,7 +210,8 @@ export default function InvoicePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
         <div className="text-center">
-          <p className="text-red-500 text-lg">حواله‌ای یافت نشد</p>
+          <p className="text-red-500 text-lg">❌ حواله‌ای با این شماره یافت نشد</p>
+          <p className="text-gray-500 text-sm mt-2">ID: {params.id}</p>
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 mt-4 inline-block">
             بازگشت به داشبورد
           </Link>
@@ -189,10 +222,12 @@ export default function InvoicePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
-      {/* Header */}
       <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+              ف
+            </div>
             <h1 className="text-2xl font-bold text-gray-900">گروه فولادیار کوروش</h1>
           </div>
           <div className="flex items-center gap-4">
@@ -214,10 +249,8 @@ export default function InvoicePage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          {/* Header Info */}
           <div className="border-b border-gray-200 pb-6 mb-6">
             <div className="flex justify-between items-start">
               <div>
@@ -233,7 +266,6 @@ export default function InvoicePage() {
             </div>
           </div>
 
-          {/* Order Details */}
           <div className="border-t border-gray-200 pt-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">جزئیات حواله</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 rounded-xl p-4">
@@ -264,7 +296,6 @@ export default function InvoicePage() {
             </div>
           </div>
 
-          {/* Status */}
           <div className="border-t border-gray-200 pt-6 mt-6">
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-500">وضعیت:</span>
@@ -284,7 +315,6 @@ export default function InvoicePage() {
             </div>
           </div>
 
-          {/* Buttons */}
           <div className="border-t border-gray-200 pt-6 mt-6 flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => window.print()}
@@ -302,7 +332,6 @@ export default function InvoicePage() {
         </div>
       </main>
 
-      {/* Modal ثبت صورت‌برش */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
@@ -319,9 +348,7 @@ export default function InvoicePage() {
             <form onSubmit={handleInvoiceSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    تعداد
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">تعداد</label>
                   <input
                     type="number"
                     value={invoiceData.quantity}
@@ -332,9 +359,7 @@ export default function InvoicePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    تعداد بندل
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">تعداد بندل</label>
                   <input
                     type="number"
                     value={invoiceData.bundle}
@@ -345,9 +370,7 @@ export default function InvoicePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    طول (متر)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">طول (متر)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -359,9 +382,7 @@ export default function InvoicePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    عرض (متر)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">عرض (متر)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -373,9 +394,7 @@ export default function InvoicePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ضخامت (میلی‌متر)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">ضخامت (میلی‌متر)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -387,9 +406,7 @@ export default function InvoicePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    وزن (کیلوگرم)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">وزن (کیلوگرم)</label>
                   <input
                     type="number"
                     step="0.01"

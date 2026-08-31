@@ -24,7 +24,6 @@ export default function DashboardPage() {
     shippedOrders: 0
   });
 
-  // تابع دریافت دیتا
   const fetchOrders = async () => {
     if (!currentUser) return;
     
@@ -33,6 +32,7 @@ export default function DashboardPage() {
       const allOrders = res.data;
       
       const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
+     
       
       setOrders(userOrders);
       setFilteredOrders(userOrders);
@@ -74,11 +74,11 @@ export default function DashboardPage() {
       setFilteredOrders(orders);
     } else {
       const filtered = orders.filter((order) =>
-        order.orderNumber.includes(searchTerm) ||
-        order.status.includes(searchTerm) ||
-        order.productType.includes(searchTerm) ||
-        order.brand.includes(searchTerm) ||
-        order.customerName.includes(searchTerm)
+        order.orderNumber?.includes(searchTerm) ||
+        order.status?.includes(searchTerm) ||
+        order.productType?.includes(searchTerm) ||
+        order.brand?.includes(searchTerm) ||
+        order.customerName?.includes(searchTerm)
       );
       setFilteredOrders(filtered);
     }
@@ -95,7 +95,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
-      {/* Header */}
       <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
@@ -106,7 +105,6 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* User Menu */}
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
@@ -151,17 +149,12 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Welcome */}
         <div className="mb-8 bg-gradient-to-l from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg">
-          <h2 className="text-3xl font-bold">
-            سلام {currentUser?.name} 👋
-          </h2>
+          <h2 className="text-3xl font-bold">سلام {currentUser?.name} 👋</h2>
           <p className="text-blue-100 mt-1">به داشبورد مدیریت حواله خوش آمدید</p>
         </div>
 
-        {/* Stats Cards */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -196,7 +189,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Search Box */}
         <div className="mb-8">
           <div className="relative">
             <input
@@ -222,7 +214,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Recent Orders */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50/50">
             <h3 className="text-xl font-bold text-gray-900">📋 حواله‌های اخیر</h3>
@@ -297,7 +288,7 @@ export default function DashboardPage() {
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <Link
-                          href={`/invoice/${order.id}`}
+                          href={`/invoice/${order.orderNumber}`}
                           className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
                         >
                           صورت‌برش
