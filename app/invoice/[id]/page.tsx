@@ -24,6 +24,8 @@ export default function InvoicePage() {
     bundle: '',
     weight: 0
   });
+  const [remainingWeight, setRemainingWeight] = useState(0);
+  const [totalInvoiceWeight, setTotalInvoiceWeight] = useState(0);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -37,20 +39,27 @@ export default function InvoicePage() {
         const id = params.id;
         console.log('🔍 ID from URL:', id);
         
-        // ۱. اول با id مستقیم میگیریم
         try {
           const res = await axios.get(`http://localhost:4000/orders/${id}`);
           console.log('✅ Found by ID:', res.data);
           setOrder(res.data);
           
           if (res.data) {
+            // گرفتن صورت‌برش‌های این حواله
+            const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${res.data.id}`);
+            const orderInvoices = invoiceRes.data;
+            const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
+            
+            setTotalInvoiceWeight(totalInvoiceWeight);
+            setRemainingWeight((res.data.totalWeight || 0) - totalInvoiceWeight);
+            
             setInvoiceData({
               length: res.data.length || '',
               width: res.data.width || '',
               thickness: res.data.thickness || '',
               quantity: res.data.quantity || '',
               bundle: '',
-              weight: res.data.totalWeight || 0
+              weight: 0
             });
           }
           
@@ -60,7 +69,6 @@ export default function InvoicePage() {
           console.log('❌ Not found by ID, trying orderNumber...');
         }
         
-        // ۲. اگه با id پیدا نشد، با orderNumber پیدا کن
         const allOrdersRes = await axios.get('http://localhost:4000/orders');
         const allOrders = allOrdersRes.data;
         const foundOrder = allOrders.find((o) => o.orderNumber === id);
@@ -69,13 +77,21 @@ export default function InvoicePage() {
           console.log('✅ Found by orderNumber:', foundOrder);
           setOrder(foundOrder);
           
+          // گرفتن صورت‌برش‌های این حواله
+          const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${foundOrder.id}`);
+          const orderInvoices = invoiceRes.data;
+          const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
+          
+          setTotalInvoiceWeight(totalInvoiceWeight);
+          setRemainingWeight((foundOrder.totalWeight || 0) - totalInvoiceWeight);
+          
           setInvoiceData({
             length: foundOrder.length || '',
             width: foundOrder.width || '',
             thickness: foundOrder.thickness || '',
             quantity: foundOrder.quantity || '',
             bundle: '',
-            weight: foundOrder.totalWeight || 0
+            weight: 0
           });
         } else {
           console.log('❌ Order not found by ID or orderNumber');
@@ -130,6 +146,12 @@ export default function InvoicePage() {
         return;
       }
 
+      if (newWeight > remainingWeight) {
+        alert(`❌ وزن وارد شده (${newWeight} kg) از وزن باقی‌مانده (${remainingWeight.toFixed(2)} kg) بیشتر است!`);
+        setSubmitting(false);
+        return;
+      }
+
       const invoicePayload = {
         id: `INV-${Date.now()}`,
         orderId: order.id,
@@ -157,22 +179,43 @@ export default function InvoicePage() {
       const currentWeight = parseFloat(order.totalWeight) || 0;
       const currentPrice = parseFloat(order.totalPrice) || 0;
       
-      const remainingWeight = currentWeight - newWeight;
-      const remainingPrice = currentPrice - newPrice;
+      const newRemainingWeight = remainingWeight - newWeight;
+      const remainingPriceAfter = currentPrice - newPrice;
 
-      await axios.patch(`http://localhost:4000/orders/${order.id}`, {
-        status: 'صورت‌برش شده',
-        totalWeight: remainingWeight > 0 ? remainingWeight : 0,
-        totalPrice: remainingPrice > 0 ? remainingPrice : 0,
-        finalPrice: remainingPrice > 0 ? remainingPrice : 0,
+      // بروزرسانی حواله
+      const updatedOrder = await axios.patch(`http://localhost:4000/orders/${order.id}`, {
+        status: newRemainingWeight <= 0 ? 'تکمیل شده' : order.status,
+        totalWeight: newRemainingWeight > 0 ? newRemainingWeight : 0,
+        totalPrice: remainingPriceAfter > 0 ? remainingPriceAfter : 0,
+        finalPrice: remainingPriceAfter > 0 ? remainingPriceAfter : 0,
         invoiceIssued: true,
         invoiceNumber: invoicePayload.id,
         invoiceDate: new Date().toISOString()
       });
 
+      // به‌روزرسانی state
+      setOrder(updatedOrder.data);
+      setRemainingWeight(newRemainingWeight > 0 ? newRemainingWeight : 0);
+      setTotalInvoiceWeight(totalInvoiceWeight + newWeight);
+      
+      // ریست کردن فرم
+      setInvoiceData({
+        length: '',
+        width: '',
+        thickness: invoiceData.thickness || order.thickness,
+        quantity: '',
+        bundle: '',
+        weight: 0
+      });
+
       setSubmitting(false);
       setShowModal(false);
-      alert('✅ صورت‌برش با موفقیت ثبت شد!');
+      
+      if (newRemainingWeight <= 0) {
+        alert('✅ صورت‌برش با موفقیت ثبت شد و حواله تکمیل گردید!');
+      } else {
+        alert(`✅ صورت‌برش با موفقیت ثبت شد! وزن باقی‌مانده: ${newRemainingWeight.toFixed(2)} kg`);
+      }
       
       router.refresh();
 
@@ -296,13 +339,30 @@ export default function InvoicePage() {
             </div>
           </div>
 
+          {/* نمایش وزن باقی‌مونده */}
+          <div className="border-t border-gray-200 pt-6 mt-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 rounded-xl p-4 text-center">
+                <p className="text-sm text-gray-500">وزن کل حواله</p>
+                <p className="text-2xl font-bold text-gray-900">{order.totalWeight} kg</p>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-4 text-center">
+                <p className="text-sm text-gray-500">وزن باقی‌مانده قابل برش</p>
+                <p className="text-2xl font-bold text-blue-600">{remainingWeight.toFixed(2)} kg</p>
+              </div>
+            </div>
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-400">مجموع وزن صورت‌برش‌های ثبت شده: {totalInvoiceWeight.toFixed(2)} kg</p>
+            </div>
+          </div>
+
           <div className="border-t border-gray-200 pt-6 mt-6">
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-500">وضعیت:</span>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 order.status === 'باز' ? 'bg-yellow-100 text-yellow-700' :
                 order.status === 'خارج شده' ? 'bg-green-100 text-green-700' :
-                order.status === 'صورت‌برش شده' ? 'bg-purple-100 text-purple-700' :
+                order.status === 'صورت‌برش شده' || order.status === 'تکمیل شده' ? 'bg-purple-100 text-purple-700' :
                 'bg-gray-100 text-gray-700'
               }`}>
                 {order.status}
@@ -324,9 +384,14 @@ export default function InvoicePage() {
             </button>
             <button
               onClick={() => setShowModal(true)}
-              className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg"
+              disabled={remainingWeight <= 0}
+              className={`px-8 py-3 font-semibold rounded-xl transition shadow-md hover:shadow-lg ${
+                remainingWeight <= 0 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
             >
-              📝 ثبت صورت‌برش
+              {remainingWeight <= 0 ? '✅ تکمیل شده' : '📝 ثبت صورت‌برش'}
             </button>
           </div>
         </div>
@@ -343,6 +408,11 @@ export default function InvoicePage() {
               >
                 ✕
               </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center">
+              <p className="text-sm text-gray-500">وزن باقی‌مانده قابل برش</p>
+              <p className="text-lg font-bold text-blue-600">{remainingWeight.toFixed(2)} kg</p>
             </div>
 
             <form onSubmit={handleInvoiceSubmit} className="space-y-4">
@@ -420,8 +490,12 @@ export default function InvoicePage() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg transition"
+                  disabled={submitting || invoiceData.weight <= 0 || invoiceData.weight > remainingWeight}
+                  className={`flex-1 py-3 font-semibold rounded-lg transition ${
+                    submitting || invoiceData.weight <= 0 || invoiceData.weight > remainingWeight
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
                 >
                   {submitting ? 'در حال ثبت...' : 'ثبت صورت‌برش'}
                 </button>
@@ -433,6 +507,11 @@ export default function InvoicePage() {
                   انصراف
                 </button>
               </div>
+              {invoiceData.weight > remainingWeight && (
+                <p className="text-red-500 text-sm text-center">
+                  ⚠️ وزن وارد شده ({invoiceData.weight.toFixed(2)} kg) از وزن باقی‌مانده ({remainingWeight.toFixed(2)} kg) بیشتر است!
+                </p>
+              )}
             </form>
           </div>
         </div>

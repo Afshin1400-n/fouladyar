@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { currentUser, isAuthenticated, logout } = useStore();
   const [orders, setOrders] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,17 +29,31 @@ export default function DashboardPage() {
     if (!currentUser) return;
     
     try {
+      // ۱. گرفتن حواله‌ها
       const res = await axios.get('http://localhost:4000/orders');
       const allOrders = res.data;
-      
       const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
      
+      // ۲. گرفتن صورت‌برش‌ها
+      const resInvoice = await axios.get('http://localhost:4000/invoice');
+      const allInvoice = resInvoice.data;
+      const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
       
+      setInvoices(userInvoice);
       setOrders(userOrders);
       setFilteredOrders(userOrders);
 
+      // ۳. محاسبه وزن کل (وزن حواله - وزن صورت‌برش)
       const totalOrders = userOrders.length;
-      const totalWeight = userOrders.reduce((sum, o) => sum + (o.totalWeight || 0), 0);
+      
+      // محاسبه وزن کل با کم کردن وزن صورت‌برش‌ها
+      const totalWeight = userOrders.reduce((sum, order) => {
+        // پیدا کردن صورت‌برش‌های این حواله
+        const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
+        const totalInvoiceWeight = orderInvoices.reduce((s, inv) => s + (inv.weight || 0), 0);
+        return sum + (order.totalWeight - totalInvoiceWeight);
+      }, 0);
+      
       const totalPrice = userOrders.reduce((sum, o) => sum + (o.finalPrice || 0), 0);
       const pendingOrders = userOrders.filter(o => o.status === 'باز').length;
       const shippedOrders = userOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
@@ -87,6 +102,13 @@ export default function DashboardPage() {
   const handleLogout = () => {
     logout();
     router.push('./login');
+  };
+
+  // تابع برای محاسبه وزن برش‌شده هر حواله
+  const getInvoiceWeight = (orderId) => {
+    const orderInvoices = invoices.filter((inv) => inv.orderId === orderId);
+    const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
+    return totalInvoiceWeight;
   };
 
   if (!isAuthenticated) {
@@ -170,10 +192,12 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-500">کل حواله‌ها</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalOrders}</p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-              <p className="text-sm text-gray-500">وزن کل</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalWeight.toFixed(0)} kg</p>
-            </div>
+   <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
+  <p className="text-sm text-gray-500">وزن کل حواله‌ها</p>
+  <p className="text-2xl font-bold text-blue-600 mt-1">
+    {orders.reduce((sum, order) => sum + (order.totalWeight || 0), 0).toFixed(0)} kg
+  </p>
+</div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
               <p className="text-sm text-gray-500">مبلغ کل</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalPrice.toLocaleString()}</p>
@@ -230,6 +254,9 @@ export default function DashboardPage() {
               <Link href="/orders" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
                 مشاهده همه →
               </Link>
+               <Link href="./invoices" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
+               صورت برش ها مشاهده  →
+              </Link>
             </div>
           </div>
 
@@ -255,47 +282,62 @@ export default function DashboardPage() {
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">نوع</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">برند</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن کل</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن برش</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن باقی‌مونده</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">مبلغ</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وضعیت</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عملیات</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredOrders.slice(0, 10).map((order) => (
-                    <tr key={order.id} className="hover:bg-blue-50/50 transition">
-                      <td className="px-4 py-3 text-sm text-blue-600 font-bold">
-                        {order.orderNumber}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{order.productType}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{order.brand}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {new Date(order.date).toLocaleDateString('fa-IR')}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{order.totalWeight} kg</td>
-                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">
-                        {order.finalPrice.toLocaleString()}
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          order.status === 'باز' ? 'bg-yellow-100 text-yellow-700' :
-                          order.status === 'خارج شده' ? 'bg-green-100 text-green-700' :
-                          order.status === 'صورت‌برش شده' ? 'bg-purple-100 text-purple-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <Link
-                          href={`/invoice/${order.orderNumber}`}
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
-                        >
-                          صورت‌برش
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredOrders.slice(0, 10).map((order) => {
+                    const invoiceWeight = getInvoiceWeight(order.id);
+                    const remainingWeight = order.totalWeight - invoiceWeight;
+                    
+                    return (
+                      <tr key={order.id} className="hover:bg-blue-50/50 transition">
+                        <td className="px-4 py-3 text-sm text-blue-600 font-bold">
+                          {order.orderNumber}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{order.productType}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{order.brand}</td>
+                        <td className="px-4 py-3 text-sm text-gray-500">
+                          {new Date(order.date).toLocaleDateString('fa-IR')}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900 font-bold">
+                          {order.totalWeight} kg
+                        </td>
+                        <td className="px-4 py-3 text-sm text-red-500 font-bold">
+                          {invoiceWeight.toFixed(2)} kg
+                        </td>
+                        <td className="px-4 py-3 text-sm text-green-600 font-bold">
+                          {remainingWeight.toFixed(2)} kg
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+                          {order.finalPrice.toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            order.status === 'باز' ? 'bg-yellow-100 text-yellow-700' :
+                            order.status === 'خارج شده' ? 'bg-green-100 text-green-700' :
+                            order.status === 'صورت‌برش شده' ? 'bg-purple-100 text-purple-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <Link
+                            href={`/invoice/${order.orderNumber}`}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
+                          >
+                            صورت‌برش
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

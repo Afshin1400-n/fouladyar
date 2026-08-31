@@ -36,7 +36,7 @@
       "customerId": "1",
       "customerName": "حسین گل محمدی",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "صورت‌برش شده",
+      "status": "باز",
       "productType": "ورق سیاه",
       "brand": "مبارکه",
       "thickness": 0.5,
@@ -45,21 +45,21 @@
       "unit": "برگ",
       "quantity": 30,
       "weightPerUnit": 12.27,
-      "totalWeight": 500,
+      "totalWeight": 132.03125,
       "unitPrice": 45000,
-      "totalPrice": 1104300,
+      "totalPrice": 0,
       "discount": 0,
-      "finalPrice": 1104300,
+      "finalPrice": 0,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1788066865780",
-      "invoiceDate": "2026-08-30T05:14:25.798Z",
+      "invoiceNumber": "INV-1788140469230",
+      "invoiceDate": "2026-08-31T01:41:09.261Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
-      "updatedAt": "2026-08-15T00:00:00.000Z",
+      "updatedAt": "2026-08-15T00:00:00.000Z"
     },
     {
       "id": "2",
@@ -69,7 +69,7 @@
       "customerPhone": "09121234567",
       "customerAddress": "تهران، خیابان آزادی، پلاک ۱۲",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "خارج شده",
+      "status": "باز",
       "productType": "ورق سرد",
       "brand": "چین",
       "thickness": 0.5,
@@ -78,18 +78,18 @@
       "unit": "رول",
       "quantity": 0.5,
       "weightPerUnit": 12.27,
-      "totalWeight": 1000,
+      "totalWeight": 632.03125,
       "unitPrice": 45000,
-      "totalPrice": 1104300,
+      "totalPrice": 0,
       "discount": 0,
-      "finalPrice": 1104300,
+      "finalPrice": 0,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
-      "invoiceIssued": false,
-      "invoiceNumber": null,
-      "invoiceDate": null,
+      "invoiceIssued": true,
+      "invoiceNumber": "INV-1788140633312",
+      "invoiceDate": "2026-08-31T01:43:53.347Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-08-15T00:00:00.000Z"
@@ -119,15 +119,17 @@
       "paymentDate": "2026-08-16T00:00:00.000Z",
       "shipped": true,
       "shippedDate": "2026-08-17T00:00:00.000Z",
-      "invoiceIssued": true,
-      "invoiceNumber": "F-1405-001",
-      "invoiceDate": "2026-08-16T00:00:00.000Z",
+      "invoiceIssued": false,
+      "invoiceNumber": null,
+      "invoiceDate": null,
       "notes": "پرداخت کامل - تحویل داده شد",
       "createdAt": "2026-08-16T00:00:00.000Z",
       "updatedAt": "2026-08-17T00:00:00.000Z"
     }
   ],
-  
+  "invoice": [
+   
+  ],
   "users": [
     {
       "id": "1",
@@ -143,5 +145,6 @@
       "password": "5678",
       "role": "user"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
