@@ -1,11 +1,10 @@
-// src/app/register/page.js
-
 "use client"
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { Building2, User, Phone, MapPin, Lock, ArrowLeft, Sparkles, CheckCircle } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,13 +17,22 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // ✅ ref برای اولین اینپوت
+  const inputRef = useRef(null);
+
+  // ✅ فوکوس روی اولین اینپوت
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // اعتبارسنجی
     if (!name || !nationalId || !phone || !address || !password) {
       setError('❌ لطفاً تمام فیلدها را پر کنید');
       return;
@@ -48,7 +56,6 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // ۱. چک کردن تکراری نبودن کد ملی
       const res = await axios.get('http://localhost:4000/customers');
       const existingUser = res.data.find((u) => u.nationalId === nationalId);
 
@@ -58,7 +65,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // ۲. ایجاد کاربر جدید
       const newUser = {
         id: Date.now().toString(),
         name,
@@ -69,13 +75,11 @@ export default function RegisterPage() {
         createdAt: new Date().toISOString()
       };
 
-      // ۳. ارسال به JSON Server
       await axios.post('http://localhost:4000/customers', newUser);
 
       setSuccess('✅ ثبت‌نام با موفقیت انجام شد');
       setLoading(false);
 
-      // ۴. بعد از ۲ ثانیه رفتن به صفحه ورود
       setTimeout(() => {
         router.push('./login');
       }, 2000);
@@ -88,125 +92,214 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4" dir="rtl">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-600">ثبت‌نام</h1>
-          <p className="text-gray-500 mt-2">ایجاد حساب کاربری جدید</p>
+    <div className="min-h-screen bg-white" dir="rtl">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-white to-blue-400/10 -z-10" />
+      
+      {/* Floating Shapes */}
+      <div className="absolute top-20 right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-400/5 rounded-full blur-3xl" />
+      
+      <div className="relative min-h-screen flex items-center justify-center p-6">
+        {/* Back Button */}
+        <Link 
+          href="/" 
+          className="absolute top-6 right-6 p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-500" />
+        </Link>
+
+        <div className="w-full max-w-md">
+          {/* Logo & Brand */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 mb-4">
+              <Building2 className="w-7 h-7 text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-900">فولادیار کوروش</h1>
+            <p className="text-sm text-gray-500 mt-1">ایجاد حساب کاربری</p>
+          </div>
+
+          {/* Card */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
+              <Sparkles className="w-3 h-3 text-blue-600" />
+              <span className="text-[10px] font-medium text-blue-700">ثبت‌نام جدید</span>
+            </div>
+
+            {error && (
+              <div className="mb-5 p-3.5 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm flex items-center gap-2">
+                <span className="text-lg">⚠️</span>
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-5 p-3.5 bg-green-50 border border-green-100 text-green-600 rounded-xl text-sm flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                {success}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  نام کامل
+                </label>
+                <div className="relative">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <User className="w-4.5 h-4.5" />
+                  </div>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="علی محمدی"
+                    className="w-full pr-10 pl-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* National ID */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  کد ملی
+                </label>
+                <div className="relative">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <User className="w-4.5 h-4.5" />
+                  </div>
+                  <input
+                    type="text"
+                    value={nationalId}
+                    onChange={(e) => setNationalId(e.target.value)}
+                    placeholder="۱۲۳۴"
+                    className="w-full pr-10 pl-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  تلفن
+                </label>
+                <div className="relative">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Phone className="w-4.5 h-4.5" />
+                  </div>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="۰۹۱۲۱۲۳۴۵۶۷"
+                    className="w-full pr-10 pl-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  آدرس
+                </label>
+                <div className="relative">
+                  <div className="absolute right-3 top-3.5 text-gray-400">
+                    <MapPin className="w-4.5 h-4.5" />
+                  </div>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="تهران، خیابان آزادی"
+                    className="w-full pr-10 pl-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  رمز عبور
+                </label>
+                <div className="relative">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Lock className="w-4.5 h-4.5" />
+                  </div>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pr-10 pl-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  تکرار رمز عبور
+                </label>
+                <div className="relative">
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Lock className="w-4.5 h-4.5" />
+                  </div>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pr-10 pl-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 placeholder:text-gray-400"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.01] text-white font-semibold rounded-xl transition-all duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    در حال ثبت‌نام...
+                  </div>
+                ) : (
+                  'ثبت‌نام'
+                )}
+              </button>
+            </form>
+
+            {/* Footer Links */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-500">
+                قبلاً ثبت‌نام کردید؟{' '}
+                <Link 
+                  href="./login" 
+                  className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition"
+                >
+                  ورود
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <p className="text-center text-[11px] text-gray-400/70 mt-6">
+            گروه فولادیار کوروش © ۱۴۰۵
+          </p>
         </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-blue-600 mb-2">
-              نام کامل
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="علی محمدی"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-blue-600 mb-2">
-              کد ملی
-            </label>
-            <input
-              type="text"
-              value={nationalId}
-              onChange={(e) => setNationalId(e.target.value)}
-              placeholder="۱۲۳۴"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-blue-600 mb-2">
-              تلفن
-            </label>
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="۰۹۱۲۱۲۳۴۵۶۷"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-blue-600 mb-2">
-              آدرس
-            </label>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="تهران، خیابان آزادی"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-blue-600 mb-2">
-              رمز عبور
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-blue-600 mb-2">
-              تکرار رمز عبور
-            </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-blue-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg transition"
-          >
-            {loading ? 'در حال ثبت‌نام...' : 'ثبت‌نام'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          قبلاً ثبت‌نام کردید؟{' '}
-          <Link href="./login" className="text-blue-600 hover:text-blue-700 font-medium">
-            ورود
-          </Link>
-        </p>
       </div>
     </div>
   );

@@ -29,12 +29,10 @@ export default function DashboardPage() {
     if (!currentUser) return;
     
     try {
-      // ۱. گرفتن حواله‌ها
       const res = await axios.get('http://localhost:4000/orders');
       const allOrders = res.data;
       const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
      
-      // ۲. گرفتن صورت‌برش‌ها
       const resInvoice = await axios.get('http://localhost:4000/invoice');
       const allInvoice = resInvoice.data;
       const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
@@ -43,12 +41,9 @@ export default function DashboardPage() {
       setOrders(userOrders);
       setFilteredOrders(userOrders);
 
-      // ۳. محاسبه وزن کل (وزن حواله - وزن صورت‌برش)
       const totalOrders = userOrders.length;
       
-      // محاسبه وزن کل با کم کردن وزن صورت‌برش‌ها
       const totalWeight = userOrders.reduce((sum, order) => {
-        // پیدا کردن صورت‌برش‌های این حواله
         const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
         const totalInvoiceWeight = orderInvoices.reduce((s, inv) => s + (inv.weight || 0), 0);
         return sum + (order.totalWeight - totalInvoiceWeight);
@@ -60,7 +55,7 @@ export default function DashboardPage() {
 
       setStats({
         totalOrders,
-        totalWeight,
+        totalWeight: Math.round(totalWeight),
         totalPrice,
         pendingOrders,
         shippedOrders
@@ -104,16 +99,17 @@ export default function DashboardPage() {
     router.push('./login');
   };
 
-  // تابع برای محاسبه وزن برش‌شده هر حواله
   const getInvoiceWeight = (orderId) => {
     const orderInvoices = invoices.filter((inv) => inv.orderId === orderId);
     const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
-    return totalInvoiceWeight;
+    return Math.round(totalInvoiceWeight);
   };
 
   if (!isAuthenticated) {
     return null;
   }
+
+  const totalOrdersWeight = orders.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
@@ -192,15 +188,17 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-500">کل حواله‌ها</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalOrders}</p>
             </div>
-   <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-  <p className="text-sm text-gray-500">وزن کل حواله‌ها</p>
-  <p className="text-2xl font-bold text-blue-600 mt-1">
-    {orders.reduce((sum, order) => sum + (order.totalWeight || 0), 0).toFixed(0)} kg
-  </p>
-</div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-              <p className="text-sm text-gray-500">مبلغ کل</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalPrice.toLocaleString()}</p>
+              <p className="text-sm text-gray-500">وزن کل حواله‌ها</p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">
+                {Math.round(totalOrdersWeight)} kg
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
+              <p className="text-sm text-gray-500">وزن باقی‌مانده</p>
+              <p className="text-2xl font-bold text-green-600 mt-1">
+                {Math.round(stats.totalWeight)} kg
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-yellow-200 hover:shadow-lg transition">
               <p className="text-sm text-yellow-600">در انتظار</p>
@@ -254,8 +252,8 @@ export default function DashboardPage() {
               <Link href="/orders" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
                 مشاهده همه →
               </Link>
-               <Link href="./invoices" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
-               صورت برش ها مشاهده  →
+              <Link href="./invoices" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
+                صورت برش ها مشاهده →
               </Link>
             </div>
           </div>
@@ -293,7 +291,7 @@ export default function DashboardPage() {
                 <tbody className="divide-y divide-gray-100">
                   {filteredOrders.slice(0, 10).map((order) => {
                     const invoiceWeight = getInvoiceWeight(order.id);
-                    const remainingWeight = order.totalWeight - invoiceWeight;
+                    const remainingWeight = Math.round(order.totalWeight - invoiceWeight);
                     
                     return (
                       <tr key={order.id} className="hover:bg-blue-50/50 transition">
@@ -306,13 +304,13 @@ export default function DashboardPage() {
                           {new Date(order.date).toLocaleDateString('fa-IR')}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 font-bold">
-                          {order.totalWeight} kg
+                          {Math.round(order.totalWeight)} kg
                         </td>
                         <td className="px-4 py-3 text-sm text-red-500 font-bold">
-                          {invoiceWeight.toFixed(2)} kg
+                          {invoiceWeight} kg
                         </td>
                         <td className="px-4 py-3 text-sm text-green-600 font-bold">
-                          {remainingWeight.toFixed(2)} kg
+                          {remainingWeight} kg
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 font-medium">
                           {order.finalPrice.toLocaleString()}

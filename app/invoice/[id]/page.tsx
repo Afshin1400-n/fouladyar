@@ -16,16 +16,23 @@ export default function InvoicePage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [invoiceData, setInvoiceData] = useState({
-    length: '',
-    width: '',
-    thickness: '',
-    quantity: '',
-    bundle: '',
-    weight: 0
-  });
   const [remainingWeight, setRemainingWeight] = useState(0);
   const [totalInvoiceWeight, setTotalInvoiceWeight] = useState(0);
+  
+  const [rows, setRows] = useState([
+    { id: 1, length: '', width: '', thickness: '', quantity: '', bundle: '', cutType: '' }
+  ]);
+
+  const cutTypes = [
+    { id: 'flat_thick', label: 'صاف ضخیم' },
+    { id: 'flat_thin', label: 'صاف نازک' },
+    { id: 'shutter_b', label: 'کرکره نوع B' },
+    { id: 'shutter_small', label: 'کرکره ریز' },
+    { id: 'trapezoidal', label: 'ذوزنقه' },
+    { id: 'corrugated', label: 'موجدار' },
+    { id: 'perforated', label: 'سوراخدار' },
+    { id: 'custom', label: 'سفارشی' },
+  ];
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -37,30 +44,28 @@ export default function InvoicePage() {
     const fetchOrder = async () => {
       try {
         const id = params.id;
-        console.log('🔍 ID from URL:', id);
         
         try {
           const res = await axios.get(`http://localhost:4000/orders/${id}`);
-          console.log('✅ Found by ID:', res.data);
           setOrder(res.data);
           
           if (res.data) {
-            // گرفتن صورت‌برش‌های این حواله
             const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${res.data.id}`);
             const orderInvoices = invoiceRes.data;
             const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
             
-            setTotalInvoiceWeight(totalInvoiceWeight);
-            setRemainingWeight((res.data.totalWeight || 0) - totalInvoiceWeight);
-            
-            setInvoiceData({
+            setTotalInvoiceWeight(Math.round(totalInvoiceWeight));
+            setRemainingWeight(Math.round((res.data.totalWeight || 0) - totalInvoiceWeight));
+
+            setRows([{
+              id: 1,
               length: res.data.length || '',
               width: res.data.width || '',
               thickness: res.data.thickness || '',
               quantity: res.data.quantity || '',
               bundle: '',
-              weight: 0
-            });
+              cutType: ''
+            }]);
           }
           
           setLoading(false);
@@ -74,27 +79,25 @@ export default function InvoicePage() {
         const foundOrder = allOrders.find((o) => o.orderNumber === id);
         
         if (foundOrder) {
-          console.log('✅ Found by orderNumber:', foundOrder);
           setOrder(foundOrder);
           
-          // گرفتن صورت‌برش‌های این حواله
           const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${foundOrder.id}`);
           const orderInvoices = invoiceRes.data;
           const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
           
-          setTotalInvoiceWeight(totalInvoiceWeight);
-          setRemainingWeight((foundOrder.totalWeight || 0) - totalInvoiceWeight);
-          
-          setInvoiceData({
+          setTotalInvoiceWeight(Math.round(totalInvoiceWeight));
+          setRemainingWeight(Math.round((foundOrder.totalWeight || 0) - totalInvoiceWeight));
+
+          setRows([{
+            id: 1,
             length: foundOrder.length || '',
             width: foundOrder.width || '',
             thickness: foundOrder.thickness || '',
             quantity: foundOrder.quantity || '',
             bundle: '',
-            weight: 0
-          });
+            cutType: ''
+          }]);
         } else {
-          console.log('❌ Order not found by ID or orderNumber');
           setOrder(null);
         }
         
@@ -110,21 +113,51 @@ export default function InvoicePage() {
     }
   }, [params.id, isAuthenticated]);
 
-  // محاسبه وزن
-  useEffect(() => {
-    const length = parseFloat(invoiceData.length) || 0;
-    const width = parseFloat(invoiceData.width) || 0;
-    const thickness = parseFloat(invoiceData.thickness) || 0;
-    const quantity = parseFloat(invoiceData.quantity) || 0;
+  const calculateRowWeight = (row) => {
+    const length = parseFloat(row.length) || 0;
+    const width = parseFloat(row.width) || 0;
+    const thickness = parseFloat(row.thickness) || 0;
+    const quantity = parseFloat(row.quantity) || 0;
     
     const density = 7.85;
-    const calculatedWeight = (length * width * thickness * density * quantity);
-    
-    setInvoiceData(prev => ({
-      ...prev,
-      weight: calculatedWeight
-    }));
-  }, [invoiceData.length, invoiceData.width, invoiceData.thickness, invoiceData.quantity]);
+    return Math.round(length * width * thickness * density * quantity);
+  };
+
+  const calculateTotalWeight = () => {
+    return rows.reduce((sum, row) => sum + calculateRowWeight(row), 0);
+  };
+
+  // ✅ محاسبه مجموع بندل‌ها
+  const calculateTotalBundle = () => {
+    return rows.reduce((sum, row) => sum + (parseFloat(row.bundle) || 0), 0);
+  };
+
+  const addRow = () => {
+    const newId = rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1;
+    setRows([...rows, { 
+      id: newId, 
+      length: order?.length || '', 
+      width: order?.width || '', 
+      thickness: order?.thickness || '', 
+      quantity: '', 
+      bundle: '', 
+      cutType: '' 
+    }]);
+  };
+
+  const removeRow = (id) => {
+    if (rows.length <= 1) {
+      alert('حداقل یک ردیف باید وجود داشته باشد');
+      return;
+    }
+    setRows(rows.filter(row => row.id !== id));
+  };
+
+  const updateRow = (id, field, value) => {
+    setRows(rows.map(row => 
+      row.id === id ? { ...row, [field]: value } : row
+    ));
+  };
 
   const handleLogout = () => {
     logout();
@@ -136,77 +169,87 @@ export default function InvoicePage() {
     setSubmitting(true);
 
     try {
-      const newWeight = parseFloat(invoiceData.weight) || 0;
-      const unitPrice = parseFloat(order.unitPrice) || 0;
-      const newPrice = newWeight * unitPrice;
-
-      if (newWeight <= 0) {
-        alert('❌ وزن باید بزرگتر از صفر باشد');
-        setSubmitting(false);
-        return;
-      }
-
-      if (newWeight > remainingWeight) {
-        alert(`❌ وزن وارد شده (${newWeight} kg) از وزن باقی‌مانده (${remainingWeight.toFixed(2)} kg) بیشتر است!`);
-        setSubmitting(false);
-        return;
-      }
-
-      const invoicePayload = {
-        id: `INV-${Date.now()}`,
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        customerId: order.customerId,
-        customerName: order.customerName,
-        date: new Date().toISOString(),
-        productType: order.productType,
-        brand: order.brand,
-        thickness: invoiceData.thickness || order.thickness,
-        width: invoiceData.width || order.width,
-        length: invoiceData.length || order.length,
-        quantity: invoiceData.quantity || order.quantity,
-        bundle: invoiceData.bundle || 0,
-        weight: newWeight,
-        unit: order.unit,
-        unitPrice: unitPrice,
-        totalPrice: newPrice,
-        status: 'صورت‌برش شده',
-        createdAt: new Date().toISOString()
-      };
-
-      await axios.post('http://localhost:4000/invoice', invoicePayload);
-
-      const currentWeight = parseFloat(order.totalWeight) || 0;
-      const currentPrice = parseFloat(order.totalPrice) || 0;
+      const totalWeight = calculateTotalWeight();
+      const totalBundle = calculateTotalBundle();
       
-      const newRemainingWeight = remainingWeight - newWeight;
-      const remainingPriceAfter = currentPrice - newPrice;
+      if (totalWeight <= 0) {
+        alert('❌ وزن کل باید بزرگتر از صفر باشد');
+        setSubmitting(false);
+        return;
+      }
 
-      // بروزرسانی حواله
-      const updatedOrder = await axios.patch(`http://localhost:4000/orders/${order.id}`, {
+      // ✅ بررسی مجموع بندل‌ها
+      if (totalBundle < 1) {
+        alert('❌ مجموع بندل‌ها باید حداقل 1 باشد');
+        setSubmitting(false);
+        return;
+      }
+
+      if (totalWeight > remainingWeight) {
+        alert(`❌ وزن کل (${totalWeight} kg) از وزن باقی‌مانده (${remainingWeight} kg) بیشتر است!`);
+        setSubmitting(false);
+        return;
+      }
+
+      for (const row of rows) {
+        const rowWeight = calculateRowWeight(row);
+        if (rowWeight <= 0) continue;
+        
+        const unitPrice = parseFloat(order.unitPrice) || 0;
+        const newPrice = rowWeight * unitPrice;
+
+        const invoicePayload = {
+          id: `INV-${Date.now()}-${row.id}`,
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          customerId: order.customerId,
+          customerName: order.customerName,
+          date: new Date().toISOString(),
+          productType: order.productType,
+          brand: order.brand,
+          thickness: row.thickness || order.thickness,
+          width: row.width || order.width,
+          length: row.length || order.length,
+          quantity: row.quantity || order.quantity,
+          bundle: row.bundle || 0,
+          weight: rowWeight,
+          unit: order.unit,
+          unitPrice: unitPrice,
+          totalPrice: newPrice,
+          cutType: row.cutType || 'standard',
+          status: 'صورت‌برش شده',
+          createdAt: new Date().toISOString()
+        };
+
+        await axios.post('http://localhost:4000/invoice', invoicePayload);
+      }
+
+      const newRemainingWeight = Math.round(remainingWeight - totalWeight);
+      const currentPrice = parseFloat(order.totalPrice) || 0;
+      const remainingPriceAfter = currentPrice - (totalWeight * parseFloat(order.unitPrice) || 0);
+
+      await axios.patch(`http://localhost:4000/orders/${order.id}`, {
         status: newRemainingWeight <= 0 ? 'تکمیل شده' : order.status,
         totalWeight: newRemainingWeight > 0 ? newRemainingWeight : 0,
         totalPrice: remainingPriceAfter > 0 ? remainingPriceAfter : 0,
         finalPrice: remainingPriceAfter > 0 ? remainingPriceAfter : 0,
         invoiceIssued: true,
-        invoiceNumber: invoicePayload.id,
+        invoiceNumber: `INV-${Date.now()}`,
         invoiceDate: new Date().toISOString()
       });
 
-      // به‌روزرسانی state
-      setOrder(updatedOrder.data);
       setRemainingWeight(newRemainingWeight > 0 ? newRemainingWeight : 0);
-      setTotalInvoiceWeight(totalInvoiceWeight + newWeight);
+      setTotalInvoiceWeight(Math.round(totalInvoiceWeight + totalWeight));
       
-      // ریست کردن فرم
-      setInvoiceData({
-        length: '',
-        width: '',
-        thickness: invoiceData.thickness || order.thickness,
-        quantity: '',
-        bundle: '',
-        weight: 0
-      });
+      setRows([{ 
+        id: 1, 
+        length: order.length || '', 
+        width: order.width || '', 
+        thickness: order.thickness || '', 
+        quantity: '', 
+        bundle: '', 
+        cutType: '' 
+      }]);
 
       setSubmitting(false);
       setShowModal(false);
@@ -214,7 +257,7 @@ export default function InvoicePage() {
       if (newRemainingWeight <= 0) {
         alert('✅ صورت‌برش با موفقیت ثبت شد و حواله تکمیل گردید!');
       } else {
-        alert(`✅ صورت‌برش با موفقیت ثبت شد! وزن باقی‌مانده: ${newRemainingWeight.toFixed(2)} kg`);
+        alert(`✅ صورت‌برش با موفقیت ثبت شد! وزن باقی‌مانده: ${newRemainingWeight} kg`);
       }
       
       router.refresh();
@@ -263,6 +306,9 @@ export default function InvoicePage() {
     );
   }
 
+  const totalWeight = calculateTotalWeight();
+  const totalBundle = calculateTotalBundle();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
       <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
@@ -297,8 +343,8 @@ export default function InvoicePage() {
           <div className="border-b border-gray-200 pb-6 mb-6">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">صورت‌برش</h2>
-                <p className="text-sm text-gray-500 mt-1">شماره حواله: {order.orderNumber}</p>
+                <h2 className="text-2xl font-bold text-blue-600">صورت‌برش</h2>
+                <p className="text-sm text-gray-500 mt-1">شماره حواله: <span className="text-blue-600">{order.orderNumber}</span></p>
               </div>
               <div className="text-left">
                 <p className="text-sm text-gray-500">تاریخ</p>
@@ -310,49 +356,48 @@ export default function InvoicePage() {
           </div>
 
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">جزئیات حواله</h3>
+            <h3 className="text-lg font-bold text-blue-600 mb-4">جزئیات حواله</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 rounded-xl p-4">
               <div>
                 <p className="text-sm text-gray-500">نوع محصول</p>
-                <p className="font-medium text-gray-900">{order.productType}</p>
+                <p className="font-medium text-blue-600">{order.productType}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">برند</p>
-                <p className="font-medium text-gray-900">{order.brand}</p>
+                <p className="font-medium text-blue-600">{order.brand}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">وزن کل</p>
-                <p className="font-medium text-gray-900">{order.totalWeight}</p>
+                <p className="font-medium text-blue-600">{Math.round(order.totalWeight)}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">واحد</p>
-                <p className="font-medium text-gray-900">{order.unit}</p>
+                <p className="font-medium text-blue-600">{order.unit}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">عرض</p>
-                <p className="font-medium text-gray-900">{order.width}</p>
+                <p className="font-medium text-blue-600">{order.width}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">ضخامت</p>
-                <p className="font-medium text-gray-900">{order.thickness}</p>
+                <p className="font-medium text-blue-600">{order.thickness}</p>
               </div>
             </div>
           </div>
 
-          {/* نمایش وزن باقی‌مونده */}
           <div className="border-t border-gray-200 pt-6 mt-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-xl p-4 text-center">
                 <p className="text-sm text-gray-500">وزن کل حواله</p>
-                <p className="text-2xl font-bold text-gray-900">{order.totalWeight} kg</p>
+                <p className="text-2xl font-bold text-blue-600">{Math.round(order.totalWeight)} kg</p>
               </div>
               <div className="bg-blue-50 rounded-xl p-4 text-center">
                 <p className="text-sm text-gray-500">وزن باقی‌مانده قابل برش</p>
-                <p className="text-2xl font-bold text-blue-600">{remainingWeight.toFixed(2)} kg</p>
+                <p className="text-2xl font-bold text-blue-600">{remainingWeight} kg</p>
               </div>
             </div>
             <div className="mt-2 text-center">
-              <p className="text-sm text-gray-400">مجموع وزن صورت‌برش‌های ثبت شده: {totalInvoiceWeight.toFixed(2)} kg</p>
+              <p className="text-sm text-gray-400">مجموع وزن صورت‌برش‌های ثبت شده: {totalInvoiceWeight} kg</p>
             </div>
           </div>
 
@@ -399,9 +444,9 @@ export default function InvoicePage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">ثبت صورت‌برش</h2>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-blue-600">ثبت صورت‌برش</h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-gray-600 text-2xl"
@@ -412,87 +457,139 @@ export default function InvoicePage() {
 
             <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center">
               <p className="text-sm text-gray-500">وزن باقی‌مانده قابل برش</p>
-              <p className="text-lg font-bold text-blue-600">{remainingWeight.toFixed(2)} kg</p>
+              <p className="text-lg font-bold text-blue-600">{remainingWeight} kg</p>
+              <p className="text-sm text-gray-500 mt-1">وزن کل انتخاب شده: <span className="text-blue-600 font-bold">{totalWeight} kg</span></p>
+              <p className="text-sm text-gray-500 mt-1">مجموع بندل‌ها: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
             </div>
 
             <form onSubmit={handleInvoiceSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">تعداد</label>
-                  <input
-                    type="number"
-                    value={invoiceData.quantity}
-                    onChange={(e) => setInvoiceData({...invoiceData, quantity: e.target.value})}
-                    placeholder="تعداد"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">تعداد بندل</label>
-                  <input
-                    type="number"
-                    value={invoiceData.bundle}
-                    onChange={(e) => setInvoiceData({...invoiceData, bundle: e.target.value})}
-                    placeholder="تعداد بندل"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">طول (متر)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={invoiceData.length}
-                    onChange={(e) => setInvoiceData({...invoiceData, length: e.target.value})}
-                    placeholder="طول"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">عرض (متر)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={invoiceData.width}
-                    onChange={(e) => setInvoiceData({...invoiceData, width: e.target.value})}
-                    placeholder="عرض"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">ضخامت (میلی‌متر)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={invoiceData.thickness}
-                    onChange={(e) => setInvoiceData({...invoiceData, thickness: e.target.value})}
-                    placeholder="ضخامت"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    readOnly
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">وزن (کیلوگرم)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={invoiceData.weight.toFixed(2)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-                    readOnly
-                  />
-                </div>
+              <div className="overflow-x-auto max-h-[50vh] overflow-y-auto">
+                <table className="w-full border-collapse min-w-[800px]">
+                  <thead className="sticky top-0 bg-white z-10">
+                    <tr className="bg-blue-50">
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[35px]">ردیف</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[150px]">نوع برش</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">تعداد</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">بندل</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">طول</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">عرض</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">ضخامت</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[60px]">وزن</th>
+                      <th className="px-3 py-2 text-center text-sm font-medium text-blue-600 w-[40px]">عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row, index) => {
+                      const rowWeight = calculateRowWeight(row);
+                      return (
+                        <tr key={row.id} className="border-b border-gray-100 hover:bg-blue-50/30">
+                          <td className="px-3 py-2 text-center text-sm text-blue-600 font-bold">{index + 1}</td>
+                          <td className="px-3 py-2">
+                            <select
+                              value={row.cutType}
+                              onChange={(e) => updateRow(row.id, 'cutType', e.target.value)}
+                              className="w-full px-2 py-2 text-sm bg-white border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600"
+                              required
+                            >
+                              <option value="">انتخاب...</option>
+                              {cutTypes.map((type) => (
+                                <option key={type.id} value={type.id}>{type.label}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="px-3 py-2">
+                            <input
+                              type="number"
+                              step="1"
+                              min={1}
+                              value={row.quantity}
+                              onChange={(e) => updateRow(row.id, 'quantity', e.target.value)}
+                              placeholder="0"
+                              className="w-full px-2 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600 text-center"
+                            />
+                          </td>
+                          <td className="px-3 py-2">
+                            <input
+                              type="number"
+                              step="1"
+                              min={0}
+                              value={row.bundle}
+                              onChange={(e) => updateRow(row.id, 'bundle', e.target.value)}
+                              placeholder="0"
+                              className="w-full px-2 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600 text-center"
+                            />
+                          </td>
+                          <td className="px-3 py-2">
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={row.length}
+                              onChange={(e) => updateRow(row.id, 'length', e.target.value)}
+                              placeholder="0"
+                              className="w-full px-2 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600 text-center"
+                            />
+                          </td>
+                          <td className="px-3 py-2">
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={row.width}
+                              onChange={(e) => updateRow(row.id, 'width', e.target.value)}
+                              placeholder="0"
+                              className="w-full px-2 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600 text-center bg-gray-50"
+                              readOnly
+                            />
+                          </td>
+                          <td className="px-3 py-2">
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={row.thickness}
+                              onChange={(e) => updateRow(row.id, 'thickness', e.target.value)}
+                              placeholder="0"
+                              className="w-full px-2 py-2 text-sm border border-blue-200 rounded-lg bg-blue-50 text-blue-600 cursor-not-allowed text-center"
+                              readOnly
+                            />
+                          </td>
+                          <td className="px-3 py-2 text-center font-bold text-blue-600">
+                            {rowWeight}
+                          </td>
+                          <td className="px-3 py-2 text-center">
+                            <button
+                              type="button"
+                              onClick={() => removeRow(row.id)}
+                              className="text-red-500 hover:text-red-700 text-sm font-bold px-2 py-1 rounded hover:bg-red-50 transition"
+                            >
+                              ✕
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <button
+                type="button"
+                onClick={addRow}
+                className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold rounded-lg transition border-2 border-dashed border-blue-300"
+              >
+                + اضافه کردن ردیف جدید
+              </button>
+
+              <div className="bg-blue-50 rounded-lg p-3 text-center border-2 border-blue-200">
+                <p className="text-sm text-gray-500">وزن کل انتخاب شده</p>
+                <p className="text-2xl font-bold text-blue-600">{totalWeight} kg</p>
+                <p className="text-sm text-gray-500 mt-1">مجموع بندل‌ها: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
               </div>
 
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  disabled={submitting || invoiceData.weight <= 0 || invoiceData.weight > remainingWeight}
+                  disabled={submitting || totalWeight <= 0 || totalWeight > remainingWeight || totalBundle < 1}
                   className={`flex-1 py-3 font-semibold rounded-lg transition ${
-                    submitting || invoiceData.weight <= 0 || invoiceData.weight > remainingWeight
+                    submitting || totalWeight <= 0 || totalWeight > remainingWeight || totalBundle < 1
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
@@ -507,9 +604,19 @@ export default function InvoicePage() {
                   انصراف
                 </button>
               </div>
-              {invoiceData.weight > remainingWeight && (
+              {totalWeight > remainingWeight && (
                 <p className="text-red-500 text-sm text-center">
-                  ⚠️ وزن وارد شده ({invoiceData.weight.toFixed(2)} kg) از وزن باقی‌مانده ({remainingWeight.toFixed(2)} kg) بیشتر است!
+                  ⚠️ وزن کل ({totalWeight} kg) از وزن باقی‌مانده ({remainingWeight} kg) بیشتر است!
+                </p>
+              )}
+              {totalWeight <= 0 && (
+                <p className="text-amber-500 text-sm text-center">
+                  ⚠️ لطفاً حداقل یک ردیف با وزن بیشتر از صفر وارد کنید
+                </p>
+              )}
+              {totalBundle < 1 && totalWeight > 0 && (
+                <p className="text-red-500 text-sm text-center">
+                  ⚠️ مجموع بندل‌ها باید حداقل 1 باشد (مقدار فعلی: {totalBundle})
                 </p>
               )}
             </form>
