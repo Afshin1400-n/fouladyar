@@ -50,9 +50,10 @@ export default function InvoicePage() {
           setOrder(res.data);
           
           if (res.data) {
+            // گرفتن صورت‌برش‌های این حواله (برای محاسبه وزن باقی‌مانده)
             const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${res.data.id}`);
             const orderInvoices = invoiceRes.data;
-            const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
+            const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
             
             setTotalInvoiceWeight(Math.round(totalInvoiceWeight));
             setRemainingWeight(Math.round((res.data.totalWeight || 0) - totalInvoiceWeight));
@@ -83,7 +84,7 @@ export default function InvoicePage() {
           
           const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${foundOrder.id}`);
           const orderInvoices = invoiceRes.data;
-          const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
+          const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
           
           setTotalInvoiceWeight(Math.round(totalInvoiceWeight));
           setRemainingWeight(Math.round((foundOrder.totalWeight || 0) - totalInvoiceWeight));
@@ -127,7 +128,6 @@ export default function InvoicePage() {
     return rows.reduce((sum, row) => sum + calculateRowWeight(row), 0);
   };
 
-  // ✅ محاسبه مجموع بندل‌ها
   const calculateTotalBundle = () => {
     return rows.reduce((sum, row) => sum + (parseFloat(row.bundle) || 0), 0);
   };
@@ -178,7 +178,6 @@ export default function InvoicePage() {
         return;
       }
 
-      // ✅ بررسی مجموع بندل‌ها
       if (totalBundle < 1) {
         alert('❌ مجموع بندل‌ها باید حداقل 1 باشد');
         setSubmitting(false);
@@ -191,20 +190,12 @@ export default function InvoicePage() {
         return;
       }
 
-      for (const row of rows) {
+      // ✅ ساخت یک invoice با چندین آیتم
+      const invoiceItems = rows.map((row, index) => {
         const rowWeight = calculateRowWeight(row);
-        if (rowWeight <= 0) continue;
-        
         const unitPrice = parseFloat(order.unitPrice) || 0;
-        const newPrice = rowWeight * unitPrice;
-
-        const invoicePayload = {
-          id: `INV-${Date.now()}-${row.id}`,
-          orderId: order.id,
-          orderNumber: order.orderNumber,
-          customerId: order.customerId,
-          customerName: order.customerName,
-          date: new Date().toISOString(),
+        return {
+          row: index + 1,
           productType: order.productType,
           brand: order.brand,
           thickness: row.thickness || order.thickness,
@@ -215,18 +206,35 @@ export default function InvoicePage() {
           weight: rowWeight,
           unit: order.unit,
           unitPrice: unitPrice,
-          totalPrice: newPrice,
-          cutType: row.cutType || 'standard',
-          status: 'صورت‌برش شده',
-          createdAt: new Date().toISOString()
+          totalPrice: rowWeight * unitPrice,
+          cutType: row.cutType || 'standard'
         };
+      });
 
-        await axios.post('http://localhost:4000/invoice', invoicePayload);
-      }
+      const totalPrice = invoiceItems.reduce((sum, item) => sum + item.totalPrice, 0);
 
+      const invoicePayload = {
+        id: `INV-${Date.now()}`,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        customerId: order.customerId,
+        customerName: order.customerName,
+        date: new Date().toISOString(),
+        status: 'صورت‌برش شده',
+        items: invoiceItems,
+        totalItems: invoiceItems.length,
+        totalWeight: totalWeight,
+        totalPrice: totalPrice,
+        createdAt: new Date().toISOString()
+      };
+
+      // ✅ یک بار ذخیره کن
+      await axios.post('http://localhost:4000/invoice', invoicePayload);
+
+      // بروزرسانی حواله
       const newRemainingWeight = Math.round(remainingWeight - totalWeight);
       const currentPrice = parseFloat(order.totalPrice) || 0;
-      const remainingPriceAfter = currentPrice - (totalWeight * parseFloat(order.unitPrice) || 0);
+      const remainingPriceAfter = currentPrice - totalPrice;
 
       await axios.patch(`http://localhost:4000/orders/${order.id}`, {
         status: newRemainingWeight <= 0 ? 'تکمیل شده' : order.status,
@@ -234,7 +242,7 @@ export default function InvoicePage() {
         totalPrice: remainingPriceAfter > 0 ? remainingPriceAfter : 0,
         finalPrice: remainingPriceAfter > 0 ? remainingPriceAfter : 0,
         invoiceIssued: true,
-        invoiceNumber: `INV-${Date.now()}`,
+        invoiceNumber: invoicePayload.id,
         invoiceDate: new Date().toISOString()
       });
 
@@ -470,8 +478,8 @@ export default function InvoicePage() {
                       <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[35px]">ردیف</th>
                       <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[150px]">نوع برش</th>
                       <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">تعداد</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">بندل</th>
                       <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">طول</th>
+                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">بندل</th>
                       <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">عرض</th>
                       <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[55px]">ضخامت</th>
                       <th className="px-3 py-2 text-right text-sm font-medium text-blue-600 w-[60px]">وزن</th>
@@ -511,10 +519,9 @@ export default function InvoicePage() {
                           <td className="px-3 py-2">
                             <input
                               type="number"
-                              step="1"
-                              min={0}
-                              value={row.bundle}
-                              onChange={(e) => updateRow(row.id, 'bundle', e.target.value)}
+                              step="0.01"
+                              value={row.length}
+                              onChange={(e) => updateRow(row.id, 'length', e.target.value)}
                               placeholder="0"
                               className="w-full px-2 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600 text-center"
                             />
@@ -522,9 +529,10 @@ export default function InvoicePage() {
                           <td className="px-3 py-2">
                             <input
                               type="number"
-                              step="0.01"
-                              value={row.length}
-                              onChange={(e) => updateRow(row.id, 'length', e.target.value)}
+                              step="1"
+                              min={0}
+                              value={row.bundle}
+                              onChange={(e) => updateRow(row.id, 'bundle', e.target.value)}
                               placeholder="0"
                               className="w-full px-2 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-blue-600 text-center"
                             />

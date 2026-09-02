@@ -29,19 +29,18 @@ export default function InvoicesPage() {
       const res = await axios.get('http://localhost:4000/invoice');
       const allInvoices = res.data;
       
-      // فیلتر invoice های کاربر فعلی
       const userInvoices = allInvoices.filter((inv) => inv.customerId === currentUser.id);
       
       setInvoices(userInvoices);
       setFilteredInvoices(userInvoices);
 
       const totalInvoices = userInvoices.length;
-      const totalWeight = userInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
+      const totalWeight = userInvoices.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
       const totalPrice = userInvoices.reduce((sum, inv) => sum + (inv.totalPrice || 0), 0);
 
       setStats({
         totalInvoices,
-        totalWeight,
+        totalWeight: Math.round(totalWeight),
         totalPrice
       });
       setLoading(false);
@@ -89,7 +88,6 @@ export default function InvoicesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
-      {/* Header */}
       <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
@@ -144,9 +142,7 @@ export default function InvoicesPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Welcome */}
         <div className="mb-8 bg-gradient-to-l from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg">
           <h2 className="text-3xl font-bold">
             📄 لیست صورت‌برش‌های {currentUser?.name} 👋
@@ -154,7 +150,6 @@ export default function InvoicesPage() {
           <p className="text-blue-100 mt-1">مدیریت صورت‌برش‌های ثبت شده</p>
         </div>
 
-        {/* Stats Cards */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             {[1, 2, 3].map((i) => (
@@ -172,7 +167,7 @@ export default function InvoicesPage() {
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
               <p className="text-sm text-gray-500">وزن کل</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalWeight.toFixed(2)} kg</p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalWeight.toFixed(0)} kg</p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
               <p className="text-sm text-gray-500">مبلغ کل</p>
@@ -181,7 +176,6 @@ export default function InvoicesPage() {
           </div>
         )}
 
-        {/* Search Box */}
         <div className="mb-8">
           <div className="relative">
             <input
@@ -207,7 +201,6 @@ export default function InvoicesPage() {
           </div>
         </div>
 
-        {/* Invoices Table */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50/50">
             <h3 className="text-xl font-bold text-gray-900">📋 صورت‌برش‌ها</h3>
@@ -269,13 +262,13 @@ export default function InvoicesPage() {
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {new Date(invoice.date).toLocaleDateString('fa-IR')}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{invoice.weight?.toFixed(2) || 0} kg</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{Math.round(invoice.totalWeight || 0)} kg</td>
                       <td className="px-4 py-3 text-sm text-gray-900 font-medium">
                         {invoice.totalPrice?.toLocaleString() || 0}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <Link
-                          href={`/invoice/${invoice.orderNumber}`}
+                          href={`/invoice-view/${invoice.orderNumber}`}
                           className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
                         >
                           مشاهده
