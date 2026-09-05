@@ -1,5 +1,3 @@
-// src/app/dashboard/page.js
-
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -18,11 +16,12 @@ export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [stats, setStats] = useState({
-    totalOrders: 0,
+    totalOrdersLength: 0,
     totalWeight: 0,
-    totalPrice: 0,
-    pendingOrders: 0,
-    shippedOrders: 0
+    cutWeight: 0,
+    remainingWeight: 0,
+    totalInvoiceWeight: 0,
+    totalOrdersWeight: 0
   });
 
   const fetchOrders = async () => {
@@ -31,34 +30,38 @@ export default function DashboardPage() {
     try {
       const res = await axios.get('http://localhost:4000/orders');
       const allOrders = res.data;
+
+      // گرفتن حواله های مشتری
       const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
-     
+       
+
       const resInvoice = await axios.get('http://localhost:4000/invoice');
       const allInvoice = resInvoice.data;
+
+      // گرفتن صورت برش های مشتری
       const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
       
       setInvoices(userInvoice);
       setOrders(userOrders);
       setFilteredOrders(userOrders);
 
-      const totalOrders = userOrders.length;
+      const totalOrdersLength = userOrders.length;
       
-      const totalWeight = userOrders.reduce((sum, order) => {
-        const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
-        const totalInvoiceWeight = orderInvoices.reduce((s, inv) => s + (inv.weight || 0), 0);
-        return sum + (order.totalWeight - totalInvoiceWeight);
-      }, 0);
+      const totalOrdersWeight = userOrders.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
+      const totalInvoiceWeight = userInvoice.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
+      const remainingWeight = totalOrdersWeight - totalInvoiceWeight;
       
-      const totalPrice = userOrders.reduce((sum, o) => sum + (o.finalPrice || 0), 0);
+
       const pendingOrders = userOrders.filter(o => o.status === 'باز').length;
       const shippedOrders = userOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
 
       setStats({
-        totalOrders,
-        totalWeight: Math.round(totalWeight),
-        totalPrice,
+        totalOrdersLength,
+        totalWeight: Math.round(remainingWeight),
         pendingOrders,
-        shippedOrders
+        shippedOrders,
+        totalInvoiceWeight: Math.round(totalInvoiceWeight),
+        totalOrdersWeight: Math.round(totalOrdersWeight)
       });
       setLoading(false);
     } catch (error) {
@@ -79,6 +82,7 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, currentUser]);
 
+  // سرچ کردن و جستسجو کردن
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredOrders(orders);
@@ -87,8 +91,7 @@ export default function DashboardPage() {
         order.orderNumber?.includes(searchTerm) ||
         order.status?.includes(searchTerm) ||
         order.productType?.includes(searchTerm) ||
-        order.brand?.includes(searchTerm) ||
-        order.customerName?.includes(searchTerm)
+        order.brand?.includes(searchTerm)
       );
       setFilteredOrders(filtered);
     }
@@ -99,26 +102,17 @@ export default function DashboardPage() {
     router.push('./login');
   };
 
-  const getInvoiceWeight = (orderId) => {
-    const orderInvoices = invoices.filter((inv) => inv.orderId === orderId);
-    const totalInvoiceWeight = orderInvoices.reduce((sum, inv) => sum + (inv.weight || 0), 0);
-    return Math.round(totalInvoiceWeight);
-  };
 
   if (!isAuthenticated) {
     return null;
   }
 
-  const totalOrdersWeight = orders.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
+
       <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-              ف
-            </div>
             <h1 className="text-2xl font-bold text-gray-900">گروه فولادیار کوروش</h1>
           </div>
 
@@ -168,11 +162,7 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8 bg-gradient-to-l from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg">
-          <h2 className="text-3xl font-bold">سلام {currentUser?.name} 👋</h2>
-          <p className="text-blue-100 mt-1">به داشبورد مدیریت حواله خوش آمدید</p>
-        </div>
-
+    
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -186,31 +176,34 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
               <p className="text-sm text-gray-500">کل حواله‌ها</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalOrders}</p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalOrdersLength}</p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
               <p className="text-sm text-gray-500">وزن کل حواله‌ها</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">
-                {Math.round(totalOrdersWeight)} kg
+                {stats.totalOrdersWeight} kg
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-              <p className="text-sm text-gray-500">وزن باقی‌مانده</p>
+            <div className="bg-white rounded-xl shadow-md p-6 border border-red-200 hover:shadow-lg transition">
+              <p className="text-sm text-red-600">وزن برش شده</p>
+              <p className="text-2xl font-bold text-red-600 mt-1">
+                {stats.totalInvoiceWeight} kg
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-md p-6 border border-green-200 hover:shadow-lg transition">
+              <p className="text-sm text-green-600">وزن باقی‌مانده</p>
               <p className="text-2xl font-bold text-green-600 mt-1">
-                {Math.round(stats.totalWeight)} kg
+                {stats.totalWeight} kg
               </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-yellow-200 hover:shadow-lg transition">
               <p className="text-sm text-yellow-600">در انتظار</p>
               <p className="text-2xl font-bold text-yellow-600 mt-1">{stats.pendingOrders}</p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-green-200 hover:shadow-lg transition">
-              <p className="text-sm text-green-600">خارج شده</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">{stats.shippedOrders}</p>
-            </div>
           </div>
         )}
 
+{/* اینپوت جستجو */}
         <div className="mb-8">
           <div className="relative">
             <input
@@ -238,22 +231,15 @@ export default function DashboardPage() {
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50/50">
-            <h3 className="text-xl font-bold text-gray-900">📋 حواله‌های اخیر</h3>
+            <h3 className="text-xl font-bold text-gray-900">📋 حواله‌ها</h3>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
                 {filteredOrders.length} مورد
               </span>
-              <button
-                onClick={fetchOrders}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline"
-              >
-                🔄 بروزرسانی
-              </button>
-              <Link href="/orders" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
-                مشاهده همه →
-              </Link>
-              <Link href="./invoices" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
-                صورت برش ها مشاهده →
+      
+              <Link href="./invoices" className="text-blue-600 hover:text-blue-700
+               text-sm font-medium hover:underline">
+                صورت برش ها مشاهده 
               </Link>
             </div>
           </div>
@@ -276,44 +262,44 @@ export default function DashboardPage() {
               <table className="w-full">
                 <thead className="bg-gray-50/80">
                   <tr>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره حواله</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">نوع</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">برند</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">ضخامت</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عرض</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن کل</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن برش</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن باقی‌مونده</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">مبلغ</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وضعیت</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عملیات</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredOrders.slice(0, 10).map((order) => {
-                    const invoiceWeight = getInvoiceWeight(order.id);
-                    const remainingWeight = Math.round(order.totalWeight - invoiceWeight);
-                    
+                  {filteredOrders.map((order) => {
+                  
                     return (
                       <tr key={order.id} className="hover:bg-blue-50/50 transition">
+
+                       <td className="px-4 py-3 text-sm text-gray-500">
+                          {new Date(order.date).toLocaleDateString('fa-IR')}
+                        </td>
                         <td className="px-4 py-3 text-sm text-blue-600 font-bold">
                           {order.orderNumber}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900">{order.productType}</td>
                         <td className="px-4 py-3 text-sm text-gray-900">{order.brand}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">
-                          {new Date(order.date).toLocaleDateString('fa-IR')}
-                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{order.thickness}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{order.width}</td>
+                      
                         <td className="px-4 py-3 text-sm text-gray-900 font-bold">
                           {Math.round(order.totalWeight)} kg
                         </td>
                         <td className="px-4 py-3 text-sm text-red-500 font-bold">
-                          {invoiceWeight} kg
+                          {order.cutWeight} kg
                         </td>
                         <td className="px-4 py-3 text-sm text-green-600 font-bold">
-                          {remainingWeight} kg
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-900 font-medium">
-                          {order.finalPrice.toLocaleString()}
+                          {order.remainingWeight} kg
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
