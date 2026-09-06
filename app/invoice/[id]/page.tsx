@@ -49,8 +49,9 @@ export default function InvoicePage() {
         const foundOrder = allOrders.find((o) => o.orderNumber === id);
         
         if (foundOrder) {
+        
           setOrder(foundOrder);
-          
+        
           const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${foundOrder.id}`);
           const orderInvoices = invoiceRes.data;
           
@@ -142,6 +143,12 @@ export default function InvoicePage() {
       const totalWeightInvoices = calculateTotalWeight();
       const totalBundle = calculateTotalBundle();
       
+        if (order.remainingWeight <= 0) {
+        alert('❌ وزن باید بزرگتر از صفر باشد');
+        setSubmitting(false);
+        return;
+      }
+
       if (totalWeightInvoices <= 0) {
         alert('❌ وزن باید بزرگتر از صفر باشد');
         setSubmitting(false);
@@ -154,8 +161,8 @@ export default function InvoicePage() {
         return;
       }
 
-      if (totalWeightInvoices > remainingWeight) {
-        alert(`❌ وزن وارد شده (${totalWeightInvoices} kg) از وزن باقی‌مانده (${remainingWeight} kg) بیشتر است!`);
+      if (totalWeightInvoices > order.remainingWeight) {
+        alert(`❌ وزن وارد شده (${totalWeightInvoices} kg) از وزن باقی‌مانده (${order.remainingWeight} kg) بیشتر است!`);
         setSubmitting(false);
         return;
       }
@@ -379,9 +386,9 @@ const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
           <div className="border-t border-gray-200 pt-6 mt-6 flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => setShowModal(true)}
-              disabled={remainingWeight <= 0}
+              disabled={order.remainingWeight <= 0}
               className={`px-8 py-3 font-semibold rounded-xl transition shadow-md hover:shadow-lg ${
-                remainingWeight <= 0 
+                order.remainingWeight <= 0 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-green-600 hover:bg-green-700 text-white'
               }`}

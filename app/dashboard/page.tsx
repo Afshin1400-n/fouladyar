@@ -26,63 +26,68 @@ export default function DashboardPage() {
     totalOrdersWeight: 0
   });
 
-  const fetchOrders = async () => {
-    if (!currentUser) return;
+const fetchOrders = async () => {
+  if (!currentUser) return;
+  
+  try {
+    const res = await axios.get('http://localhost:4000/orders');
+    const allOrders = res.data;
+    const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
+
+    const resInvoice = await axios.get('http://localhost:4000/invoice');
+    const allInvoice = resInvoice.data;
+    const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
     
-    try {
-      // ۱. گرفتن حواله‌ها
-      const res = await axios.get('http://localhost:4000/orders');
-      const allOrders = res.data;
-      const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
+    setInvoices(userInvoice);
 
-      // ۲. گرفتن صورت‌برش‌ها
-      const resInvoice = await axios.get('http://localhost:4000/invoice');
-      const allInvoice = resInvoice.data;
-      const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
+    // ✅ محاسبه cutWeight و remainingWeight
+    const ordersWithCutWeight = userOrders.map((order) => {
+      const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
+      const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
       
-      setInvoices(userInvoice);
+      const remainingWeight = Math.round((order.totalWeight || 0) - totalCutWeight);
+      
+      return {
+        ...order,
+        cutWeight: Math.round(totalCutWeight),
+        remainingWeight: remainingWeight
+      };
+    });
 
-      // ۳. ✅ محاسبه cutWeight برای هر حواله از روی invoice‌ها
-      const ordersWithCutWeight = userOrders.map((order) => {
-        // پیدا کردن همه invoice های این حواله
-        const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
-        // جمع کردن وزن برش‌ها از totalWeightInvoices
-        const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
-        
-        return {
-          ...order,
-          cutWeight: Math.round(totalCutWeight),
-          remainingWeight: Math.round((order.totalWeight || 0) - totalCutWeight)
-        };
-      });
+    // ✅ بررسی وضعیت: اگه remainingWeight صفر یا کمتر بود → تکمیل شده
+    const finalOrders = ordersWithCutWeight.map((order) => {
+      if (order.remainingWeight <= 0) {
+        return { ...order, status: 'تکمیل شده' };
+      }
+      return order;
+    });
 
-      setOrders(ordersWithCutWeight);
-      setFilteredOrders(ordersWithCutWeight);
+    setOrders(finalOrders);
+    setFilteredOrders(finalOrders);
 
-      // ۴. محاسبه آمار
-      const totalOrdersLength = ordersWithCutWeight.length;
-      const totalOrdersWeight = ordersWithCutWeight.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
-      const totalInvoiceWeight = userInvoice.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
-      const remainingWeight = totalOrdersWeight - totalInvoiceWeight;
+    // محاسبه آمار
+    const totalOrdersLength = finalOrders.length;
+    const totalOrdersWeight = finalOrders.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
+    const totalInvoiceWeight = userInvoice.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
+    const remainingWeight = totalOrdersWeight - totalInvoiceWeight;
 
-      const pendingOrders = ordersWithCutWeight.filter(o => o.status === 'باز').length;
-      const shippedOrders = ordersWithCutWeight.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
+    const pendingOrders = finalOrders.filter(o => o.status === 'باز').length;
+    const shippedOrders = finalOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
 
-      setStats({
-        totalOrdersLength,
-        totalWeight: Math.round(remainingWeight),
-        pendingOrders,
-        shippedOrders,
-        totalInvoiceWeight: Math.round(totalInvoiceWeight),
-        totalOrdersWeight: Math.round(totalOrdersWeight)
-      });
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      setLoading(false);
-    }
-  };
-
+    setStats({
+      totalOrdersLength,
+      totalWeight: Math.round(remainingWeight),
+      pendingOrders,
+      shippedOrders,
+      totalInvoiceWeight: Math.round(totalInvoiceWeight),
+      totalOrdersWeight: Math.round(totalOrdersWeight)
+    });
+    setLoading(false);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    setLoading(false);
+  }
+};
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('./login');
