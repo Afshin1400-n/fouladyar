@@ -17,7 +17,6 @@ export default function InvoicePage() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [remainingWeight, setRemainingWeight] = useState(0);
-  const [totalInvoiceWeight, setTotalInvoiceWeight] = useState(0);
   
   const [rows, setRows] = useState([
     { id: 1, length: '', width: '', thickness: '', quantity: '', bundle: '', cutType: '' }
@@ -57,8 +56,7 @@ export default function InvoicePage() {
           
           const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
           const remaining = Math.round((foundOrder.totalWeight || 0) - totalCutWeight);
-          
-          setTotalInvoiceWeight(totalCutWeight);
+        
           setRemainingWeight(remaining);
 
           setRows([{
@@ -194,8 +192,13 @@ export default function InvoicePage() {
 
       await axios.post('http://localhost:4000/invoice', invoicePayload);
 
-      const newCutWeight = Math.round(totalInvoiceWeight + totalWeightInvoices);
-      const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
+      // قبل از PATCH، مقدار قبلی رو از دیتابیس بگیر
+const currentOrder = await axios.get(`http://localhost:4000/orders/${order.id}`);
+const currentCutWeight = currentOrder.data.cutWeight || 0;
+
+// مقدار جدید رو با قبلی جمع کن
+const newCutWeight = Math.round(currentCutWeight + totalWeightInvoices);
+const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
 
       // ✅ تعیین وضعیت جدید
       let newStatus = order.status;
@@ -217,7 +220,7 @@ export default function InvoicePage() {
       });
 
       setOrder(updatedOrder.data);
-      setTotalInvoiceWeight(newCutWeight);
+ 
       setRemainingWeight(newRemainingWeight);
       
       setRows([{ 
@@ -383,7 +386,7 @@ export default function InvoicePage() {
                   : 'bg-green-600 hover:bg-green-700 text-white'
               }`}
             >
-              {remainingWeight <= 0 ? '✅ تکمیل شده' : '📝 ثبت صورت‌برش'}
+              {order.remainingWeight <= 0 ? '✅ تکمیل شده' : '📝 ثبت صورت‌برش'}
             </button>
           </div>
         </div>
@@ -404,7 +407,7 @@ export default function InvoicePage() {
 
             <div className="mb-4 p-3 bg-green-50 rounded-lg text-center border-2 border-green-300">
               <p className="text-sm text-gray-500">وزن باقی‌مانده قابل برش</p>
-              <p className="text-2xl font-bold text-green-600">{remainingWeight} kg</p>
+              <p className="text-2xl font-bold text-green-600">{order.remainingWeight} kg</p>
               <p className="text-sm text-gray-500 mt-1">وزن کل انتخاب شده: <span className="text-blue-600 font-bold">{totalWeightInvoices} kg</span></p>
               <p className="text-sm text-gray-500 mt-1">مجموع بندل‌ها: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
             </div>
