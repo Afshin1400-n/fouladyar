@@ -36,23 +36,23 @@
       "customerId": "1",
       "customerName": "حسین گل محمدی",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "تکمیل شده",
+      "status": "صورت برش شده",
       "productType": "ورق سیاه",
       "brand": "مبارکه",
       "thickness": 0.5,
       "width": 1.25,
       "unit": "برگ",
       "totalWeight": 500,
-      "cutWeight": 26,
-      "remainingWeight": 474,
+      "cutWeight": 25,
+      "remainingWeight": 475,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1788577773452",
-      "invoiceDate": "2026-09-05T03:09:33.484Z",
+      "invoiceNumber": "INV-1788672458473",
+      "invoiceDate": "2026-09-06T05:27:38.494Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-08-15T00:00:00.000Z"
@@ -72,16 +72,16 @@
       "width": 1.25,
       "unit": "رول",
       "totalWeight": 1000,
-      "cutWeight": 10,
-      "remainingWeight": 990,
+      "cutWeight": 0,
+      "remainingWeight": 1000,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1788577849851",
-      "invoiceDate": "2026-09-05T03:10:49.881Z",
+      "invoiceNumber": "INV-1788666909049",
+      "invoiceDate": "2026-09-06T03:55:09.080Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-08-15T00:00:00.000Z"
@@ -117,30 +117,82 @@
   ],
   "invoice": [
     {
-      "id": "PsirwL_RpfY",
-      "orderId": "2",
-      "orderNumber": "140504123",
+      "id": "umelGgqvnhc",
+      "orderId": "1",
+      "orderNumber": "140505135",
       "customerId": "1",
       "customerName": "حسین گل محمدی",
-      "date": "2026-09-05T03:10:49.851Z",
+      "date": "2026-09-06T05:26:39.991Z",
       "status": "ثبت صورت برش",
       "items": [
         {
           "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
           "thickness": 0.5,
           "width": 1.25,
-          "length": "2",
+          "length": "0.25",
           "quantity": "1",
           "bundle": "1",
-          "weight": 10,
-          "cutType": "flat_thin"
+          "weight": 1,
+          "cutType": "flat_thick"
         }
       ],
       "totalItems": 1,
-      "totalWeightInvoices": 10,
-      "createdAt": "2026-09-05T03:10:49.851Z"
+      "totalWeightInvoices": 1,
+      "createdAt": "2026-09-06T05:26:39.991Z"
+    },
+    {
+      "id": "_gPlGI0QoR8",
+      "orderId": "1",
+      "orderNumber": "140505135",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "date": "2026-09-06T05:27:04.759Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "0.25",
+          "quantity": "9",
+          "bundle": "1",
+          "weight": 11,
+          "cutType": "shutter_small"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 11,
+      "createdAt": "2026-09-06T05:27:04.759Z"
+    },
+    {
+      "id": "ewSFFa8rB_4",
+      "orderId": "1",
+      "orderNumber": "140505135",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "date": "2026-09-06T05:27:38.473Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "0.25",
+          "quantity": "20",
+          "bundle": "1",
+          "weight": 25,
+          "cutType": "flat_thick"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 25,
+      "createdAt": "2026-09-06T05:27:38.473Z"
     }
   ],
   "users": [

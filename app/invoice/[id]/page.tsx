@@ -1,3 +1,5 @@
+// src/app/invoice/[id]/page.js
+
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -14,7 +16,8 @@ export default function InvoicePage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
+  const [remainingWeight, setRemainingWeight] = useState(0);
+  const [totalInvoiceWeight, setTotalInvoiceWeight] = useState(0);
   
   const [rows, setRows] = useState([
     { id: 1, length: '', width: '', thickness: '', quantity: '', bundle: '', cutType: '' }
@@ -38,17 +41,25 @@ export default function InvoicePage() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    
     const fetchOrder = async () => {
       try {
         const id = params.id;
-      
+        
         const allOrdersRes = await axios.get('http://localhost:4000/orders');
         const allOrders = allOrdersRes.data;
         const foundOrder = allOrders.find((o) => o.orderNumber === id);
         
         if (foundOrder) {
           setOrder(foundOrder);
+          
+          const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${foundOrder.id}`);
+          const orderInvoices = invoiceRes.data;
+          
+          const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
+          const remaining = Math.round((foundOrder.totalWeight || 0) - totalCutWeight);
+          
+          setTotalInvoiceWeight(totalCutWeight);
+          setRemainingWeight(remaining);
 
           setRows([{
             id: 1,
@@ -75,11 +86,7 @@ export default function InvoicePage() {
     }
   }, [params.id, isAuthenticated]);
 
-
-// وزن هر ردیف صورت برش
   const calculateRowWeight = (row) => {
-  console.log(row);
-  
     const length = parseFloat(row.length) || 0;
     const width = parseFloat(row.width) || 0;
     const thickness = parseFloat(row.thickness) || 0;
@@ -88,15 +95,15 @@ export default function InvoicePage() {
     const density = 7.85;
     return Math.round(length * width * thickness * density * quantity);
   };
-// وزن کل صورت برش
+
   const calculateTotalWeight = () => {
     return rows.reduce((sum, row) => sum + calculateRowWeight(row), 0);
   };
-// وزن کل بندل صورت برش
+
   const calculateTotalBundle = () => {
     return rows.reduce((sum, row) => sum + (parseFloat(row.bundle) || 0), 0);
   };
-// اضافه کردن ردیف
+
   const addRow = () => {
     const newId = rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1;
     setRows([...rows, { 
@@ -109,7 +116,7 @@ export default function InvoicePage() {
       cutType: '' 
     }]);
   };
-// حذف یک ردیف
+
   const removeRow = (id) => {
     if (rows.length <= 1) {
       alert('حداقل یک ردیف باید وجود داشته باشد');
@@ -117,7 +124,7 @@ export default function InvoicePage() {
     }
     setRows(rows.filter(row => row.id !== id));
   };
-// آپدیت کردن ردیف
+
   const updateRow = (id, field, value) => {
     setRows(rows.map(row => 
       row.id === id ? { ...row, [field]: value } : row
@@ -129,7 +136,6 @@ export default function InvoicePage() {
     router.push('/');
   };
 
-// ثبت صورت برش
   const handleInvoiceSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -150,16 +156,14 @@ export default function InvoicePage() {
         return;
       }
 
-      if (totalWeightInvoices > order.remainingWeight) {
+      if (totalWeightInvoices > remainingWeight) {
         alert(`❌ وزن وارد شده (${totalWeightInvoices} kg) از وزن باقی‌مانده (${remainingWeight} kg) بیشتر است!`);
         setSubmitting(false);
         return;
       }
-// آیتم صورت برش
+
       const invoiceItems = rows.map((row, index) => {
-      
         const rowWeight = calculateRowWeight(row);
-     
         return {
           row: index + 1,
           productType: order.productType,
@@ -173,8 +177,6 @@ export default function InvoicePage() {
           cutType: row.cutType || 'standard'
         };
       });
-
-
 
       const invoicePayload = {
         id: `INV-${Date.now()}`,
@@ -192,17 +194,32 @@ export default function InvoicePage() {
 
       await axios.post('http://localhost:4000/invoice', invoicePayload);
 
+      const newCutWeight = Math.round(totalInvoiceWeight + totalWeightInvoices);
+      const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
+
+      // ✅ تعیین وضعیت جدید
+      let newStatus = order.status;
+      if (newRemainingWeight < order.totalWeight) {
+        newStatus = 'صورت برش شده';
+      } else if (order.status === 'باز') {
+        newStatus = 'باز';
+      }else if(newRemainingWeight === 0){
+                newStatus = ' نکمیل شده';
+      }
+
       const updatedOrder = await axios.patch(`http://localhost:4000/orders/${order.id}`, {
-        status: order.remainingWeight <= 0 ? 'تکمیل شده' : order.status,
-        cutWeight: totalWeightInvoices,
-        remainingWeight: Math.round((order.totalWeight || 0) - totalWeightInvoices),
+        status: newStatus,
+        cutWeight: newCutWeight,
+        remainingWeight: newRemainingWeight,
         invoiceIssued: true,
         invoiceNumber: invoicePayload.id,
         invoiceDate: new Date().toISOString()
       });
 
       setOrder(updatedOrder.data);
-    
+      setTotalInvoiceWeight(newCutWeight);
+      setRemainingWeight(newRemainingWeight);
+      
       setRows([{ 
         id: 1, 
         length: order.length || '', 
@@ -216,10 +233,10 @@ export default function InvoicePage() {
       setSubmitting(false);
       setShowModal(false);
       
-      if (order.remainingWeight <= 0) {
+      if (newRemainingWeight <= 0) {
         alert('✅ صورت‌برش با موفقیت ثبت شد و حواله تکمیل گردید!');
       } else {
-        alert(`✅ صورت‌برش با موفقیت ثبت شد! وزن باقی‌مانده: ${order.remainingWeight} kg`);
+        alert(`✅ صورت‌برش با موفقیت ثبت شد! وزن باقی‌مانده: ${newRemainingWeight} kg`);
       }
       
       router.refresh();
@@ -356,39 +373,18 @@ export default function InvoicePage() {
             </div>
           </div>
 
-          {/* <div className="border-t border-gray-200 pt-6 mt-6">
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">وضعیت:</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                order.status === 'باز' ? 'bg-yellow-100 text-yellow-700' :
-                order.status === 'خارج شده' ? 'bg-green-100 text-green-700' :
-                order.status === 'صورت‌برش شده' || order.status === 'تکمیل شده' ? 'bg-purple-100 text-purple-700' :
-                'bg-gray-100 text-gray-700'
-              }`}>
-                {order.status}
-              </span>
-              {order.paid && (
-                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                  ✓ پرداخت شده
-                </span>
-              )}
-            </div>
-          </div> */}
-
           <div className="border-t border-gray-200 pt-6 mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-    
             <button
               onClick={() => setShowModal(true)}
-              disabled={order.remainingWeight <= 0}
+              disabled={remainingWeight <= 0}
               className={`px-8 py-3 font-semibold rounded-xl transition shadow-md hover:shadow-lg ${
-                order.remainingWeight <= 0 
+                remainingWeight <= 0 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-green-600 hover:bg-green-700 text-white'
               }`}
             >
-              {order.remainingWeight <= 0 ? '✅ تکمیل شده' : '📝 ثبت صورت‌برش'}
+              {remainingWeight <= 0 ? '✅ تکمیل شده' : '📝 ثبت صورت‌برش'}
             </button>
-
           </div>
         </div>
       </main>
@@ -408,11 +404,9 @@ export default function InvoicePage() {
 
             <div className="mb-4 p-3 bg-green-50 rounded-lg text-center border-2 border-green-300">
               <p className="text-sm text-gray-500">وزن باقی‌مانده قابل برش</p>
-              <p className="text-2xl font-bold text-green-600">{order.remainingWeight} kg</p>
-              <p className="text-sm text-gray-500 mt-1">وزن کل انتخاب شده: <span className="text-blue-600
-               font-bold">{totalWeightInvoices} kg</span></p>
-              <p className="text-sm text-gray-500 mt-1">مجموع بندل‌ها: <span className="text-blue-600
-               font-bold">{totalBundle}</span></p>
+              <p className="text-2xl font-bold text-green-600">{remainingWeight} kg</p>
+              <p className="text-sm text-gray-500 mt-1">وزن کل انتخاب شده: <span className="text-blue-600 font-bold">{totalWeightInvoices} kg</span></p>
+              <p className="text-sm text-gray-500 mt-1">مجموع بندل‌ها: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
             </div>
 
             <form onSubmit={handleInvoiceSubmit} className="space-y-4">
@@ -541,9 +535,9 @@ export default function InvoicePage() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  disabled={submitting || totalWeightInvoices <= 0 || totalWeightInvoices > order.remainingWeight || totalBundle < 1}
+                  disabled={submitting || totalWeightInvoices <= 0 || totalWeightInvoices > remainingWeight || totalBundle < 1}
                   className={`flex-1 py-3 font-semibold rounded-lg transition ${
-                    submitting || totalWeightInvoices <= 0 || totalWeightInvoices > order.remainingWeight || totalBundle < 1
+                    submitting || totalWeightInvoices <= 0 || totalWeightInvoices > remainingWeight || totalBundle < 1
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
@@ -558,9 +552,9 @@ export default function InvoicePage() {
                   انصراف
                 </button>
               </div>
-              {totalWeightInvoices > order.remainingWeight && (
+              {totalWeightInvoices > remainingWeight && (
                 <p className="text-red-500 text-sm text-center">
-                  ⚠️ وزن کل ({totalWeightInvoices} kg) از وزن باقی‌مانده ({order.remainingWeight} kg) بیشتر است!
+                  ⚠️ وزن کل ({totalWeightInvoices} kg) از وزن باقی‌مانده ({remainingWeight} kg) بیشتر است!
                 </p>
               )}
               {totalWeightInvoices <= 0 && (

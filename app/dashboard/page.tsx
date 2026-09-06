@@ -1,3 +1,5 @@
+// src/app/dashboard/page.js
+
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -28,32 +30,43 @@ export default function DashboardPage() {
     if (!currentUser) return;
     
     try {
+      // ۱. گرفتن حواله‌ها
       const res = await axios.get('http://localhost:4000/orders');
       const allOrders = res.data;
-
-      // گرفتن حواله های مشتری
       const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
-       
 
+      // ۲. گرفتن صورت‌برش‌ها
       const resInvoice = await axios.get('http://localhost:4000/invoice');
       const allInvoice = resInvoice.data;
-
-      // گرفتن صورت برش های مشتری
       const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
       
       setInvoices(userInvoice);
-      setOrders(userOrders);
-      setFilteredOrders(userOrders);
 
-      const totalOrdersLength = userOrders.length;
-      
-      const totalOrdersWeight = userOrders.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
-      const totalInvoiceWeight = userInvoice.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
+      // ۳. ✅ محاسبه cutWeight برای هر حواله از روی invoice‌ها
+      const ordersWithCutWeight = userOrders.map((order) => {
+        // پیدا کردن همه invoice های این حواله
+        const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
+        // جمع کردن وزن برش‌ها از totalWeightInvoices
+        const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
+        
+        return {
+          ...order,
+          cutWeight: Math.round(totalCutWeight),
+          remainingWeight: Math.round((order.totalWeight || 0) - totalCutWeight)
+        };
+      });
+
+      setOrders(ordersWithCutWeight);
+      setFilteredOrders(ordersWithCutWeight);
+
+      // ۴. محاسبه آمار
+      const totalOrdersLength = ordersWithCutWeight.length;
+      const totalOrdersWeight = ordersWithCutWeight.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
+      const totalInvoiceWeight = userInvoice.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
       const remainingWeight = totalOrdersWeight - totalInvoiceWeight;
-      
 
-      const pendingOrders = userOrders.filter(o => o.status === 'باز').length;
-      const shippedOrders = userOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
+      const pendingOrders = ordersWithCutWeight.filter(o => o.status === 'باز').length;
+      const shippedOrders = ordersWithCutWeight.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
 
       setStats({
         totalOrdersLength,
@@ -82,7 +95,6 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, currentUser]);
 
-  // سرچ کردن و جستسجو کردن
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredOrders(orders);
@@ -102,14 +114,12 @@ export default function DashboardPage() {
     router.push('./login');
   };
 
-
   if (!isAuthenticated) {
     return null;
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
-
       <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
@@ -162,7 +172,6 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-    
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -203,7 +212,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-{/* اینپوت جستجو */}
         <div className="mb-8">
           <div className="relative">
             <input
@@ -236,9 +244,7 @@ export default function DashboardPage() {
               <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
                 {filteredOrders.length} مورد
               </span>
-      
-              <Link href="./invoices" className="text-blue-600 hover:text-blue-700
-               text-sm font-medium hover:underline">
+              <Link href="./invoices" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
                 صورت برش ها مشاهده 
               </Link>
             </div>
@@ -277,11 +283,9 @@ export default function DashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {filteredOrders.map((order) => {
-                  
                     return (
                       <tr key={order.id} className="hover:bg-blue-50/50 transition">
-
-                       <td className="px-4 py-3 text-sm text-gray-500">
+                        <td className="px-4 py-3 text-sm text-gray-500">
                           {new Date(order.date).toLocaleDateString('fa-IR')}
                         </td>
                         <td className="px-4 py-3 text-sm text-blue-600 font-bold">
@@ -291,7 +295,6 @@ export default function DashboardPage() {
                         <td className="px-4 py-3 text-sm text-gray-900">{order.brand}</td>
                         <td className="px-4 py-3 text-sm text-gray-900">{order.thickness}</td>
                         <td className="px-4 py-3 text-sm text-gray-900">{order.width}</td>
-                      
                         <td className="px-4 py-3 text-sm text-gray-900 font-bold">
                           {Math.round(order.totalWeight)} kg
                         </td>
