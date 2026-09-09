@@ -36,6 +36,7 @@ export default function InvoiceDetailPage() {
     const fetchData = async () => {
       try {
         const orderNumber = params.orderNumber;
+     
         
         // گرفتن همه invoice ها
         const res = await axios.get('http://localhost:4000/invoice');
@@ -132,14 +133,7 @@ export default function InvoiceDetailPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 print:shadow-none print:border-none">
-          <div className="flex justify-end mb-6 print:hidden">
-            <button
-              onClick={handlePrint}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg flex items-center gap-2"
-            >
-              🖨️ چاپ
-            </button>
-          </div>
+       
 
           <div className="border-b-2 border-blue-600 pb-6 mb-6">
             <div className="flex justify-between items-start">
@@ -156,36 +150,24 @@ export default function InvoiceDetailPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-gray-50 rounded-xl p-6">
-            <div>
-              <p className="text-sm text-gray-500">نام مشتری</p>
-              <p className="text-lg font-bold text-gray-900">{invoice.customerName}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">شماره حواله</p>
-              <p className="text-lg font-bold text-blue-600">{invoice.orderNumber}</p>
-            </div>
-          </div>
-
           {/* مشخصات فنی */}
           <div className="mb-8">
-            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-3 mb-4">مشخصات فنی</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-sm text-gray-500">نوع محصول</p>
-                <p className="font-bold text-blue-600">{invoice.productType || '---'}</p>
+                <p className="text-sm text-gray-500"> نام مشتری</p>
+                <p className="font-bold text-blue-600">{invoice.customerName || '---'}</p>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-4 text-center">
+                <p className="text-sm text-gray-500">شماره حواله</p>
+                <p className="font-bold text-blue-600">{invoice.orderNumber || '---'}</p>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-4 text-center">
+                <p className="text-sm text-gray-500">نوع</p>
+                <p className="font-bold text-blue-600">{invoice.items[0].productType || '---'}</p>
               </div>
               <div className="bg-blue-50 rounded-xl p-4 text-center">
                 <p className="text-sm text-gray-500">برند</p>
-                <p className="font-bold text-blue-600">{invoice.brand || '---'}</p>
-              </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-sm text-gray-500">واحد</p>
-                <p className="font-bold text-blue-600">{invoice.unit || '---'}</p>
-              </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-sm text-gray-500">نوع برش</p>
-                <p className="font-bold text-blue-600">{getCutTypeLabel(invoice.cutType)}</p>
+                <p className="font-bold text-blue-600">{invoice.items[0].brand || '---'}</p>
               </div>
             </div>
           </div>
@@ -204,8 +186,8 @@ export default function InvoiceDetailPage() {
                       <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">طول</th>
                       <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">عرض</th>
                       <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">ضخامت</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">بندیل</th>
                       <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">وزن</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">قیمت</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -217,16 +199,16 @@ export default function InvoiceDetailPage() {
                         <td className="px-4 py-2 text-sm text-gray-900">{item.length} m</td>
                         <td className="px-4 py-2 text-sm text-gray-900">{item.width} m</td>
                         <td className="px-4 py-2 text-sm text-gray-900">{item.thickness} mm</td>
-                        <td className="px-4 py-2 text-sm font-bold text-blue-600">{item.weight} kg</td>
-                        <td className="px-4 py-2 text-sm font-bold text-gray-900">{item.totalPrice.toLocaleString()}</td>
+                        <td className="px-4 py-2 text-sm font-bold text-blue-600">{item.bundle || 0}</td>
+                        <td className="px-4 py-2 text-sm font-bold text-blue-600">{item.weight} kg</td>              
                       </tr>
                     ))}
                   </tbody>
                   <tfoot className="bg-gray-50">
                     <tr>
-                      <td colSpan="6" className="px-4 py-2 text-left font-bold text-gray-900">جمع کل</td>
-                      <td className="px-4 py-2 text-center font-bold text-blue-600">{invoice.totalWeight} kg</td>
-                      <td className="px-4 py-2 text-center font-bold text-green-600">{invoice.totalPrice.toLocaleString()}</td>
+                      <td colSpan="7" className="px-4 py-2 text-left font-bold text-gray-900">جمع کل</td>
+             <td className="px-4 py-2 text-center font-bold text-blue-600">{invoice.totalWeightInvoices} kg</td>
+            
                     </tr>
                   </tfoot>
                 </table>
@@ -234,22 +216,6 @@ export default function InvoiceDetailPage() {
             </div>
           )}
 
-          {/* خلاصه قیمت */}
-          <div className="mb-8">
-            <h3 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-3 mb-4">خلاصه قیمت</h3>
-            <div className="bg-gray-50 rounded-xl p-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <p className="text-sm text-gray-500">وزن کل</p>
-                  <p className="text-2xl font-bold text-blue-600">{Math.round(invoice.totalWeight || 0)} kg</p>
-                </div>
-                <div className="border-t border-gray-200 pt-4 col-span-2">
-                  <p className="text-sm text-gray-500">قیمت کل</p>
-                  <p className="text-3xl font-bold text-green-600">{invoice.totalPrice?.toLocaleString() || 0} ریال</p>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* وضعیت */}
           <div className="flex items-center gap-4 border-t border-gray-200 pt-6">
@@ -263,6 +229,14 @@ export default function InvoiceDetailPage() {
             <span className="text-sm text-gray-400">
               تاریخ ثبت: {new Date(invoice.createdAt).toLocaleString('fa-IR')}
             </span>
+          </div>
+             <div className="flex justify-end mb-6 print:hidden">
+            <button
+              onClick={handlePrint}
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg flex items-center gap-2"
+            >
+              🖨️ چاپ
+            </button>
           </div>
         </div>
       </main>

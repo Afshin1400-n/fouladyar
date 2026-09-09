@@ -19,7 +19,7 @@ export default function InvoicesPage() {
   const [stats, setStats] = useState({
     totalInvoices: 0,
     totalWeight: 0,
-    totalPrice: 0
+   
   });
 
   const fetchInvoices = async () => {
@@ -31,19 +31,19 @@ export default function InvoicesPage() {
       
       const userInvoices = allInvoices.filter((inv) => inv.customerId === currentUser.id);
       
-      console.log(userInvoices);
+      
       
       setInvoices(userInvoices);
       setFilteredInvoices(userInvoices);
 
       const totalInvoices = userInvoices.length;
       const totalWeight = userInvoices.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
-      const totalPrice = userInvoices.reduce((sum, inv) => sum + (inv.totalPrice || 0), 0);
+     
 
       setStats({
         totalInvoices,
         totalWeight: Math.round(totalWeight),
-        totalPrice
+        
       });
       setLoading(false);
     } catch (error) {
@@ -166,10 +166,7 @@ export default function InvoicesPage() {
               <p className="text-sm text-gray-500">وزن کل</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalWeight.toFixed(0)} kg</p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-              <p className="text-sm text-gray-500">مبلغ کل</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalPrice.toLocaleString()}</p>
-            </div>
+           
           </div>
         )}
 
