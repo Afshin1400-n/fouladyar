@@ -31,6 +31,8 @@ export default function InvoicesPage() {
       
       const userInvoices = allInvoices.filter((inv) => inv.customerId === currentUser.id);
       
+      console.log(userInvoices);
+      
       setInvoices(userInvoices);
       setFilteredInvoices(userInvoices);
 
@@ -143,12 +145,7 @@ export default function InvoicesPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8 bg-gradient-to-l from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg">
-          <h2 className="text-3xl font-bold">
-            📄 لیست صورت‌برش‌های {currentUser?.name} 👋
-          </h2>
-          <p className="text-blue-100 mt-1">مدیریت صورت‌برش‌های ثبت شده</p>
-        </div>
+    
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -239,33 +236,31 @@ export default function InvoicesPage() {
                 <thead className="bg-gray-50/80">
                   <tr>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره صورت‌برش</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ ثبت برش</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره حواله</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">نوع</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">برند</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تعداد ابعاد</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">مبلغ</th>
                     <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عملیات</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {filteredInvoices.slice(0, 20).map((invoice) => (
                     <tr key={invoice.id} className="hover:bg-blue-50/50 transition">
+                      
                       <td className="px-4 py-3 text-sm text-purple-600 font-bold">
                         {invoice.invoiceNumber || invoice.id}
+                      </td>
+                           <td className="px-4 py-3 text-sm text-gray-500">
+                        {new Date(invoice.date).toLocaleDateString('fa-IR')}
                       </td>
                       <td className="px-4 py-3 text-sm text-blue-600 font-bold">
                         {invoice.orderNumber}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{invoice.productType}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{invoice.brand}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {new Date(invoice.date).toLocaleDateString('fa-IR')}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{Math.round(invoice.totalWeight || 0)} kg</td>
-                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">
-                        {invoice.totalPrice?.toLocaleString() || 0}
-                      </td>
+                     
+                      <td className="px-4 py-3 text-sm text-gray-900">{invoice.totalItems}</td>
+                 
+                      <td className="px-4 py-3 text-sm text-gray-900">{Math.round(invoice.totalWeightInvoices || 0)} kg</td>
+                  
                       <td className="px-4 py-3 text-sm">
                         <Link
                           href={`/invoice-view/${invoice.orderNumber}`}
