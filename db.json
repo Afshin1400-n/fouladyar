@@ -72,16 +72,16 @@
       "width": 1.25,
       "unit": "رول",
       "totalWeight": 1000,
-      "cutWeight": 294,
-      "remainingWeight": 706,
+      "cutWeight": 319,
+      "remainingWeight": 681,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1788932726689",
-      "invoiceDate": "2026-09-09T05:45:26.720Z",
+      "invoiceNumber": "INV-1789108224868",
+      "invoiceDate": "2026-09-11T06:30:24.923Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-08-15T00:00:00.000Z"
@@ -179,6 +179,32 @@
       "totalItems": 1,
       "totalWeightInvoices": 294,
       "createdAt": "2026-09-09T05:45:26.689Z"
+    },
+    {
+      "id": "jcnhyZo0DkQ",
+      "orderId": "2",
+      "orderNumber": "140504123",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "date": "2026-09-11T06:30:24.868Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سرد",
+          "brand": "چین",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "5",
+          "quantity": "1",
+          "bundle": "1",
+          "weight": 25,
+          "cutType": "shutter_b"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 25,
+      "createdAt": "2026-09-11T06:30:24.868Z"
     }
   ],
   "users": [

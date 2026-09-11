@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import useStore from './store/store';
-import { Building2, Package, FileText, Users, Sparkles, ArrowRight } from 'lucide-react';
+import { Building2, Package, FileText, Users, Sparkles, UserCircle, ShieldCheck } from 'lucide-react';
 
 export default function HomePage() {
   const { isAuthenticated } = useStore();
@@ -68,25 +68,53 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 max-w-md w-full">
+        {/* 🎯 دو دکمه ورود: مشتریان + کارمندان */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl w-full">
+
+          {/* ورود مشتریان */}
           <Link
             href="/login"
-            className="group flex items-center justify-center gap-2 flex-1 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] transition-all duration-200 text-sm"
+            className="group relative bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-right"
           >
-            ورود به حساب
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <UserCircle className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">
+                  ورود مشتریان
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  مشاهده حواله‌ها، صورت‌برش‌ها و سابقه سفارشات
+                </p>
+              </div>
+            </div>
           </Link>
+
+          {/* ورود کارمندان */}
           <Link
-            href="/register"
-            className="flex-1 px-8 py-3.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 hover:shadow-md transition-all duration-200 text-center border border-gray-200 text-sm"
+            href="/adminLogin"
+            className="group relative bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 text-right"
           >
-            ثبت‌نام
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <ShieldCheck className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition">
+                  ورود کارمندان
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  دسترسی به پنل مدیریت و ابزارهای سیستم
+                </p>
+              </div>
+            </div>
           </Link>
+
         </div>
 
-        {/* Divider with decorative line */}
-        <div className="flex items-center gap-4 mt-10 mb-4">
+        {/* Divider */}
+        <div className="flex items-center gap-4 mt-10 mb-4 max-w-2xl w-full">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent to-gray-200" />
           <span className="text-xs text-gray-400 font-light">گروه فولادیار کوروش</span>
           <div className="h-px flex-1 bg-gradient-to-l from-transparent to-gray-200" />
