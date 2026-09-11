@@ -43,19 +43,19 @@
       "width": 1.25,
       "unit": "برگ",
       "totalWeight": 500,
-      "cutWeight": 123,
-      "remainingWeight": 377,
+      "cutWeight": 186,
+      "remainingWeight": 314,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1788932702598",
-      "invoiceDate": "2026-09-09T05:45:02.628Z",
+      "invoiceNumber": "INV-1789110055761",
+      "invoiceDate": "2026-09-11T07:00:55.815Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
-      "updatedAt": "2026-08-15T00:00:00.000Z"
+      "updatedAt": "2026-09-11T07:00:27.791Z"
     },
     {
       "id": "2",
@@ -65,26 +65,26 @@
       "customerPhone": "09121234567",
       "customerAddress": "تهران، خیابان آزادی، پلاک ۱۲",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "صورت برش شده",
+      "status": "تکمیل شده",
       "productType": "ورق سرد",
       "brand": "چین",
       "thickness": 0.5,
       "width": 1.25,
       "unit": "رول",
       "totalWeight": 1000,
-      "cutWeight": 319,
-      "remainingWeight": 681,
+      "cutWeight": 971,
+      "remainingWeight": 29,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1789108224868",
-      "invoiceDate": "2026-09-11T06:30:24.923Z",
+      "invoiceNumber": "INV-1789110117355",
+      "invoiceDate": "2026-09-11T07:01:57.393Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
-      "updatedAt": "2026-08-15T00:00:00.000Z"
+      "updatedAt": "2026-09-11T07:02:20.954Z"
     },
     {
       "id": "3",
@@ -94,7 +94,7 @@
       "customerPhone": "09129876543",
       "customerAddress": "اصفهان، خیابان امام، پلاک ۴۵",
       "date": "2026-08-16T00:00:00.000Z",
-      "status": "خارج شده",
+      "status": "باز",
       "productType": "میلگرد",
       "brand": "ذوب آهن",
       "diameter": 16,
@@ -117,12 +117,39 @@
   ],
   "invoice": [
     {
-      "id": "gMX38uTyKXk",
+      "id": "NIMLwjFZOMI",
       "orderId": "1",
       "orderNumber": "140505135",
       "customerId": "1",
       "customerName": "حسین گل محمدی",
-      "date": "2026-09-09T05:45:02.598Z",
+      "date": "2026-09-11T06:51:50.217Z",
+      "status": "ثبت نهایی",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "3",
+          "quantity": "10",
+          "bundle": "1",
+          "weight": 147,
+          "cutType": "flat_thin"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 147,
+      "createdAt": "2026-09-11T06:51:50.217Z",
+      "finalizedAt": "2026-09-11T07:00:27.835Z"
+    },
+    {
+      "id": "lZEMYmWiMWY",
+      "orderId": "1",
+      "orderNumber": "140505135",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "date": "2026-09-11T07:00:55.761Z",
       "status": "ثبت صورت برش",
       "items": [
         {
@@ -132,36 +159,24 @@
           "thickness": 0.5,
           "width": 1.25,
           "length": "2",
-          "quantity": "10",
-          "bundle": "1",
-          "weight": 98,
+          "quantity": "4",
+          "bundle": "2",
+          "weight": 39,
           "cutType": "flat_thin"
-        },
-        {
-          "row": 2,
-          "productType": "ورق سیاه",
-          "brand": "مبارکه",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "1",
-          "quantity": "5",
-          "bundle": "",
-          "weight": 25,
-          "cutType": "shutter_small"
         }
       ],
-      "totalItems": 2,
-      "totalWeightInvoices": 123,
-      "createdAt": "2026-09-09T05:45:02.598Z"
+      "totalItems": 1,
+      "totalWeightInvoices": 39,
+      "createdAt": "2026-09-11T07:00:55.761Z"
     },
     {
-      "id": "ZyEpdkczBvE",
+      "id": "dVGoGLZTrB0",
       "orderId": "2",
       "orderNumber": "140504123",
       "customerId": "1",
       "customerName": "حسین گل محمدی",
-      "date": "2026-09-09T05:45:26.689Z",
-      "status": "ثبت صورت برش",
+      "date": "2026-09-11T07:01:57.355Z",
+      "status": "ثبت نهایی",
       "items": [
         {
           "row": 1,
@@ -169,42 +184,17 @@
           "brand": "چین",
           "thickness": 0.5,
           "width": 1.25,
-          "length": "3",
-          "quantity": "20",
+          "length": "1.5",
+          "quantity": "132",
           "bundle": "1",
-          "weight": 294,
-          "cutType": "shutter_b"
+          "weight": 971,
+          "cutType": "trapezoidal"
         }
       ],
       "totalItems": 1,
-      "totalWeightInvoices": 294,
-      "createdAt": "2026-09-09T05:45:26.689Z"
-    },
-    {
-      "id": "jcnhyZo0DkQ",
-      "orderId": "2",
-      "orderNumber": "140504123",
-      "customerId": "1",
-      "customerName": "حسین گل محمدی",
-      "date": "2026-09-11T06:30:24.868Z",
-      "status": "ثبت صورت برش",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "5",
-          "quantity": "1",
-          "bundle": "1",
-          "weight": 25,
-          "cutType": "shutter_b"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 25,
-      "createdAt": "2026-09-11T06:30:24.868Z"
+      "totalWeightInvoices": 971,
+      "createdAt": "2026-09-11T07:01:57.355Z",
+      "finalizedAt": "2026-09-11T07:02:20.985Z"
     }
   ],
   "users": [
@@ -214,13 +204,6 @@
       "nationalId": "1234",
       "password": "1234",
       "role": "admin"
-    },
-    {
-      "id": "2",
-      "name": "علی رضایی",
-      "nationalId": "5678",
-      "password": "5678",
-      "role": "user"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

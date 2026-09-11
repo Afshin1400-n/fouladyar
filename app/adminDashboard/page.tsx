@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import axios from 'axios';
 import useStore from '../store/store';
 import {
   Shield,
@@ -16,12 +17,37 @@ import {
   BarChart3,
   Phone,
   MapPin,
-  CreditCard,
   TrendingUp,
   Clock,
   CheckCircle2,
   Home,
+  X,
+  Eye,
+  ClipboardList,
+  AlertCircle,
+  Save,
+  Archive,
 } from 'lucide-react';
+
+// ============ نام فارسی انواع برش ============
+const CUT_TYPE_LABELS = {
+  flat_thin: 'ورق صاف نازک',
+  flat_thick: 'ورق صاف ضخیم',
+  shutter_small: 'کرکره کوچک',
+  shutter_big: 'کرکره بزرگ',
+  shutter_a: 'کرکره A',
+  shutter_b: 'کرکره B',
+  shutter_c: 'کرکره C',
+  bend: 'خم',
+  cut: 'برش ساده',
+  custom: 'سفارشی',
+};
+
+const getCutTypeLabel = (cutType) => {
+  return CUT_TYPE_LABELS[cutType] || cutType || '---';
+};
+
+// ============ کامپوننت اصلی ============
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -36,13 +62,14 @@ export default function AdminDashboardPage() {
     fetchAdminData,
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState('customers'); // customers | orders
+  const [activeTab, setActiveTab] = useState('customers'); // customers | invoices | archive
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   // محافظت از صفحه
   useEffect(() => {
     if (!isAdminAuthenticated) {
-      router.push('/admin/login');
+      router.push('/adminLogin');
     }
   }, [isAdminAuthenticated, router]);
 
@@ -55,14 +82,53 @@ export default function AdminDashboardPage() {
 
   const handleLogout = () => {
     adminLogout();
-    router.push('/admin/login');
+    router.push('/adminLogin');
+  };
+
+  // ✅ ثبت نهایی صورت‌برش
+  const handleFinalizeInvoice = async (invoice, order) => {
+    const totalCutWeight = invoice.totalWeightInvoices || 0;
+    const orderWeight = order?.totalWeight || 0;
+    const remaining = Math.round(orderWeight - totalCutWeight);
+
+    const newStatus = remaining <= 50 ? 'تکمیل شده' : 'باز';
+
+    try {
+      // ۱. آپدیت وضعیت حواله
+      await axios.put(`http://localhost:4000/orders/${order.id}`, {
+        ...order,
+        status: newStatus,
+        remainingWeight: remaining,
+        updatedAt: new Date().toISOString(),
+      });
+
+      // ۲. آپدیت وضعیت صورت‌برش → ثبت نهایی (میره بایگانی)
+      await axios.put(`http://localhost:4000/invoice/${invoice.id}`, {
+        ...invoice,
+        status: 'ثبت نهایی',
+        finalizedAt: new Date().toISOString(),
+      });
+
+      // ۳. رفرش دیتا
+      await fetchAdminData();
+      setSelectedInvoice(null);
+
+      alert(
+        remaining <= 50
+          ? `✅ حواله ${order.orderNumber} تکمیل شد و به بایگانی منتقل شد!`
+          : `✅ صورت‌برش ثبت نهایی شد و به بایگانی منتقل شد.`
+      );
+    } catch (error) {
+      console.error('Error finalizing invoice:', error);
+      alert('❌ خطا در ثبت نهایی');
+    }
   };
 
   if (!isAdminAuthenticated) return null;
 
   // 📊 محاسبه آمار
   const totalCustomers = allCustomers.length;
-  const totalOrders = allOrders.length;
+  const totalInvoices = allInvoices.filter((inv) => inv.status !== 'ثبت نهایی').length;
   const totalOrdersWeight = allOrders.reduce(
     (sum, o) => sum + (o.totalWeight || 0),
     0
@@ -81,14 +147,29 @@ export default function AdminDashboardPage() {
       c.phone?.includes(searchTerm)
   );
 
-  // 🔍 فیلتر حواله‌ها
-  const filteredOrders = allOrders.filter(
-    (o) =>
-      o.orderNumber?.includes(searchTerm) ||
-      o.customerName?.includes(searchTerm) ||
-      o.productType?.includes(searchTerm) ||
-      o.brand?.includes(searchTerm) ||
-      o.status?.includes(searchTerm)
+  // 📦 صورت‌برش‌های فعال (هنوز ثبت نهایی نشدن)
+  const activeInvoices = allInvoices.filter(
+    (inv) => inv.status !== 'ثبت نهایی'
+  );
+
+  // 📚 صورت‌برش‌های بایگانی (ثبت نهایی شدن)
+  const archivedInvoices = allInvoices.filter(
+    (inv) => inv.status === 'ثبت نهایی'
+  );
+
+  // 🔍 فیلتر روی اکتیو
+  const filteredInvoices = activeInvoices.filter(
+    (inv) =>
+      inv.orderNumber?.includes(searchTerm) ||
+      inv.customerName?.includes(searchTerm) ||
+      inv.status?.includes(searchTerm)
+  );
+
+  // 🔍 فیلتر روی بایگانی
+  const filteredArchived = archivedInvoices.filter(
+    (inv) =>
+      inv.orderNumber?.includes(searchTerm) ||
+      inv.customerName?.includes(searchTerm)
   );
 
   return (
@@ -147,7 +228,7 @@ export default function AdminDashboardPage() {
             سلام ادمین {adminUser?.name} 👋
           </h2>
           <p className="text-indigo-100 text-sm">
-            اینجا می‌تونی همه مشتری‌ها، حواله‌ها و آمار سیستم رو ببینی.
+            اینجا می‌تونی همه مشتری‌ها، صورت‌برش‌ها و آمار سیستم رو ببینی.
           </p>
         </div>
 
@@ -161,9 +242,9 @@ export default function AdminDashboardPage() {
             shadow="shadow-blue-500/20"
           />
           <StatCard
-            icon={Package}
-            label="کل حواله‌ها"
-            value={totalOrders}
+            icon={FileText}
+            label="صورت‌برش‌های فعال"
+            value={totalInvoices}
             color="from-emerald-500 to-emerald-600"
             shadow="shadow-emerald-500/20"
           />
@@ -185,7 +266,7 @@ export default function AdminDashboardPage() {
 
         {/* Tabs + Search */}
         <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-          
+
           {/* Tabs Header */}
           <div className="border-b border-slate-800">
             <div className="flex items-center justify-between flex-wrap gap-3 p-4">
@@ -212,21 +293,41 @@ export default function AdminDashboardPage() {
 
                 <button
                   onClick={() => {
-                    setActiveTab('orders');
+                    setActiveTab('invoices');
                     setSearchTerm('');
                   }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    activeTab === 'orders'
+                    activeTab === 'invoices'
                       ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md'
                       : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                   }`}
                 >
-                  <Package className="w-4 h-4" />
-                  حواله‌ها
+                  <FileText className="w-4 h-4" />
+                  صورت‌برش‌ها
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                    activeTab === 'orders' ? 'bg-white/20' : 'bg-slate-700'
+                    activeTab === 'invoices' ? 'bg-white/20' : 'bg-slate-700'
                   }`}>
-                    {totalOrders}
+                    {activeInvoices.length}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setActiveTab('archive');
+                    setSearchTerm('');
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    activeTab === 'archive'
+                      ? 'bg-gradient-to-r from-slate-600 to-slate-500 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                  }`}
+                >
+                  <Archive className="w-4 h-4" />
+                  بایگانی
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                    activeTab === 'archive' ? 'bg-white/20' : 'bg-slate-700'
+                  }`}>
+                    {archivedInvoices.length}
                   </span>
                 </button>
               </div>
@@ -241,7 +342,9 @@ export default function AdminDashboardPage() {
                   placeholder={
                     activeTab === 'customers'
                       ? 'جستجو در نام، کد ملی، تلفن...'
-                      : 'جستجو در شماره، مشتری، وضعیت...'
+                      : activeTab === 'invoices'
+                      ? 'جستجو در شماره حواله، مشتری...'
+                      : 'جستجو در بایگانی...'
                   }
                   className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl py-2.5 pr-10 pl-4 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                 />
@@ -336,75 +439,136 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
-              {/* ============ حواله‌ها ============ */}
-              {activeTab === 'orders' && (
+              {/* ============ صورت‌برش‌ها (فعال) ============ */}
+              {activeTab === 'invoices' && (
                 <div className="overflow-x-auto">
-                  {filteredOrders.length === 0 ? (
+                  {filteredInvoices.length === 0 ? (
                     <EmptyState
-                      icon={Package}
-                      title={searchTerm ? 'حواله‌ای یافت نشد' : 'هیچ حواله‌ای ثبت نشده'}
+                      icon={FileText}
+                      title={searchTerm ? 'صورت‌برشی یافت نشد' : 'هیچ صورت‌برش فعالی ثبت نشده'}
                     />
                   ) : (
                     <table className="w-full">
                       <thead className="bg-slate-800/50">
                         <tr>
                           <Th>تاریخ</Th>
-                          <Th>شماره</Th>
+                          <Th>شماره حواله</Th>
                           <Th>مشتری</Th>
-                          <Th>محصول</Th>
-                          <Th>برند</Th>
-                          <Th>وزن کل</Th>
-                          <Th>برش</Th>
-                          <Th>باقی‌مانده</Th>
+                          <Th>تعداد آیتم</Th>
+                          <Th>وزن برش</Th>
                           <Th>وضعیت</Th>
+                          <Th>عملیات</Th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
-                        {filteredOrders.map((order) => {
-                          const orderInvoices = allInvoices.filter(
-                            (inv) => inv.orderId === order.id
-                          );
-                          const cutWeight = orderInvoices.reduce(
-                            (sum, inv) => sum + (inv.totalWeightInvoices || 0),
-                            0
-                          );
-                          const remaining = Math.round(
-                            (order.totalWeight || 0) - cutWeight
-                          );
+                        {filteredInvoices.map((invoice) => (
+                          <tr
+                            key={invoice.id}
+                            className="hover:bg-slate-800/30 transition"
+                          >
+                            <Td className="text-slate-500 text-xs">
+                              {new Date(invoice.date).toLocaleDateString('fa-IR')}
+                            </Td>
+                            <Td className="font-mono text-blue-400 font-semibold">
+                              {invoice.orderNumber}
+                            </Td>
+                            <Td className="text-white font-medium">
+                              {invoice.customerName}
+                            </Td>
+                            <Td>
+                              <span className="inline-flex items-center gap-1 bg-slate-700/50 text-slate-300 text-xs px-2.5 py-1 rounded-full">
+                                {invoice.totalItems} آیتم
+                              </span>
+                            </Td>
+                            <Td className="text-red-400 font-semibold">
+                              {invoice.totalWeightInvoices} kg
+                            </Td>
+                            <Td>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-purple-500/10 border-purple-500/30 text-purple-400">
+                                <CheckCircle2 className="w-3 h-3" />
+                                {invoice.status}
+                              </span>
+                            </Td>
+                            <Td>
+                              <button
+                                onClick={() => setSelectedInvoice(invoice)}
+                                className="inline-flex items-center gap-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                جزئیات
+                              </button>
+                            </Td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )}
 
-                          return (
-                            <tr
-                              key={order.id}
-                              className="hover:bg-slate-800/30 transition"
-                            >
-                              <Td className="text-slate-500 text-xs">
-                                {new Date(order.date).toLocaleDateString('fa-IR')}
-                              </Td>
-                              <Td className="font-mono text-blue-400 font-semibold">
-                                {order.orderNumber}
-                              </Td>
-                              <Td className="text-white font-medium">
-                                {order.customerName}
-                              </Td>
-                              <Td className="text-slate-300">
-                                {order.productType}
-                              </Td>
-                              <Td className="text-slate-400">{order.brand}</Td>
-                              <Td className="text-white font-semibold">
-                                {Math.round(order.totalWeight)} kg
-                              </Td>
-                              <Td className="text-red-400 font-semibold">
-                                {Math.round(cutWeight)} kg
-                              </Td>
-                              <Td className="text-emerald-400 font-semibold">
-                                {remaining} kg
-                              </Td>
-                              <Td>
-                                <StatusBadge status={order.status} />
-                              </Td>
-                            </tr>
-                          );
-                        })}
+              {/* ============ بایگانی ============ */}
+              {activeTab === 'archive' && (
+                <div className="overflow-x-auto">
+                  {filteredArchived.length === 0 ? (
+                    <EmptyState
+                      icon={Archive}
+                      title={searchTerm ? 'صورت‌برشی یافت نشد' : 'بایگانی خالی است'}
+                    />
+                  ) : (
+                    <table className="w-full">
+                      <thead className="bg-slate-800/50">
+                        <tr>
+                          <Th>تاریخ ثبت نهایی</Th>
+                          <Th>شماره حواله</Th>
+                          <Th>مشتری</Th>
+                          <Th>تعداد آیتم</Th>
+                          <Th>وزن نهایی</Th>
+                          <Th>وضعیت</Th>
+                          <Th>عملیات</Th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800">
+                        {filteredArchived.map((invoice) => (
+                          <tr
+                            key={invoice.id}
+                            className="hover:bg-slate-800/30 transition"
+                          >
+                            <Td className="text-slate-500 text-xs">
+                              {invoice.finalizedAt
+                                ? new Date(invoice.finalizedAt).toLocaleDateString('fa-IR')
+                                : new Date(invoice.date).toLocaleDateString('fa-IR')}
+                            </Td>
+                            <Td className="font-mono text-blue-400 font-semibold">
+                              {invoice.orderNumber}
+                            </Td>
+                            <Td className="text-white font-medium">
+                              {invoice.customerName}
+                            </Td>
+                            <Td>
+                              <span className="inline-flex items-center gap-1 bg-slate-700/50 text-slate-300 text-xs px-2.5 py-1 rounded-full">
+                                {invoice.totalItems} آیتم
+                              </span>
+                            </Td>
+                            <Td className="text-emerald-400 font-semibold">
+                              {invoice.totalWeightInvoices} kg
+                            </Td>
+                            <Td>
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
+                                <CheckCircle2 className="w-3 h-3" />
+                                ثبت نهایی
+                              </span>
+                            </Td>
+                            <Td>
+                              <button
+                                onClick={() => setSelectedInvoice(invoice)}
+                                className="inline-flex items-center gap-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                مشاهده
+                              </button>
+                            </Td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   )}
@@ -419,6 +583,16 @@ export default function AdminDashboardPage() {
           گروه فولادیار کوروش © ۱۴۰۵ — پنل مدیریت
         </p>
       </main>
+
+      {/* ============ Invoice Detail Modal ============ */}
+      {selectedInvoice && (
+        <InvoiceDetailModal
+          invoice={selectedInvoice}
+          order={allOrders.find((o) => o.id === selectedInvoice.orderId)}
+          onClose={() => setSelectedInvoice(null)}
+          onFinalize={handleFinalizeInvoice}
+        />
+      )}
     </div>
   );
 }
@@ -458,26 +632,6 @@ function Td({ children, className = '' }) {
   );
 }
 
-function StatusBadge({ status }) {
-  const styles = {
-    'باز': 'bg-amber-500/10 border-amber-500/30 text-amber-400',
-    'خارج شده': 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
-    'صورت‌برش شده': 'bg-purple-500/10 border-purple-500/30 text-purple-400',
-    'صورت برش شده': 'bg-purple-500/10 border-purple-500/30 text-purple-400',
-    'تکمیل شده': 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-  };
-  const style = styles[status] || 'bg-slate-700/30 border-slate-600 text-slate-400';
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${style}`}
-    >
-      <CheckCircle2 className="w-3 h-3" />
-      {status}
-    </span>
-  );
-}
-
 function EmptyState({ icon: Icon, title }) {
   return (
     <div className="p-12 text-center">
@@ -485,6 +639,269 @@ function EmptyState({ icon: Icon, title }) {
         <Icon className="w-8 h-8 text-slate-600" />
       </div>
       <p className="text-slate-500">{title}</p>
+    </div>
+  );
+}
+
+// ============ مودال جزئیات صورت‌برش ============
+
+function InvoiceDetailModal({ invoice, order, onClose, onFinalize }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isArchived = invoice.status === 'ثبت نهایی';
+
+  const totalCutWeight = invoice.totalWeightInvoices || 0;
+  const orderWeight = order?.totalWeight || 0;
+  const remaining = Math.round(orderWeight - totalCutWeight);
+
+  // 📊 محاسبه درصد
+  const cutPercent = orderWeight > 0
+    ? Math.round((totalCutWeight / orderWeight) * 100)
+    : 0;
+  const remainingPercent = 100 - cutPercent;
+
+  // 🎨 تعیین رنگ بر اساس وزن باقی‌مانده
+  const getRemainingColor = () => {
+    if (remaining <= 50) return {
+      bg: 'bg-emerald-500/10',
+      border: 'border-emerald-500/30',
+      text: 'text-emerald-400',
+      bar: 'bg-emerald-500',
+      label: 'قابل تکمیل',
+    };
+    if (remaining <= 200) return {
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/30',
+      text: 'text-amber-400',
+      bar: 'bg-amber-500',
+      label: 'نزدیک به تکمیل',
+    };
+    return {
+      bg: 'bg-red-500/10',
+      border: 'border-red-500/30',
+      text: 'text-red-400',
+      bar: 'bg-red-500',
+      label: 'باقی‌مانده زیاد',
+    };
+  };
+
+  const colors = getRemainingColor();
+  const canFinalize = remaining <= 50;
+
+  const handleFinalize = async () => {
+    setIsSubmitting(true);
+    await onFinalize(invoice, order);
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+      dir="rtl"
+    >
+      <div
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-slate-800 bg-gradient-to-r from-indigo-600/20 to-purple-600/20">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
+              <ClipboardList className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">
+                صورت‌برش حواله {invoice.orderNumber}
+              </h3>
+              <p className="text-xs text-slate-400">
+                {invoice.customerName} — {new Date(invoice.date).toLocaleDateString('fa-IR')}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-800 rounded-xl transition"
+          >
+            <X className="w-5 h-5 text-slate-400" />
+          </button>
+        </div>
+
+        {/* Summary با درصد */}
+        <div className="p-5 border-b border-slate-800 bg-slate-950/30 space-y-4">
+
+          {/* سه کارت */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <p className="text-xs text-slate-500 mb-1">وزن کل حواله</p>
+              <p className="text-lg font-bold text-white">
+                {Math.round(orderWeight)} kg
+              </p>
+            </div>
+            <div className="text-center border-x border-slate-800">
+              <p className="text-xs text-slate-500 mb-1">وزن برش شده</p>
+              <p className="text-lg font-bold text-red-400">
+                {Math.round(totalCutWeight)} kg
+              </p>
+              <p className="text-[10px] text-red-400/70 mt-0.5">
+                {cutPercent}%
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-slate-500 mb-1">وزن باقی‌مانده</p>
+              <p className={`text-lg font-bold ${colors.text}`}>
+                {remaining} kg
+              </p>
+              <p className={`text-[10px] mt-0.5 ${colors.text} opacity-70`}>
+                {remainingPercent}%
+              </p>
+            </div>
+          </div>
+
+          {/* 📊 نوار پیشرفت */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-slate-500">پیشرفت برش</span>
+              <span className={colors.text}>{cutPercent}%</span>
+            </div>
+            <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${colors.bar} transition-all duration-500`}
+                style={{ width: `${cutPercent}%` }}
+              />
+            </div>
+          </div>
+
+          {/* 🎨 نمایش وضعیت رنگ‌بندی شده */}
+          <div className={`flex items-center justify-between p-3 rounded-xl border ${colors.bg} ${colors.border}`}>
+            <div className="flex items-center gap-2">
+              <AlertCircle className={`w-4 h-4 ${colors.text}`} />
+              <span className={`text-xs font-medium ${colors.text}`}>
+                {colors.label}
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-400">
+              {isArchived
+                ? '📚 این صورت‌برش در بایگانی است'
+                : canFinalize
+                ? '✅ قابل تکمیل و بستن'
+                : `❌ برای تکمیل باید باقی‌مانده ≤ ۵۰ کیلو باشه`}
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-5">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-800/50 rounded-lg">
+                <tr>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">#</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">محصول</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">برند</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">ضخامت</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">عرض</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">طول</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">تعداد</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">بندیل</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">وزن</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">نوع برش</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/50">
+                {invoice.items?.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-slate-800/20">
+                    <td className="px-3 py-2 text-slate-500 text-xs">{item.row || idx + 1}</td>
+                    <td className="px-3 py-2 text-slate-300">{item.productType || '---'}</td>
+                    <td className="px-3 py-2 text-slate-400">{item.brand || '---'}</td>
+                    <td className="px-3 py-2 text-slate-300">{item.thickness || '---'}</td>
+                    <td className="px-3 py-2 text-slate-300">{item.width || '---'}</td>
+                    <td className="px-3 py-2 text-slate-300">{item.length || '---'}</td>
+                    <td className="px-3 py-2 text-slate-300">{item.quantity || '---'}</td>
+                    <td className="px-3 py-2 text-slate-500">{item.bundle || '---'}</td>
+                    <td className="px-3 py-2 text-white font-semibold">{item.weight || 0} kg</td>
+                    <td className="px-3 py-2">
+                      <span className="inline-flex items-center gap-1 text-[11px] bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 px-2 py-1 rounded-lg whitespace-nowrap">
+                        {getCutTypeLabel(item.cutType)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="bg-slate-800/30">
+                <tr>
+                  <td colSpan="8" className="px-3 py-3 text-left text-xs font-semibold text-slate-400">
+                    مجموع وزن:
+                  </td>
+                  <td className="px-3 py-3 text-white font-bold">
+                    {invoice.totalWeightInvoices} kg
+                  </td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        {/* Footer با دکمه ثبت نهایی */}
+        <div className="p-4 border-t border-slate-800 bg-slate-950/50 flex items-center justify-between gap-3 flex-wrap">
+
+          {/* وضعیت */}
+          <div className="flex items-center gap-2">
+            {isArchived ? (
+              <div className="flex items-center gap-1.5 text-xs text-emerald-400">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>این صورت‌برش ثبت نهایی شده و در بایگانی است</span>
+              </div>
+            ) : canFinalize ? (
+              <div className="flex items-center gap-1.5 text-xs text-emerald-400">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>آماده ثبت نهایی</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-xs text-amber-400">
+                <AlertCircle className="w-4 h-4" />
+                <span>باقی‌مانده: {remaining} kg (باید ≤ 50 بشه)</span>
+              </div>
+            )}
+          </div>
+
+          {/* دکمه‌ها */}
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition"
+            >
+              بستن
+            </button>
+
+            {!isArchived && (
+              <button
+                onClick={handleFinalize}
+                disabled={isSubmitting}
+                className={`px-5 py-2.5 text-sm font-medium rounded-xl transition flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
+                  canFinalize
+                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-lg hover:shadow-emerald-500/30 text-white'
+                    : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:shadow-lg hover:shadow-amber-500/30 text-white'
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    در حال ثبت...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    ثبت نهایی
+                    {canFinalize ? ' و بستن حواله' : ''}
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

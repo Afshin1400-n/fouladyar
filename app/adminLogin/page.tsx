@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
   // اگه ادمین قبلاً لاگین کرده، بره به پنل ادمین
   useEffect(() => {
     if (isAdminAuthenticated) {
-      router.push('/admin/dashboard');
+      router.push('/adminDashboard');
     }
   }, [isAdminAuthenticated, router]);
 
