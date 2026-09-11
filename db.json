@@ -94,23 +94,23 @@
       "customerPhone": "09121234567",
       "customerAddress": "تهران، خیابان آزادی، پلاک ۱۲",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "باز",
+      "status": "صورت برش شده",
       "productType": "ورق سرد",
       "brand": "چین",
       "thickness": 0.5,
       "width": 1.25,
       "unit": "رول",
       "totalWeight": 1000,
-      "cutWeight": 109,
-      "remainingWeight": 862,
+      "cutWeight": 183,
+      "remainingWeight": 817,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1789167994860",
-      "invoiceDate": "2026-09-11T23:06:34.892Z",
+      "invoiceNumber": "INV-1789168292300",
+      "invoiceDate": "2026-09-11T23:11:32.329Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-09-11T23:06:41.710Z"
@@ -476,6 +476,60 @@
       "notes": null,
       "createdAt": "2026-09-11T23:06:34.860Z",
       "finalizedAt": "2026-09-11T23:06:41.739Z"
+    },
+    {
+      "id": "wpIQUO8glnE",
+      "orderId": "4",
+      "orderNumber": "140503000",
+      "customerId": "2",
+      "customerName": "علی رضایی",
+      "date": "2026-09-11T23:08:05.884Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سرد",
+          "brand": "چین",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "0.25",
+          "quantity": "1",
+          "bundle": "1",
+          "weight": 1,
+          "cutType": "shutter_b"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 1,
+      "notes": "کرکره نذارید",
+      "createdAt": "2026-09-11T23:08:05.884Z"
+    },
+    {
+      "id": "q_4Qx_HffNM",
+      "orderId": "4",
+      "orderNumber": "140503000",
+      "customerId": "2",
+      "customerName": "علی رضایی",
+      "date": "2026-09-11T23:11:32.300Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سرد",
+          "brand": "چین",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "3",
+          "quantity": "5",
+          "bundle": "1",
+          "weight": 74,
+          "cutType": "shutter_small"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 74,
+      "notes": "کرکره نذارید لطفا",
+      "createdAt": "2026-09-11T23:11:32.300Z"
     }
   ],
   "users": [

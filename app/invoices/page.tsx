@@ -225,48 +225,59 @@ export default function InvoicesPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50/80">
-                  <tr>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره صورت‌برش</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ ثبت برش</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره حواله</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تعداد ابعاد</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عملیات</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredInvoices.slice(0, 20).map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-blue-50/50 transition">
-                      
-                      <td className="px-4 py-3 text-sm text-purple-600 font-bold">
-                        {invoice.invoiceNumber || invoice.id}
-                      </td>
-                           <td className="px-4 py-3 text-sm text-gray-500">
-                        {new Date(invoice.date).toLocaleDateString('fa-IR')}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-blue-600 font-bold">
-                        {invoice.orderNumber}
-                      </td>
-                     
-                      <td className="px-4 py-3 text-sm text-gray-900">{invoice.totalItems}</td>
-                 
-                      <td className="px-4 py-3 text-sm text-gray-900">{Math.round(invoice.totalWeightInvoices || 0)} kg</td>
-                  
-                      <td className="px-4 py-3 text-sm">
-                        <Link
-                          href={`/invoice-view/${invoice.orderNumber}`}
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
-                        >
-                          مشاهده
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+  <table className="w-full">
+    <thead className="bg-gray-50/80">
+      <tr>
+        <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره صورت‌برش</th>
+        <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ ثبت برش</th>
+        <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره حواله</th>
+        <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تعداد ابعاد</th>
+        <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن</th>
+        <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">توضیحات</th> {/* ← اضافه کن */}
+        <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عملیات</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-100">
+      {filteredInvoices.slice(0, 20).map((invoice) => (
+        <tr key={invoice.id} className="hover:bg-blue-50/50 transition">
+          <td className="px-4 py-3 text-sm text-purple-600 font-bold">
+            {invoice.invoiceNumber || invoice.id}
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-500">
+            {new Date(invoice.date).toLocaleDateString('fa-IR')}
+          </td>
+          <td className="px-4 py-3 text-sm text-blue-600 font-bold">
+            {invoice.orderNumber}
+          </td>
+          <td className="px-4 py-3 text-sm text-gray-900">{invoice.totalItems}</td>
+          <td className="px-4 py-3 text-sm text-gray-900">
+            {Math.round(invoice.totalWeightInvoices || 0)} kg
+          </td>
+
+          {/* ✅ ستون توضیحات - اینجا درست قرار گرفته */}
+          <td className="px-4 py-3 text-sm text-gray-700 max-w-[200px]">
+            {invoice.notes ? (
+              <span className="block truncate" title={invoice.notes}>
+                📝 {invoice.notes}
+              </span>
+            ) : (
+              <span className="text-gray-400 text-xs">---</span>
+            )}
+          </td>
+
+          <td className="px-4 py-3 text-sm">
+            <Link
+              href={`/invoice-view/${invoice.orderNumber}`}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
+            >
+              مشاهده
+            </Link>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
           )}
         </div>
       </main>
