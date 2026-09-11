@@ -1,5 +1,3 @@
-// src/app/admin/login/page.js
-
 "use client"
 
 import Link from 'next/link';
@@ -17,7 +15,6 @@ export default function AdminLoginPage() {
 
   const inputRef = useRef(null);
 
-  // اگه ادمین قبلاً لاگین کرده، بره به پنل ادمین
   useEffect(() => {
     if (isAdminAuthenticated) {
       router.push('/adminDashboard');
@@ -44,9 +41,9 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-slate-950" dir="rtl">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_70%)]" />
-      <div className="absolute top-20 right-20 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.10),transparent_70%)]" />
+      <div className="absolute top-20 right-20 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl animate-pulse" />
 
       <div className="relative min-h-screen flex items-center justify-center p-6">
         {/* Back Button */}
@@ -60,7 +57,7 @@ export default function AdminLoginPage() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl shadow-lg shadow-indigo-500/40 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-lg shadow-blue-500/40 mb-4">
               <Shield className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-xl font-bold text-white">فولادیار کوروش</h1>
@@ -68,12 +65,12 @@ export default function AdminLoginPage() {
           </div>
 
           {/* Card */}
-          <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8">
+          <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl shadow-blue-500/5 p-8">
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-1.5 bg-indigo-500/10 border border-indigo-500/30 px-3 py-1 rounded-full mb-6">
-              <Shield className="w-3 h-3 text-indigo-400" />
-              <span className="text-[10px] font-medium text-indigo-300">دسترسی محدود</span>
+            <div className="inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/30 px-3 py-1 rounded-full mb-6">
+              <Shield className="w-3 h-3 text-blue-400" />
+              <span className="text-[10px] font-medium text-blue-300">دسترسی محدود</span>
             </div>
 
             {error && (
@@ -91,7 +88,7 @@ export default function AdminLoginPage() {
                 </label>
                 <div className="relative">
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
-                    <User className="w-5 h-5" />
+                    <User className="w-4 h-4" />
                   </div>
                   <input
                     ref={inputRef}
@@ -99,7 +96,7 @@ export default function AdminLoginPage() {
                     value={nationalId}
                     onChange={(e) => setNationalId(e.target.value)}
                     placeholder="•••••••••"
-                    className="w-full pr-11 pl-4 py-3.5 bg-slate-800/50 border border-slate-700 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition placeholder:text-slate-500"
+                    className="w-full pr-10 pl-4 py-3.5 bg-slate-800/50 border border-slate-700 text-white rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition placeholder:text-slate-500"
                     required
                   />
                 </div>
@@ -112,14 +109,14 @@ export default function AdminLoginPage() {
                 </label>
                 <div className="relative">
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
-                    <Lock className="w-5 h-5" />
+                    <Lock className="w-4 h-4" />
                   </div>
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pr-11 pl-4 py-3.5 bg-slate-800/50 border border-slate-700 text-white rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition placeholder:text-slate-500"
+                    className="w-full pr-10 pl-4 py-3.5 bg-slate-800/50 border border-slate-700 text-white rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition placeholder:text-slate-500"
                     required
                   />
                 </div>
@@ -129,7 +126,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-xl hover:shadow-indigo-500/40 hover:scale-[1.01] text-white font-semibold rounded-xl transition-all duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 text-white font-semibold rounded-xl transition-all duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -146,7 +143,7 @@ export default function AdminLoginPage() {
           {/* Info Box */}
           <div className="mt-6 bg-slate-900/50 border border-slate-800 rounded-xl p-4">
             <p className="text-xs text-slate-500 text-center">
-              🔑 برای تست: کد ملی <span className="text-indigo-400 font-mono">1234</span> و رمز <span className="text-indigo-400 font-mono">1234</span>
+              🔑 برای تست: کد ملی <span className="text-blue-400 font-mono">1234</span> و رمز <span className="text-blue-400 font-mono">1234</span>
             </p>
           </div>
 

@@ -94,7 +94,7 @@
       "customerPhone": "09121234567",
       "customerAddress": "تهران، خیابان آزادی، پلاک ۱۲",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "صورت برش شده",
+      "status": "باز",
       "productType": "ورق سرد",
       "brand": "چین",
       "thickness": 0.5,
@@ -102,7 +102,7 @@
       "unit": "رول",
       "totalWeight": 1000,
       "cutWeight": 183,
-      "remainingWeight": 817,
+      "remainingWeight": 787,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
@@ -113,7 +113,7 @@
       "invoiceDate": "2026-09-11T23:11:32.329Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
-      "updatedAt": "2026-09-11T23:06:41.710Z"
+      "updatedAt": "2026-09-11T23:25:01.255Z"
     }
   ],
   "invoice": [
@@ -484,7 +484,7 @@
       "customerId": "2",
       "customerName": "علی رضایی",
       "date": "2026-09-11T23:08:05.884Z",
-      "status": "ثبت صورت برش",
+      "status": "ثبت نهایی",
       "items": [
         {
           "row": 1,
@@ -502,7 +502,8 @@
       "totalItems": 1,
       "totalWeightInvoices": 1,
       "notes": "کرکره نذارید",
-      "createdAt": "2026-09-11T23:08:05.884Z"
+      "createdAt": "2026-09-11T23:08:05.884Z",
+      "finalizedAt": "2026-09-11T23:24:56.990Z"
     },
     {
       "id": "q_4Qx_HffNM",
@@ -511,7 +512,7 @@
       "customerId": "2",
       "customerName": "علی رضایی",
       "date": "2026-09-11T23:11:32.300Z",
-      "status": "ثبت صورت برش",
+      "status": "ثبت نهایی",
       "items": [
         {
           "row": 1,
@@ -529,7 +530,8 @@
       "totalItems": 1,
       "totalWeightInvoices": 74,
       "notes": "کرکره نذارید لطفا",
-      "createdAt": "2026-09-11T23:11:32.300Z"
+      "createdAt": "2026-09-11T23:11:32.300Z",
+      "finalizedAt": "2026-09-11T23:25:01.274Z"
     }
   ],
   "users": [

@@ -15,13 +15,13 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-blue-100" dir="rtl">
+    <div className="min-h-screen bg-slate-50" dir="rtl">
       {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-white to-blue-400/10 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-blue-400/10 -z-10" />
       
       {/* Floating Shapes */}
       <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-400/5 rounded-full blur-3xl" />
       
       <div className="relative min-h-screen flex flex-col items-center justify-center p-6">
@@ -33,38 +33,38 @@ export default function HomePage() {
 
         {/* Logo & Brand */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-2xl shadow-blue-500/40 mb-5 relative group">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-2xl shadow-blue-500/40 mb-5 relative group">
             <Building2 className="w-10 h-10 text-white" />
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/20 to-transparent" />
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500/20 to-indigo-500/20 blur-xl -z-10 group-hover:blur-2xl transition" />
+            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500/20 to-blue-400/20 blur-xl -z-10 group-hover:blur-2xl transition" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 tracking-tight">
             فولادیار <span className="text-blue-600">کوروش</span>
           </h1>
-          <p className="text-base text-gray-500 font-normal">
+          <p className="text-base text-slate-500 font-normal">
             سامانه جامع مدیریت مشتریان
           </p>
         </div>
 
         {/* Features Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl w-full mb-10">
-          <div className="group bg-white rounded-xl p-4 text-center border border-gray-100 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
+          <div className="group bg-white rounded-xl p-4 text-center border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
             <div className="w-11 h-11 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
               <Package className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-sm font-medium text-gray-700">مدیریت حواله‌ها</p>
+            <p className="text-sm font-medium text-slate-700">مدیریت حواله‌ها</p>
           </div>
-          <div className="group bg-white rounded-xl p-4 text-center border border-gray-100 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
+          <div className="group bg-white rounded-xl p-4 text-center border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
             <div className="w-11 h-11 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-sm font-medium text-gray-700">صورت‌برش‌ها</p>
+            <p className="text-sm font-medium text-slate-700">صورت‌برش‌ها</p>
           </div>
-          <div className="group bg-white rounded-xl p-4 text-center border border-gray-100 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
+          <div className="group bg-white rounded-xl p-4 text-center border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
             <div className="w-11 h-11 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
               <Users className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-sm font-medium text-gray-700">مشتریان</p>
+            <p className="text-sm font-medium text-slate-700">مشتریان</p>
           </div>
         </div>
 
@@ -74,17 +74,17 @@ export default function HomePage() {
           {/* ورود مشتریان */}
           <Link
             href="/login"
-            className="group relative bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-right"
+            className="group relative bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-right"
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 <UserCircle className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">
+                <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition">
                   ورود مشتریان
                 </h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   مشاهده حواله‌ها، صورت‌برش‌ها و سابقه سفارشات
                 </p>
               </div>
@@ -94,17 +94,17 @@ export default function HomePage() {
           {/* ورود کارمندان */}
           <Link
             href="/adminLogin"
-            className="group relative bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-indigo-400 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 text-right"
+            className="group relative bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-right"
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 <ShieldCheck className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-indigo-600 transition">
+                <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition">
                   ورود کارمندان
                 </h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   دسترسی به پنل مدیریت و ابزارهای سیستم
                 </p>
               </div>
@@ -115,13 +115,13 @@ export default function HomePage() {
 
         {/* Divider */}
         <div className="flex items-center gap-4 mt-10 mb-4 max-w-2xl w-full">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-gray-200" />
-          <span className="text-xs text-gray-400 font-light">گروه فولادیار کوروش</span>
-          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-gray-200" />
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200" />
+          <span className="text-xs text-slate-400 font-light">گروه فولادیار کوروش</span>
+          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200" />
         </div>
 
         {/* Footer */}
-        <p className="text-xs text-gray-400/70 font-light">
+        <p className="text-xs text-slate-400/70 font-light">
           © ۱۴۰۵ تمامی حقوق محفوظ است
         </p>
       </div>

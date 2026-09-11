@@ -1,5 +1,3 @@
-// src/app/dashboard/page.js
-
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -7,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useStore from '../store/store';
 import axios from 'axios';
- import RefreshButton from '../component/refreshBtn';
+import RefreshButton from '../component/refreshBtn';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,7 +16,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const {fetchAdminData} =useStore()
+  const { fetchAdminData } = useStore()
   const [stats, setStats] = useState({
     totalOrdersLength: 0,
     totalWeight: 0,
@@ -28,68 +26,66 @@ export default function DashboardPage() {
     totalOrdersWeight: 0
   });
 
-const fetchOrders = async () => {
-  if (!currentUser) return;
-  
-  try {
-    const res = await axios.get('http://localhost:4000/orders');
-    const allOrders = res.data;
-    const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
-
-    const resInvoice = await axios.get('http://localhost:4000/invoice');
-    const allInvoice = resInvoice.data;
-    const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
+  const fetchOrders = async () => {
+    if (!currentUser) return;
     
-    setInvoices(userInvoice);
+    try {
+      const res = await axios.get('http://localhost:4000/orders');
+      const allOrders = res.data;
+      const userOrders = allOrders.filter((o) => o.customerId === currentUser.id);
 
-    // ✅ محاسبه cutWeight و remainingWeight
-    const ordersWithCutWeight = userOrders.map((order) => {
-      const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
-      const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
+      const resInvoice = await axios.get('http://localhost:4000/invoice');
+      const allInvoice = resInvoice.data;
+      const userInvoice = allInvoice.filter((o) => o.customerId === currentUser.id);
       
-      const remainingWeight = Math.round((order.totalWeight || 0) - totalCutWeight);
-      
-      return {
-        ...order,
-        cutWeight: Math.round(totalCutWeight),
-        remainingWeight: remainingWeight
-      };
-    });
+      setInvoices(userInvoice);
 
-    // ✅ بررسی وضعیت: اگه remainingWeight صفر یا کمتر بود → تکمیل شده
-    const finalOrders = ordersWithCutWeight.map((order) => {
-      if (order.remainingWeight <= 0) {
-        return { ...order, status: 'تکمیل شده' };
-      }
-      return order;
-    });
+      const ordersWithCutWeight = userOrders.map((order) => {
+        const orderInvoices = userInvoice.filter((inv) => inv.orderId === order.id);
+        const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
+        
+        const remainingWeight = Math.round((order.totalWeight || 0) - totalCutWeight);
+        
+        return {
+          ...order,
+          cutWeight: Math.round(totalCutWeight),
+          remainingWeight: remainingWeight
+        };
+      });
 
-    setOrders(finalOrders);
-    setFilteredOrders(finalOrders);
+      const finalOrders = ordersWithCutWeight.map((order) => {
+        if (order.remainingWeight <= 0) {
+          return { ...order, status: 'تکمیل شده' };
+        }
+        return order;
+      });
 
-    // محاسبه آمار
-    const totalOrdersLength = finalOrders.length;
-    const totalOrdersWeight = finalOrders.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
-    const totalInvoiceWeight = userInvoice.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
-    const remainingWeight = totalOrdersWeight - totalInvoiceWeight;
+      setOrders(finalOrders);
+      setFilteredOrders(finalOrders);
 
-    const pendingOrders = finalOrders.filter(o => o.status === 'باز').length;
-    const shippedOrders = finalOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
+      const totalOrdersLength = finalOrders.length;
+      const totalOrdersWeight = finalOrders.reduce((sum, order) => sum + (order.totalWeight || 0), 0);
+      const totalInvoiceWeight = userInvoice.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
+      const remainingWeight = totalOrdersWeight - totalInvoiceWeight;
 
-    setStats({
-      totalOrdersLength,
-      totalWeight: Math.round(remainingWeight),
-      pendingOrders,
-      shippedOrders,
-      totalInvoiceWeight: Math.round(totalInvoiceWeight),
-      totalOrdersWeight: Math.round(totalOrdersWeight)
-    });
-    setLoading(false);
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    setLoading(false);
-  }
-};
+      const pendingOrders = finalOrders.filter(o => o.status === 'باز').length;
+      const shippedOrders = finalOrders.filter(o => o.status === 'خارج شده' || o.status === 'صورت‌برش شده').length;
+
+      setStats({
+        totalOrdersLength,
+        totalWeight: Math.round(remainingWeight),
+        pendingOrders,
+        shippedOrders,
+        totalInvoiceWeight: Math.round(totalInvoiceWeight),
+        totalOrdersWeight: Math.round(totalOrdersWeight)
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('./login');
@@ -126,11 +122,11 @@ const fetchOrders = async () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
-      <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
+    <div className="min-h-screen bg-slate-50" dir="rtl">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">گروه فولادیار کوروش</h1>
+            <h1 className="text-2xl font-bold text-slate-900">گروه فولادیار کوروش</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -143,11 +139,11 @@ const fetchOrders = async () => {
                   {currentUser?.name?.charAt(0) || 'م'}
                 </div>
                 <div className="hidden sm:block text-right">
-                  <p className="text-sm font-semibold text-gray-900">{currentUser?.name}</p>
-                  <p className="text-xs text-gray-500">{currentUser?.phone || 'شماره ثبت نشده'}</p>
+                  <p className="text-sm font-semibold text-slate-900">{currentUser?.name}</p>
+                  <p className="text-xs text-slate-500">{currentUser?.phone || 'شماره ثبت نشده'}</p>
                 </div>
                 <svg
-                  className={`w-4 h-4 text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -157,12 +153,12 @@ const fetchOrders = async () => {
               </button>
 
               {showUserMenu && (
-                <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-bold text-gray-900">{currentUser?.name}</p>
-                    <p className="text-xs text-gray-500">کد ملی: {currentUser?.nationalId}</p>
-                    <p className="text-xs text-gray-500">تلفن: {currentUser?.phone || '---'}</p>
-                    <p className="text-xs text-gray-500">آدرس: {currentUser?.address || '---'}</p>
+                <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-xl shadow-slate-900/5 border border-slate-200 py-2 z-20">
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <p className="text-sm font-bold text-slate-900">{currentUser?.name}</p>
+                    <p className="text-xs text-slate-500">کد ملی: {currentUser?.nationalId}</p>
+                    <p className="text-xs text-slate-500">تلفن: {currentUser?.phone || '---'}</p>
+                    <p className="text-xs text-slate-500">آدرس: {currentUser?.address || '---'}</p>
                   </div>
                   <button
                     onClick={handleLogout}
@@ -182,39 +178,39 @@ const fetchOrders = async () => {
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded w-16"></div>
+              <div key={i} className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 animate-pulse">
+                <div className="h-4 bg-slate-200 rounded w-20 mb-2"></div>
+                <div className="h-8 bg-slate-200 rounded w-16"></div>
               </div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-              <p className="text-sm text-gray-500">کل حواله‌ها</p>
+            <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-slate-200 transition">
+              <p className="text-sm text-slate-500">کل حواله‌ها</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalOrdersLength}</p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-              <p className="text-sm text-gray-500">وزن کل حواله‌ها</p>
+            <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-slate-200 transition">
+              <p className="text-sm text-slate-500">وزن کل حواله‌ها</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">
                 {stats.totalOrdersWeight} kg
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-red-200 hover:shadow-lg transition">
+            <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-red-100 transition">
               <p className="text-sm text-red-600">وزن برش شده</p>
               <p className="text-2xl font-bold text-red-600 mt-1">
                 {stats.totalInvoiceWeight} kg
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-green-200 hover:shadow-lg transition">
+            <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-green-100 transition">
               <p className="text-sm text-green-600">وزن باقی‌مانده</p>
               <p className="text-2xl font-bold text-green-600 mt-1">
                 {stats.totalWeight} kg
               </p>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-yellow-200 hover:shadow-lg transition">
-              <p className="text-sm text-yellow-600">در انتظار</p>
-              <p className="text-2xl font-bold text-yellow-600 mt-1">{stats.pendingOrders}</p>
+            <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-amber-100 transition">
+              <p className="text-sm text-amber-600">در انتظار</p>
+              <p className="text-2xl font-bold text-amber-600 mt-1">{stats.pendingOrders}</p>
             </div>
           </div>
         )}
@@ -226,10 +222,10 @@ const fetchOrders = async () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="🔍 جستجو در شماره حواله، نوع محصول، برند، مشتری، وضعیت..."
-              className="w-full px-6 py-4 pr-12 border-2 border-gray-200 text-blue-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition shadow-sm hover:shadow-md bg-white"
+              className="w-full px-6 py-4 pr-12 border border-slate-200 text-slate-900 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition shadow-sm hover:shadow-md bg-white placeholder:text-slate-400"
             />
             <svg
-              className="absolute left-4 top-4 w-6 h-6 text-gray-400"
+              className="absolute left-4 top-4 w-6 h-6 text-slate-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -244,27 +240,27 @@ const fetchOrders = async () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-gray-50/50">
-            <h3 className="text-xl font-bold text-gray-900">📋 حواله‌ها</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50/50">
+            <h3 className="text-xl font-bold text-slate-900">📋 حواله‌ها</h3>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
+              <span className="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
                 {filteredOrders.length} مورد
               </span>
               <Link href="./invoices" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
-                صورت برش ها مشاهده 
+                صورت برش ها مشاهده
               </Link>
-                <RefreshButton
-    onRefresh={fetchAdminData}
-    className="bg-slate-800 hover:bg-slate-600 text-slate-300 border border-slate-700"
-  />
+              <RefreshButton
+                onRefresh={fetchAdminData}
+                className="bg-slate-800 hover:bg-slate-600 text-slate-300 border border-slate-700"
+              />
             </div>
           </div>
 
           {loading ? (
-            <div className="p-8 text-center text-gray-500">در حال بارگذاری...</div>
+            <div className="p-8 text-center text-slate-500">در حال بارگذاری...</div>
           ) : filteredOrders.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-slate-500">
               <p className="text-lg">
                 {searchTerm ? '🔍 هیچ حواله‌ای با این جستجو یافت نشد' : '📭 هیچ حواله‌ای ثبت نشده است'}
               </p>
@@ -277,36 +273,36 @@ const fetchOrders = async () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50/80">
+                <thead className="bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">تاریخ</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">شماره حواله</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">نوع</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">برند</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">ضخامت</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عرض</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن کل</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن برش</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وزن باقی‌مونده</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">وضعیت</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">عملیات</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">تاریخ</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">شماره حواله</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">نوع</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">برند</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">ضخامت</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">عرض</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">وزن کل</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">وزن برش</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">وزن باقی‌مونده</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">وضعیت</th>
+                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">عملیات</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-slate-100">
                   {filteredOrders.map((order) => {
                     return (
-                      <tr key={order.id} className="hover:bg-blue-50/50 transition">
-                        <td className="px-4 py-3 text-sm text-gray-500">
+                      <tr key={order.id} className="hover:bg-slate-50 transition">
+                        <td className="px-4 py-3 text-sm text-slate-500">
                           {new Date(order.date).toLocaleDateString('fa-IR')}
                         </td>
                         <td className="px-4 py-3 text-sm text-blue-600 font-bold">
                           {order.orderNumber}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{order.productType}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{order.brand}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{order.thickness}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{order.width}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900 font-bold">
+                        <td className="px-4 py-3 text-sm text-slate-900">{order.productType}</td>
+                        <td className="px-4 py-3 text-sm text-slate-900">{order.brand}</td>
+                        <td className="px-4 py-3 text-sm text-slate-900">{order.thickness}</td>
+                        <td className="px-4 py-3 text-sm text-slate-900">{order.width}</td>
+                        <td className="px-4 py-3 text-sm text-slate-900 font-bold">
                           {Math.round(order.totalWeight)} kg
                         </td>
                         <td className="px-4 py-3 text-sm text-red-500 font-bold">
@@ -316,11 +312,12 @@ const fetchOrders = async () => {
                           {order.remainingWeight} kg
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            order.status === 'باز' ? 'bg-yellow-100 text-yellow-700' :
-                            order.status === 'خارج شده' ? 'bg-green-100 text-green-700' :
-                            order.status === 'صورت‌برش شده' ? 'bg-purple-100 text-purple-700' :
-                            'bg-gray-100 text-gray-700'
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                            order.status === 'باز' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                            order.status === 'خارج شده' ? 'bg-green-50 text-green-700 border border-green-200' :
+                            order.status === 'صورت‌برش شده' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                            order.status === 'تکمیل شده' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                            'bg-slate-50 text-slate-700 border border-slate-200'
                           }`}>
                             {order.status}
                           </span>

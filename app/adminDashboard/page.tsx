@@ -176,27 +176,27 @@ export default function AdminDashboardPage() {
       inv.orderNumber?.includes(searchTerm) ||
       inv.customerName?.includes(searchTerm) ||
       inv.status?.includes(searchTerm) ||
-      inv.notes?.includes(searchTerm)  // ✅ جستجو در توضیحات
+      inv.notes?.includes(searchTerm)
   );
 
   const filteredArchived = archivedInvoices.filter(
     (inv) =>
       inv.orderNumber?.includes(searchTerm) ||
       inv.customerName?.includes(searchTerm) ||
-      inv.notes?.includes(searchTerm)  // ✅ جستجو در توضیحات
+      inv.notes?.includes(searchTerm)
   );
 
   return (
     <div className="min-h-screen bg-slate-950" dir="rtl">
       {/* Background */}
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_50%)]" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(168,85,247,0.1),transparent_50%)]" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent_50%)]" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.10),transparent_50%)]" />
 
       {/* Header */}
       <header className="relative bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -208,9 +208,9 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col text-left">
               <p className="text-sm font-medium text-white">{adminUser?.name}</p>
-              <p className="text-[11px] text-indigo-400">مدیر سیستم</p>
+              <p className="text-[11px] text-blue-400">مدیر سیستم</p>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-sm font-bold">
               {adminUser?.name?.charAt(0) || 'م'}
             </div>
             <Link
@@ -238,7 +238,7 @@ export default function AdminDashboardPage() {
           <StatCard icon={Users} label="کل مشتریان" value={totalCustomers} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/20" />
           <StatCard icon={FileText} label="صورت‌برش‌های فعال" value={totalInvoices} color="from-emerald-500 to-emerald-600" shadow="shadow-emerald-500/20" />
           <StatCard icon={TrendingUp} label="وزن کل (kg)" value={Math.round(totalOrdersWeight)} color="from-amber-500 to-amber-600" shadow="shadow-amber-500/20" />
-          <StatCard icon={Clock} label="وزن باقی‌مانده (kg)" value={Math.round(remainingWeight)} color="from-purple-500 to-purple-600" shadow="shadow-purple-500/20" />
+          <StatCard icon={Clock} label="وزن باقی‌مانده (kg)" value={Math.round(remainingWeight)} color="from-blue-600 to-blue-700" shadow="shadow-blue-500/20" />
         </div>
 
         {/* Tabs + Search */}
@@ -250,7 +250,7 @@ export default function AdminDashboardPage() {
                   onClick={() => { setActiveTab('customers'); setSearchTerm(''); }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
                     activeTab === 'customers'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md'
+                      ? 'bg-blue-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                   }`}
                 >
@@ -265,7 +265,7 @@ export default function AdminDashboardPage() {
                   onClick={() => { setActiveTab('invoices'); setSearchTerm(''); }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
                     activeTab === 'invoices'
-                      ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md'
+                      ? 'bg-blue-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                   }`}
                 >
@@ -280,7 +280,7 @@ export default function AdminDashboardPage() {
                   onClick={() => { setActiveTab('archive'); setSearchTerm(''); }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
                     activeTab === 'archive'
-                      ? 'bg-gradient-to-r from-slate-600 to-slate-500 text-white shadow-md'
+                      ? 'bg-slate-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
                   }`}
                 >
@@ -305,7 +305,7 @@ export default function AdminDashboardPage() {
                       ? 'جستجو در شماره حواله، مشتری، توضیحات...'
                       : 'جستجو در بایگانی...'
                   }
-                  className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl py-2.5 pr-10 pl-4 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl py-2.5 pr-10 pl-4 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition"
                 />
               </div>
               <RefreshButton onRefresh={fetchAdminData} className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700" />
@@ -314,7 +314,7 @@ export default function AdminDashboardPage() {
 
           {adminLoading ? (
             <div className="p-12 text-center">
-              <div className="inline-block w-8 h-8 border-3 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+              <div className="inline-block w-8 h-8 border-3 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
               <p className="text-slate-400 mt-3 text-sm">در حال بارگذاری...</p>
             </div>
           ) : (
@@ -345,7 +345,7 @@ export default function AdminDashboardPage() {
                               <Td className="text-slate-500">{idx + 1}</Td>
                               <Td>
                                 <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                  <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                     {customer.name?.charAt(0) || '؟'}
                                   </div>
                                   <span className="font-semibold text-white">{customer.name}</span>
@@ -365,7 +365,7 @@ export default function AdminDashboardPage() {
                                 </span>
                               </Td>
                               <Td>
-                                <span className="inline-flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs px-2.5 py-1 rounded-full">
+                                <span className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs px-2.5 py-1 rounded-full">
                                   <Package className="w-3 h-3" />
                                   {customerOrders.length} حواله
                                 </span>
@@ -396,7 +396,7 @@ export default function AdminDashboardPage() {
                           <Th>مشتری</Th>
                           <Th>تعداد آیتم</Th>
                           <Th>وزن برش</Th>
-                          <Th>توضیحات</Th>  {/* ✅ ستون توضیحات */}
+                          <Th>توضیحات</Th>
                           <Th>وضعیت</Th>
                           <Th>عملیات</Th>
                         </tr>
@@ -416,7 +416,6 @@ export default function AdminDashboardPage() {
                             </Td>
                             <Td className="text-red-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
 
-                            {/* ✅ ستون توضیحات */}
                             <Td className="max-w-[150px]">
                               {invoice.notes ? (
                                 <span
@@ -432,7 +431,7 @@ export default function AdminDashboardPage() {
                             </Td>
 
                             <Td>
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-purple-500/10 border-purple-500/30 text-purple-400">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-blue-500/10 border-blue-500/30 text-blue-400">
                                 <CheckCircle2 className="w-3 h-3" />
                                 {invoice.status}
                               </span>
@@ -440,7 +439,7 @@ export default function AdminDashboardPage() {
                             <Td>
                               <button
                                 onClick={() => setSelectedInvoice(invoice)}
-                                className="inline-flex items-center gap-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
+                                className="inline-flex items-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                                 جزئیات
@@ -468,7 +467,7 @@ export default function AdminDashboardPage() {
                           <Th>مشتری</Th>
                           <Th>تعداد آیتم</Th>
                           <Th>وزن نهایی</Th>
-                          <Th>توضیحات</Th>  {/* ✅ ستون توضیحات */}
+                          <Th>توضیحات</Th>
                           <Th>وضعیت</Th>
                           <Th>عملیات</Th>
                         </tr>
@@ -490,7 +489,6 @@ export default function AdminDashboardPage() {
                             </Td>
                             <Td className="text-emerald-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
 
-                            {/* ✅ ستون توضیحات */}
                             <Td className="max-w-[150px]">
                               {invoice.notes ? (
                                 <span
@@ -650,9 +648,9 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-800 bg-gradient-to-r from-indigo-600/20 to-purple-600/20">
+        <div className="flex items-center justify-between p-5 border-b border-slate-800 bg-gradient-to-r from-blue-600/20 to-blue-500/10">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
               <ClipboardList className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -710,7 +708,6 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
             </div>
           </div>
 
-          {/* ✅ توضیحات (داخل مودال) */}
           {invoice.notes && invoice.notes.trim() !== '' && (
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
               <div className="flex items-start gap-2">
@@ -757,7 +754,7 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
                     <td className="px-3 py-2 text-slate-500">{item.bundle || '---'}</td>
                     <td className="px-3 py-2 text-white font-semibold">{item.weight || 0} kg</td>
                     <td className="px-3 py-2">
-                      <span className="inline-flex items-center gap-1 text-[11px] bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 px-2 py-1 rounded-lg whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1 text-[11px] bg-blue-500/10 border border-blue-500/30 text-blue-300 px-2 py-1 rounded-lg whitespace-nowrap">
                         {getCutTypeLabel(item.cutType)}
                       </span>
                     </td>
@@ -812,8 +809,8 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
                 disabled={isSubmitting}
                 className={`px-5 py-2.5 text-sm font-medium rounded-xl transition flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
                   canFinalize
-                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:shadow-lg hover:shadow-emerald-500/30 text-white'
-                    : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:shadow-lg hover:shadow-amber-500/30 text-white'
+                    ? 'bg-emerald-600 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/30 text-white'
+                    : 'bg-amber-600 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-500/30 text-white'
                 }`}
               >
                 {isSubmitting ? (

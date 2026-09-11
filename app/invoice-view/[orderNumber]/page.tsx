@@ -36,13 +36,10 @@ export default function InvoiceDetailPage() {
     const fetchData = async () => {
       try {
         const orderNumber = params.orderNumber;
-     
-        
-        // گرفتن همه invoice ها
+
         const res = await axios.get('http://localhost:4000/invoice');
         const allInvoices = res.data;
         
-        // پیدا کردن با orderNumber
         const foundInvoice = allInvoices.find((inv) => inv.orderNumber === orderNumber);
         setInvoice(foundInvoice);
 
@@ -79,10 +76,10 @@ export default function InvoiceDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-500">در حال بارگذاری...</p>
+          <p className="text-slate-500">در حال بارگذاری...</p>
         </div>
       </div>
     );
@@ -90,10 +87,10 @@ export default function InvoiceDetailPage() {
 
   if (!invoice) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
         <div className="text-center">
           <p className="text-red-500 text-lg">❌ صورت‌برشی با این شماره حواله یافت نشد</p>
-          <p className="text-gray-500 text-sm mt-2">شماره حواله: {params.orderNumber}</p>
+          <p className="text-slate-500 text-sm mt-2">شماره حواله: {params.orderNumber}</p>
           <Link href="/invoices" className="text-blue-600 hover:text-blue-700 mt-4 inline-block">
             بازگشت به لیست صورت‌برش‌ها
           </Link>
@@ -103,17 +100,17 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
-      <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95 print:shadow-none print:border-none">
+    <div className="min-h-screen bg-slate-50" dir="rtl">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95 print:shadow-none print:border-none">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
               ف
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">گروه فولادیار کوروش</h1>
+            <h1 className="text-2xl font-bold text-slate-900">گروه فولادیار کوروش</h1>
           </div>
           <div className="flex items-center gap-4 print:hidden">
-            <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
               <span className="text-blue-600 text-sm font-medium hidden sm:inline">
                 {currentUser?.name}
               </span>
@@ -123,7 +120,7 @@ export default function InvoiceDetailPage() {
             </div>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition text-sm font-medium shadow-sm hover:shadow-md"
+              className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition text-sm font-medium"
             >
               خروج
             </button>
@@ -132,18 +129,17 @@ export default function InvoiceDetailPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 print:shadow-none print:border-none">
-       
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 print:shadow-none print:border-none">
 
           <div className="border-b-2 border-blue-600 pb-6 mb-6">
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-3xl font-bold text-blue-600">صورت‌برش</h2>
-                <p className="text-sm text-gray-500 mt-1">شماره صورت‌برش: <span className="text-blue-600 font-medium">{invoice.invoiceNumber || invoice.id}</span></p>
+                <p className="text-sm text-slate-500 mt-1">شماره صورت‌برش: <span className="text-blue-600 font-medium">{invoice.invoiceNumber || invoice.id}</span></p>
               </div>
               <div className="text-left">
-                <p className="text-sm text-gray-500">تاریخ</p>
-                <p className="text-lg font-bold text-gray-900">
+                <p className="text-sm text-slate-500">تاریخ</p>
+                <p className="text-lg font-bold text-slate-900">
                   {new Date(invoice.date).toLocaleDateString('fa-IR')}
                 </p>
               </div>
@@ -153,20 +149,20 @@ export default function InvoiceDetailPage() {
           {/* مشخصات فنی */}
           <div className="mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-sm text-gray-500"> نام مشتری</p>
+              <div className="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
+                <p className="text-sm text-slate-500">نام مشتری</p>
                 <p className="font-bold text-blue-600">{invoice.customerName || '---'}</p>
               </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-sm text-gray-500">شماره حواله</p>
+              <div className="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
+                <p className="text-sm text-slate-500">شماره حواله</p>
                 <p className="font-bold text-blue-600">{invoice.orderNumber || '---'}</p>
               </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-sm text-gray-500">نوع</p>
+              <div className="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
+                <p className="text-sm text-slate-500">نوع</p>
                 <p className="font-bold text-blue-600">{invoice.items[0].productType || '---'}</p>
               </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-sm text-gray-500">برند</p>
+              <div className="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
+                <p className="text-sm text-slate-500">برند</p>
                 <p className="font-bold text-blue-600">{invoice.items[0].brand || '---'}</p>
               </div>
             </div>
@@ -175,40 +171,39 @@ export default function InvoiceDetailPage() {
           {/* آیتم‌های صورت‌برش */}
           {invoice.items && invoice.items.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-3 mb-4">آیتم‌های صورت‌برش</h3>
-              <div className="overflow-x-auto">
+              <h3 className="text-lg font-bold text-slate-900 border-b border-slate-200 pb-3 mb-4">آیتم‌های صورت‌برش</h3>
+              <div className="overflow-x-auto rounded-lg border border-slate-200">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-slate-50">
                     <tr>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">ردیف</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">نوع برش</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">تعداد</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">طول</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">عرض</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">ضخامت</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">بندیل</th>
-                      <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">وزن</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">ردیف</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">نوع برش</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">تعداد</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">طول</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">عرض</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">ضخامت</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">بندیل</th>
+                      <th className="px-4 py-2 text-right text-sm font-medium text-slate-500">وزن</th>
                     </tr>
                   </thead>
                   <tbody>
                     {invoice.items.map((item, index) => (
-                      <tr key={index} className="border-b border-gray-100 hover:bg-blue-50/30">
+                      <tr key={index} className="border-b border-slate-100 hover:bg-slate-50">
                         <td className="px-4 py-2 text-center text-sm text-blue-600">{item.row}</td>
-                        <td className="px-4 py-2 text-sm text-gray-900">{getCutTypeLabel(item.cutType)}</td>
-                        <td className="px-4 py-2 text-sm text-gray-900">{item.quantity}</td>
-                        <td className="px-4 py-2 text-sm text-gray-900">{item.length} m</td>
-                        <td className="px-4 py-2 text-sm text-gray-900">{item.width} m</td>
-                        <td className="px-4 py-2 text-sm text-gray-900">{item.thickness} mm</td>
+                        <td className="px-4 py-2 text-sm text-slate-900">{getCutTypeLabel(item.cutType)}</td>
+                        <td className="px-4 py-2 text-sm text-slate-900">{item.quantity}</td>
+                        <td className="px-4 py-2 text-sm text-slate-900">{item.length} m</td>
+                        <td className="px-4 py-2 text-sm text-slate-900">{item.width} m</td>
+                        <td className="px-4 py-2 text-sm text-slate-900">{item.thickness} mm</td>
                         <td className="px-4 py-2 text-sm font-bold text-blue-600">{item.bundle || 0}</td>
-                        <td className="px-4 py-2 text-sm font-bold text-blue-600">{item.weight} kg</td>              
+                        <td className="px-4 py-2 text-sm font-bold text-blue-600">{item.weight} kg</td>
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot className="bg-gray-50">
+                  <tfoot className="bg-slate-50">
                     <tr>
-                      <td colSpan="7" className="px-4 py-2 text-left font-bold text-gray-900">جمع کل</td>
-             <td className="px-4 py-2 text-center font-bold text-blue-600">{invoice.totalWeightInvoices} kg</td>
-            
+                      <td colSpan="7" className="px-4 py-2 text-left font-bold text-slate-900">جمع کل</td>
+                      <td className="px-4 py-2 text-center font-bold text-blue-600">{invoice.totalWeightInvoices} kg</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -216,24 +211,25 @@ export default function InvoiceDetailPage() {
             </div>
           )}
 
-
           {/* وضعیت */}
-          <div className="flex items-center gap-4 border-t border-gray-200 pt-6">
-            <span className="text-sm text-gray-500">وضعیت:</span>
-            <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-              invoice.status === 'صورت‌برش شده' ? 'bg-green-100 text-green-700' :
-              'bg-yellow-100 text-yellow-700'
+          <div className="flex items-center gap-4 border-t border-slate-200 pt-6">
+            <span className="text-sm text-slate-500">وضعیت:</span>
+            <span className={`px-4 py-2 rounded-full text-sm font-bold border ${
+              invoice.status === 'صورت‌برش شده'
+                ? 'bg-green-50 text-green-700 border-green-200'
+                : 'bg-amber-50 text-amber-700 border-amber-200'
             }`}>
               {invoice.status || 'ثبت شده'}
             </span>
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-slate-400">
               تاریخ ثبت: {new Date(invoice.createdAt).toLocaleString('fa-IR')}
             </span>
           </div>
-             <div className="flex justify-end mb-6 print:hidden">
+
+          <div className="flex justify-end mt-6 print:hidden">
             <button
               onClick={handlePrint}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition shadow-md hover:shadow-lg flex items-center gap-2"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition shadow-sm hover:shadow-md flex items-center gap-2"
             >
               🖨️ چاپ
             </button>
