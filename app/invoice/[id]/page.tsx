@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useStore from '../../store/store';
 import axios from 'axios';
+import RefreshButton from '../../component/refreshBtn';
 
 export default function InvoicePage() {
   const params = useParams();
@@ -17,7 +18,9 @@ export default function InvoicePage() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [remainingWeight, setRemainingWeight] = useState(0);
-  
+  const [notes, setNotes] = useState('');  // 📝 state توضیحات
+  const {fetchAdminData} =useStore()
+
   const [rows, setRows] = useState([
     { id: 1, length: '', width: '', thickness: '', quantity: '', bundle: '', cutType: '' }
   ]);
@@ -43,21 +46,21 @@ export default function InvoicePage() {
     const fetchOrder = async () => {
       try {
         const id = params.id;
-        
+
         const allOrdersRes = await axios.get('http://localhost:4000/orders');
         const allOrders = allOrdersRes.data;
         const foundOrder = allOrders.find((o) => o.orderNumber === id);
-        
+
         if (foundOrder) {
-        
+
           setOrder(foundOrder);
-        
+
           const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${foundOrder.id}`);
           const orderInvoices = invoiceRes.data;
-          
+
           const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
           const remaining = Math.round((foundOrder.totalWeight || 0) - totalCutWeight);
-        
+
           setRemainingWeight(remaining);
 
           setRows([{
@@ -72,7 +75,7 @@ export default function InvoicePage() {
         } else {
           setOrder(null);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error('❌ Error fetching order:', error);
@@ -90,7 +93,7 @@ export default function InvoicePage() {
     const width = parseFloat(row.width) || 0;
     const thickness = parseFloat(row.thickness) || 0;
     const quantity = parseFloat(row.quantity) || 0;
-    
+
     const density = 7.85;
     return Math.round(length * width * thickness * density * quantity);
   };
@@ -105,14 +108,14 @@ export default function InvoicePage() {
 
   const addRow = () => {
     const newId = rows.length > 0 ? Math.max(...rows.map(r => r.id)) + 1 : 1;
-    setRows([...rows, { 
-      id: newId, 
-      length: order?.length || '', 
-      width: order?.width || '', 
-      thickness: order?.thickness || '', 
-      quantity: '', 
-      bundle: '', 
-      cutType: '' 
+    setRows([...rows, {
+      id: newId,
+      length: order?.length || '',
+      width: order?.width || '',
+      thickness: order?.thickness || '',
+      quantity: '',
+      bundle: '',
+      cutType: ''
     }]);
   };
 
@@ -125,7 +128,7 @@ export default function InvoicePage() {
   };
 
   const updateRow = (id, field, value) => {
-    setRows(rows.map(row => 
+    setRows(rows.map(row =>
       row.id === id ? { ...row, [field]: value } : row
     ));
   };
@@ -142,8 +145,8 @@ export default function InvoicePage() {
     try {
       const totalWeightInvoices = calculateTotalWeight();
       const totalBundle = calculateTotalBundle();
-      
-        if (order.remainingWeight <= 0) {
+
+      if (order.remainingWeight <= 0) {
         alert('❌ وزن باید بزرگتر از صفر باشد');
         setSubmitting(false);
         return;
@@ -194,18 +197,19 @@ export default function InvoicePage() {
         items: invoiceItems,
         totalItems: invoiceItems.length,
         totalWeightInvoices: totalWeightInvoices,
+        notes: notes.trim() || null,  // 📝 توضیحات
         createdAt: new Date().toISOString()
       };
 
       await axios.post('http://localhost:4000/invoice', invoicePayload);
 
       // قبل از PATCH، مقدار قبلی رو از دیتابیس بگیر
-const currentOrder = await axios.get(`http://localhost:4000/orders/${order.id}`);
-const currentCutWeight = currentOrder.data.cutWeight || 0;
+      const currentOrder = await axios.get(`http://localhost:4000/orders/${order.id}`);
+      const currentCutWeight = currentOrder.data.cutWeight || 0;
 
-// مقدار جدید رو با قبلی جمع کن
-const newCutWeight = Math.round(currentCutWeight + totalWeightInvoices);
-const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
+      // مقدار جدید رو با قبلی جمع کن
+      const newCutWeight = Math.round(currentCutWeight + totalWeightInvoices);
+      const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
 
       // ✅ تعیین وضعیت جدید
       let newStatus = order.status;
@@ -213,8 +217,8 @@ const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
         newStatus = 'صورت برش شده';
       } else if (order.status === 'باز') {
         newStatus = 'باز';
-      }else if(newRemainingWeight === 0){
-                newStatus = ' نکمیل شده';
+      } else if (newRemainingWeight === 0) {
+        newStatus = ' تکمیل شده';
       }
 
       const updatedOrder = await axios.patch(`http://localhost:4000/orders/${order.id}`, {
@@ -227,33 +231,35 @@ const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
       });
 
       setOrder(updatedOrder.data);
- 
+
       setRemainingWeight(newRemainingWeight);
-      
-      setRows([{ 
-        id: 1, 
-        length: order.length || '', 
-        width: order.width || '', 
-        thickness: order.thickness || '', 
-        quantity: '', 
-        bundle: '', 
-        cutType: '' 
+
+      setRows([{
+        id: 1,
+        length: order.length || '',
+        width: order.width || '',
+        thickness: order.thickness || '',
+        quantity: '',
+        bundle: '',
+        cutType: ''
       }]);
+
+      setNotes('');  // 📝 پاک کردن توضیحات
 
       setSubmitting(false);
       setShowModal(false);
-      
+
       if (newRemainingWeight <= 0) {
         alert('✅ صورت‌برش با موفقیت ثبت شد و حواله تکمیل گردید!');
       } else {
         alert(`✅ صورت‌برش با موفقیت ثبت شد! وزن باقی‌مانده: ${newRemainingWeight} kg`);
       }
-      
+
       router.refresh();
 
     } catch (error) {
       console.error('Error submitting invoice:', error);
-      
+
       if (error.response) {
         alert(`❌ خطا: ${error.response.data || 'مشکلی در سرور وجود دارد'}`);
       } else if (error.request) {
@@ -261,7 +267,7 @@ const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
       } else {
         alert(`❌ خطا: ${error.message}`);
       }
-      
+
       setSubmitting(false);
     }
   };
@@ -354,7 +360,7 @@ const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
               <div>
                 <p className="text-sm text-gray-500">برند</p>
                 <p className="font-medium text-blue-600">{order.brand}</p>
-              </div>  
+              </div>
               <div>
                 <p className="text-sm text-gray-500">عرض</p>
                 <p className="font-medium text-blue-600">{order.width}</p>
@@ -388,8 +394,8 @@ const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
               onClick={() => setShowModal(true)}
               disabled={order.remainingWeight <= 0}
               className={`px-8 py-3 font-semibold rounded-xl transition shadow-md hover:shadow-lg ${
-                order.remainingWeight <= 0 
-                  ? 'bg-gray-400 cursor-not-allowed' 
+                order.remainingWeight <= 0
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-green-600 hover:bg-green-700 text-white'
               }`}
             >
@@ -535,6 +541,20 @@ const newRemainingWeight = Math.round((order.totalWeight || 0) - newCutWeight);
               >
                 + اضافه کردن ردیف جدید
               </button>
+
+              {/* 📝 توضیحات */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  توضیحات (اختیاری)
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="مثلاً: برش مخصوص پروژه، توضیحات فنی، یادداشت برای انبار..."
+                  rows={3}
+                  className="w-full px-4 py-3 text-sm bg-white border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-700 resize-none"
+                />
+              </div>
 
               <div className="bg-blue-50 rounded-lg p-3 text-center border-2 border-blue-200">
                 <p className="text-sm text-gray-500">وزن کل انتخاب شده</p>

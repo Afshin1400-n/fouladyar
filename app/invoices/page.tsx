@@ -8,6 +8,7 @@ import Link from 'next/link';
 import useStore from '../store/store';
 import axios from 'axios';
 
+
 export default function InvoicesPage() {
   const router = useRouter();
   const { currentUser, isAuthenticated, logout } = useStore();
@@ -202,12 +203,7 @@ export default function InvoicesPage() {
               <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
                 {filteredInvoices.length} مورد
               </span>
-              <button
-                onClick={fetchInvoices}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline"
-              >
-                🔄 بروزرسانی
-              </button>
+        
               <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
                 ← بازگشت به داشبورد
               </Link>

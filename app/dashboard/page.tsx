@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useStore from '../store/store';
 import axios from 'axios';
+ import RefreshButton from '../component/refreshBtn';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const {fetchAdminData} =useStore()
   const [stats, setStats] = useState({
     totalOrdersLength: 0,
     totalWeight: 0,
@@ -252,6 +254,10 @@ const fetchOrders = async () => {
               <Link href="./invoices" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
                 صورت برش ها مشاهده 
               </Link>
+                <RefreshButton
+    onRefresh={fetchAdminData}
+    className="bg-slate-800 hover:bg-slate-600 text-slate-300 border border-slate-700"
+  />
             </div>
           </div>
 
