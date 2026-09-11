@@ -26,6 +26,7 @@ import {
   AlertCircle,
   Save,
   Archive,
+  MessageSquare,
 } from 'lucide-react';
 
 // ============ نام فارسی انواع برش ============
@@ -98,33 +99,26 @@ export default function AdminDashboardPage() {
   // ✅ ثبت نهایی صورت‌برش
   // ============================================================
   const handleFinalizeInvoice = async (invoice, order) => {
-    // مجموع وزن برش همه‌ی صورت‌برش‌های این حواله
     const totalCutWeight = getOrderTotalCutWeight(order.id);
     const orderWeight = order?.totalWeight || 0;
     const remaining = Math.max(0, Math.round(orderWeight - totalCutWeight));
     const newStatus = remaining <= 50 ? 'تکمیل شده' : 'باز';
 
     try {
-      // ۱. آپدیت وضعیت حواله (PATCH = فقط فیلدهای ارسالی)
       await axios.patch(`http://localhost:4000/orders/${order.id}`, {
         status: newStatus,
         remainingWeight: remaining,
         updatedAt: new Date().toISOString(),
       });
 
-      // ۲. آپدیت وضعیت صورت‌برش → ثبت نهایی
       await axios.patch(`http://localhost:4000/invoice/${invoice.id}`, {
         status: 'ثبت نهایی',
         finalizedAt: new Date().toISOString(),
       });
 
-      // ۳. ✅ اول مودال رو ببند
       setSelectedInvoice(null);
-
-      // ۴. ✅ بعد دیتا رو رفرش کن
       await fetchAdminData();
 
-      // ۵. چک کن سرور واقعاً دیتا رو ذخیره کرده
       const updatedInvoice = useStore
         .getState()
         .allInvoices.find((inv) => inv.id === invoice.id);
@@ -181,13 +175,15 @@ export default function AdminDashboardPage() {
     (inv) =>
       inv.orderNumber?.includes(searchTerm) ||
       inv.customerName?.includes(searchTerm) ||
-      inv.status?.includes(searchTerm)
+      inv.status?.includes(searchTerm) ||
+      inv.notes?.includes(searchTerm)  // ✅ جستجو در توضیحات
   );
 
   const filteredArchived = archivedInvoices.filter(
     (inv) =>
       inv.orderNumber?.includes(searchTerm) ||
-      inv.customerName?.includes(searchTerm)
+      inv.customerName?.includes(searchTerm) ||
+      inv.notes?.includes(searchTerm)  // ✅ جستجو در توضیحات
   );
 
   return (
@@ -306,7 +302,7 @@ export default function AdminDashboardPage() {
                     activeTab === 'customers'
                       ? 'جستجو در نام، کد ملی، تلفن...'
                       : activeTab === 'invoices'
-                      ? 'جستجو در شماره حواله، مشتری...'
+                      ? 'جستجو در شماره حواله، مشتری، توضیحات...'
                       : 'جستجو در بایگانی...'
                   }
                   className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl py-2.5 pr-10 pl-4 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
@@ -400,6 +396,7 @@ export default function AdminDashboardPage() {
                           <Th>مشتری</Th>
                           <Th>تعداد آیتم</Th>
                           <Th>وزن برش</Th>
+                          <Th>توضیحات</Th>  {/* ✅ ستون توضیحات */}
                           <Th>وضعیت</Th>
                           <Th>عملیات</Th>
                         </tr>
@@ -418,6 +415,22 @@ export default function AdminDashboardPage() {
                               </span>
                             </Td>
                             <Td className="text-red-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
+
+                            {/* ✅ ستون توضیحات */}
+                            <Td className="max-w-[150px]">
+                              {invoice.notes ? (
+                                <span
+                                  className="inline-flex items-center gap-1 text-amber-400 text-xs truncate max-w-[140px]"
+                                  title={invoice.notes}
+                                >
+                                  <MessageSquare className="w-3 h-3 flex-shrink-0" />
+                                  <span className="truncate">{invoice.notes}</span>
+                                </span>
+                              ) : (
+                                <span className="text-slate-600 text-xs">---</span>
+                              )}
+                            </Td>
+
                             <Td>
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-purple-500/10 border-purple-500/30 text-purple-400">
                                 <CheckCircle2 className="w-3 h-3" />
@@ -455,6 +468,7 @@ export default function AdminDashboardPage() {
                           <Th>مشتری</Th>
                           <Th>تعداد آیتم</Th>
                           <Th>وزن نهایی</Th>
+                          <Th>توضیحات</Th>  {/* ✅ ستون توضیحات */}
                           <Th>وضعیت</Th>
                           <Th>عملیات</Th>
                         </tr>
@@ -475,6 +489,22 @@ export default function AdminDashboardPage() {
                               </span>
                             </Td>
                             <Td className="text-emerald-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
+
+                            {/* ✅ ستون توضیحات */}
+                            <Td className="max-w-[150px]">
+                              {invoice.notes ? (
+                                <span
+                                  className="inline-flex items-center gap-1 text-amber-400 text-xs truncate max-w-[140px]"
+                                  title={invoice.notes}
+                                >
+                                  <MessageSquare className="w-3 h-3 flex-shrink-0" />
+                                  <span className="truncate">{invoice.notes}</span>
+                                </span>
+                              ) : (
+                                <span className="text-slate-600 text-xs">---</span>
+                              )}
+                            </Td>
+
                             <Td>
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
                                 <CheckCircle2 className="w-3 h-3" />
@@ -679,6 +709,21 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
                 : '❌ برای تکمیل باید باقی‌مانده ≤ ۵۰ کیلو باشه'}
             </div>
           </div>
+
+          {/* ✅ توضیحات (داخل مودال) */}
+          {invoice.notes && invoice.notes.trim() !== '' && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+              <div className="flex items-start gap-2">
+                <MessageSquare className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-xs font-bold text-amber-400 mb-1">توضیحات:</p>
+                  <p className="text-sm text-amber-200/90 leading-relaxed whitespace-pre-wrap">
+                    {invoice.notes}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Body */}
