@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { Building2, User, Phone, MapPin, Lock, ArrowLeft, Sparkles, CheckCircle } from 'lucide-react';
+import Footer from '../component/footer';
+import Logo from '../component/logo';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -109,15 +111,12 @@ export default function RegisterPage() {
         </Link>
 
         <div className="w-full max-w-md">
-          {/* Logo & Brand */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg shadow-blue-500/30 mb-4">
-              <Building2 className="w-7 h-7 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-slate-900">Fouladyar Kourosh</h1>
-            <p className="text-sm text-slate-500 mt-1">Create Account</p>
-          </div>
-
+       
+      
+      {/* Logo */}
+<div className="relative w-32 h-20 mx-auto mb-6">
+  <Logo />
+</div>
           {/* Card */}
           <div className="bg-white rounded-2xl shadow-xl shadow-slate-900/5 border border-slate-200 p-8">
             {/* Badge */}
@@ -294,9 +293,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Footer */}
-          <p className="text-center text-[11px] text-slate-400 mt-6">
-            Fouladyar Kourosh Group © 2026
-          </p>
+         <Footer />
         </div>
       </div>
     </div>

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import useStore from './store/store';
 import { Building2, Package, FileText, Users, Sparkles, UserCircle, ShieldCheck } from 'lucide-react';
+import Footer from './component/footer';
+import Logo from './component/logo';
 
 export default function HomePage() {
   const { isAuthenticated } = useStore();
@@ -15,7 +17,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="h-screen  bg-slate-50">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-blue-400/10 -z-10" />
       
@@ -30,21 +32,10 @@ export default function HomePage() {
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
           <span className="text-[11px] font-medium text-blue-700 tracking-wide">Version 2.0</span>
         </div>
+<div className="relative w-full h-32 mb-10">
+  <Logo />
+</div>
 
-        {/* Logo & Brand */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-2xl shadow-blue-500/40 mb-5 relative group">
-            <Building2 className="w-10 h-10 text-white" />
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/20 to-transparent" />
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500/20 to-blue-400/20 blur-xl -z-10 group-hover:blur-2xl transition" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 tracking-tight">
-            Fouladyar <span className="text-blue-600">Kourosh</span>
-          </h1>
-          <p className="text-base text-slate-500 font-normal">
-            Comprehensive Customer Management System
-          </p>
-        </div>
 
         {/* Features Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl w-full mb-10">
@@ -113,17 +104,9 @@ export default function HomePage() {
 
         </div>
 
-        {/* Divider */}
-        <div className="flex items-center gap-4 mt-10 mb-4 max-w-2xl w-full">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200" />
-          <span className="text-xs text-slate-400 font-light">Fouladyar Kourosh Group</span>
-          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200" />
-        </div>
 
         {/* Footer */}
-        <p className="text-xs text-slate-400/70 font-light">
-          © 2026 All rights reserved
-        </p>
+       <Footer />
       </div>
     </div>
   );

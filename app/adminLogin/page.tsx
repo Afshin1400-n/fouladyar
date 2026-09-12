@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import useStore from '../store/store';
 import { Shield, Lock, User, ArrowLeft } from 'lucide-react';
+import Footer from '../component/footer';
+import Logo from '../component/logo';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -56,14 +58,9 @@ export default function AdminLoginPage() {
 
         <div className="w-full max-w-md">
           {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl shadow-lg shadow-blue-500/40 mb-4">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-white">Fouladyar Kourosh</h1>
-            <p className="text-sm text-slate-400 mt-1">System Admin Login</p>
-          </div>
-
+         <div className="relative w-full h-32 mb-10">
+           <Logo />
+         </div>
           {/* Card */}
           <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl shadow-blue-500/5 p-8">
 
@@ -140,16 +137,8 @@ export default function AdminLoginPage() {
             </form>
           </div>
 
-          {/* Info Box */}
-          <div className="mt-6 bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-            <p className="text-xs text-slate-500 text-center">
-              🔑 Demo: National ID <span className="text-blue-400 font-mono">1234</span> / Password <span className="text-blue-400 font-mono">1234</span>
-            </p>
-          </div>
 
-          <p className="text-center text-[11px] text-slate-600 mt-6">
-            Fouladyar Kourosh Group © 2026 — Admin Panel
-          </p>
+        <Footer />
         </div>
       </div>
     </div>
