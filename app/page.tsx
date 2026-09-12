@@ -15,20 +15,20 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
+    <div className="min-h-screen bg-slate-50">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-blue-400/10 -z-10" />
       
       {/* Floating Shapes */}
-      <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-400/5 rounded-full blur-3xl" />
       
       <div className="relative min-h-screen flex flex-col items-center justify-center p-6">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-3.5 py-1.5 rounded-full mb-8">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span className="text-[11px] font-medium text-blue-700 tracking-wide">نسخه ۲.۰</span>
+          <span className="text-[11px] font-medium text-blue-700 tracking-wide">Version 2.0</span>
         </div>
 
         {/* Logo & Brand */}
@@ -39,10 +39,10 @@ export default function HomePage() {
             <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500/20 to-blue-400/20 blur-xl -z-10 group-hover:blur-2xl transition" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 tracking-tight">
-            فولادیار <span className="text-blue-600">کوروش</span>
+            Fouladyar <span className="text-blue-600">Kourosh</span>
           </h1>
           <p className="text-base text-slate-500 font-normal">
-            سامانه جامع مدیریت مشتریان
+            Comprehensive Customer Management System
           </p>
         </div>
 
@@ -52,29 +52,29 @@ export default function HomePage() {
             <div className="w-11 h-11 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
               <Package className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-sm font-medium text-slate-700">مدیریت حواله‌ها</p>
+            <p className="text-sm font-medium text-slate-700">Order Management</p>
           </div>
           <div className="group bg-white rounded-xl p-4 text-center border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
             <div className="w-11 h-11 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-sm font-medium text-slate-700">صورت‌برش‌ها</p>
+            <p className="text-sm font-medium text-slate-700">Cutting Invoices</p>
           </div>
           <div className="group bg-white rounded-xl p-4 text-center border border-slate-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
             <div className="w-11 h-11 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
               <Users className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-sm font-medium text-slate-700">مشتریان</p>
+            <p className="text-sm font-medium text-slate-700">Customers</p>
           </div>
         </div>
 
-        {/* 🎯 دو دکمه ورود: مشتریان + کارمندان */}
+        {/* 🎯 Two login buttons: Customers + Employees */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl w-full">
 
-          {/* ورود مشتریان */}
+          {/* Customer Login */}
           <Link
             href="/login"
-            className="group relative bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-right"
+            className="group relative bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-left"
           >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -82,19 +82,19 @@ export default function HomePage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition">
-                  ورود مشتریان
+                  Customer Login
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  مشاهده حواله‌ها، صورت‌برش‌ها و سابقه سفارشات
+                  View orders, cutting invoices, and order history
                 </p>
               </div>
             </div>
           </Link>
 
-          {/* ورود کارمندان */}
+          {/* Employee Login */}
           <Link
             href="/adminLogin"
-            className="group relative bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-right"
+            className="group relative bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 text-left"
           >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -102,10 +102,10 @@ export default function HomePage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition">
-                  ورود کارمندان
+                  Employee Login
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  دسترسی به پنل مدیریت و ابزارهای سیستم
+                  Access to admin panel and system tools
                 </p>
               </div>
             </div>
@@ -116,13 +116,13 @@ export default function HomePage() {
         {/* Divider */}
         <div className="flex items-center gap-4 mt-10 mb-4 max-w-2xl w-full">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200" />
-          <span className="text-xs text-slate-400 font-light">گروه فولادیار کوروش</span>
+          <span className="text-xs text-slate-400 font-light">Fouladyar Kourosh Group</span>
           <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200" />
         </div>
 
         {/* Footer */}
         <p className="text-xs text-slate-400/70 font-light">
-          © ۱۴۰۵ تمامی حقوق محفوظ است
+          © 2026 All rights reserved
         </p>
       </div>
     </div>
