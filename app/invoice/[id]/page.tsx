@@ -24,14 +24,14 @@ export default function InvoicePage() {
   ]);
 
   const cutTypes = [
-    { id: 'flat_thick', label: 'صاف ضخیم' },
-    { id: 'flat_thin', label: 'صاف نازک' },
-    { id: 'shutter_b', label: 'کرکره نوع B' },
-    { id: 'shutter_small', label: 'کرکره ریز' },
-    { id: 'trapezoidal', label: 'ذوزنقه' },
-    { id: 'corrugated', label: 'موجدار' },
-    { id: 'perforated', label: 'سوراخدار' },
-    { id: 'custom', label: 'سفارشی' },
+    { id: 'flat_thick', label: 'Flat Sheet - Thick' },
+    { id: 'flat_thin', label: 'Flat Sheet - Thin' },
+    { id: 'shutter_b', label: 'Shutter Type B' },
+    { id: 'shutter_small', label: 'Small Shutter' },
+    { id: 'trapezoidal', label: 'Trapezoidal' },
+    { id: 'corrugated', label: 'Corrugated' },
+    { id: 'perforated', label: 'Perforated' },
+    { id: 'custom', label: 'Custom' },
   ];
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function InvoicePage() {
 
   const removeRow = (id) => {
     if (rows.length <= 1) {
-      alert('حداقل یک ردیف باید وجود داشته باشد');
+      alert('At least one row is required');
       return;
     }
     setRows(rows.filter(row => row.id !== id));
@@ -144,25 +144,25 @@ export default function InvoicePage() {
       const totalBundle = calculateTotalBundle();
 
       if (order.remainingWeight <= 0) {
-        alert('❌ وزن باید بزرگتر از صفر باشد');
+        alert('❌ Weight must be greater than zero');
         setSubmitting(false);
         return;
       }
 
       if (totalWeightInvoices <= 0) {
-        alert('❌ وزن باید بزرگتر از صفر باشد');
+        alert('❌ Weight must be greater than zero');
         setSubmitting(false);
         return;
       }
 
       if (totalBundle < 1) {
-        alert('❌ مجموع بندل‌ها باید حداقل 1 باشد');
+        alert('❌ Total bundles must be at least 1');
         setSubmitting(false);
         return;
       }
 
       if (totalWeightInvoices > order.remainingWeight) {
-        alert(`❌ وزن وارد شده (${totalWeightInvoices} kg) از وزن باقی‌مانده (${order.remainingWeight} kg) بیشتر است!`);
+        alert(`❌ Entered weight (${totalWeightInvoices} kg) exceeds remaining weight (${order.remainingWeight} kg)!`);
         setSubmitting(false);
         return;
       }
@@ -242,9 +242,9 @@ export default function InvoicePage() {
       setShowModal(false);
 
       if (newRemainingWeight <= 0) {
-        alert('✅ صورت‌برش با موفقیت ثبت شد و حواله تکمیل گردید!');
+        alert('✅ Cutting invoice saved successfully and order completed!');
       } else {
-        alert(`✅ صورت‌برش با موفقیت ثبت شد! وزن باقی‌مانده: ${newRemainingWeight} kg`);
+        alert(`✅ Cutting invoice saved successfully! Remaining weight: ${newRemainingWeight} kg`);
       }
 
       router.refresh();
@@ -253,11 +253,11 @@ export default function InvoicePage() {
       console.error('Error submitting invoice:', error);
 
       if (error.response) {
-        alert(`❌ خطا: ${error.response.data || 'مشکلی در سرور وجود دارد'}`);
+        alert(`❌ Error: ${error.response.data || 'Server error'}`);
       } else if (error.request) {
-        alert('❌ خطا در ارتباط با سرور');
+        alert('❌ Server connection error');
       } else {
-        alert(`❌ خطا: ${error.message}`);
+        alert(`❌ Error: ${error.message}`);
       }
 
       setSubmitting(false);
@@ -270,10 +270,10 @@ export default function InvoicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-500">در حال بارگذاری...</p>
+          <p className="text-slate-500">Loading...</p>
         </div>
       </div>
     );
@@ -281,12 +281,12 @@ export default function InvoicePage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <p className="text-red-500 text-lg">❌ حواله‌ای با این شماره یافت نشد</p>
+          <p className="text-red-500 text-lg">❌ No order found with this number</p>
           <p className="text-slate-500 text-sm mt-2">ID: {params.id}</p>
           <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 mt-4 inline-block">
-            بازگشت به داشبورد
+            Back to Dashboard
           </Link>
         </div>
       </div>
@@ -297,14 +297,14 @@ export default function InvoicePage() {
   const totalBundle = calculateTotalBundle();
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
+    <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-              ف
+              F
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">گروه فولادیار کوروش</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Fouladyar Kourosh Group</h1>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
@@ -312,14 +312,14 @@ export default function InvoicePage() {
                 {currentUser?.name}
               </span>
               <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                {currentUser?.name?.charAt(0) || 'م'}
+                {currentUser?.name?.charAt(0) || 'U'}
               </div>
             </div>
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition text-sm font-medium"
             >
-              خروج
+              Logout
             </button>
           </div>
         </div>
@@ -330,35 +330,35 @@ export default function InvoicePage() {
           <div className="border-b border-slate-200 pb-6 mb-6">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-2xl font-bold text-blue-600">صورت‌برش</h2>
-                <p className="text-sm text-slate-500 mt-1">شماره حواله: <span className="text-blue-600 font-semibold">{order.orderNumber}</span></p>
+                <h2 className="text-2xl font-bold text-blue-600">Cutting Invoice</h2>
+                <p className="text-sm text-slate-500 mt-1">Order #: <span className="text-blue-600 font-semibold">{order.orderNumber}</span></p>
               </div>
-              <div className="text-left">
-                <p className="text-sm text-slate-500">تاریخ</p>
+              <div className="text-right">
+                <p className="text-sm text-slate-500">Date</p>
                 <p className="text-sm font-medium text-slate-900">
-                  {new Date(order.date).toLocaleDateString('fa-IR')}
+                  {new Date(order.date).toLocaleDateString('en-US')}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="border-t border-slate-200 pt-6">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">جزئیات حواله</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Order Details</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 rounded-xl p-4 border border-slate-200">
               <div>
-                <p className="text-sm text-slate-500">نوع محصول</p>
+                <p className="text-sm text-slate-500">Product Type</p>
                 <p className="font-medium text-slate-900">{order.productType}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500">برند</p>
+                <p className="text-sm text-slate-500">Brand</p>
                 <p className="font-medium text-slate-900">{order.brand}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500">عرض</p>
+                <p className="text-sm text-slate-500">Width</p>
                 <p className="font-medium text-slate-900">{order.width}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500">ضخامت</p>
+                <p className="text-sm text-slate-500">Thickness</p>
                 <p className="font-medium text-slate-900">{order.thickness}</p>
               </div>
             </div>
@@ -367,15 +367,15 @@ export default function InvoicePage() {
           <div className="border-t border-slate-200 pt-6 mt-6">
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
-                <p className="text-sm text-slate-500">وزن کل حواله</p>
+                <p className="text-sm text-slate-500">Total Order Weight</p>
                 <p className="text-2xl font-bold text-slate-900">{Math.round(order.totalWeight)} kg</p>
               </div>
               <div className="bg-red-50 rounded-xl p-4 text-center border border-red-100">
-                <p className="text-sm text-red-600">وزن برش شده</p>
+                <p className="text-sm text-red-600">Cut Weight</p>
                 <p className="text-2xl font-bold text-red-600">{Math.round(order.cutWeight)} kg</p>
               </div>
               <div className="bg-green-50 rounded-xl p-4 text-center border border-green-100">
-                <p className="text-sm text-green-600">وزن باقی‌مانده</p>
+                <p className="text-sm text-green-600">Remaining Weight</p>
                 <p className="text-2xl font-bold text-green-600">{Math.round(order.remainingWeight)} kg</p>
               </div>
             </div>
@@ -391,7 +391,7 @@ export default function InvoicePage() {
                   : 'bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow-md'
               }`}
             >
-              {order.remainingWeight <= 0 ? '✅ تکمیل شده' : '📝 ثبت صورت‌برش'}
+              {order.remainingWeight <= 0 ? '✅ Completed' : '📝 Create Cutting Invoice'}
             </button>
           </div>
         </div>
@@ -401,7 +401,7 @@ export default function InvoicePage() {
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl shadow-slate-900/20 max-w-5xl w-full p-6 max-h-[90vh] overflow-y-auto border border-slate-200">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-slate-900">ثبت صورت‌برش</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Create Cutting Invoice</h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-slate-400 hover:text-slate-600 text-2xl w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition"
@@ -411,10 +411,10 @@ export default function InvoicePage() {
             </div>
 
             <div className="mb-4 p-4 bg-green-50 rounded-xl text-center border border-green-200">
-              <p className="text-sm text-slate-500">وزن باقی‌مانده قابل برش</p>
+              <p className="text-sm text-slate-500">Available weight to cut</p>
               <p className="text-2xl font-bold text-green-600">{order.remainingWeight} kg</p>
-              <p className="text-sm text-slate-500 mt-1">وزن کل انتخاب شده: <span className="text-blue-600 font-bold">{totalWeightInvoices} kg</span></p>
-              <p className="text-sm text-slate-500 mt-1">مجموع بندل‌ها: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
+              <p className="text-sm text-slate-500 mt-1">Selected total weight: <span className="text-blue-600 font-bold">{totalWeightInvoices} kg</span></p>
+              <p className="text-sm text-slate-500 mt-1">Total bundles: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
             </div>
 
             <form onSubmit={handleInvoiceSubmit} className="space-y-4">
@@ -422,15 +422,15 @@ export default function InvoicePage() {
                 <table className="w-full border-collapse min-w-[800px]">
                   <thead className="sticky top-0 bg-slate-50 z-10">
                     <tr className="bg-blue-50">
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[35px] border-b border-blue-100">ردیف</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[150px] border-b border-blue-100">نوع برش</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">تعداد</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">طول</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">بندل</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">عرض</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">ضخامت</th>
-                      <th className="px-3 py-2 text-right text-sm font-medium text-blue-700 w-[60px] border-b border-blue-100">وزن</th>
-                      <th className="px-3 py-2 text-center text-sm font-medium text-blue-700 w-[40px] border-b border-blue-100">عملیات</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[35px] border-b border-blue-100">#</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[150px] border-b border-blue-100">Cut Type</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">Qty</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">Length</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">Bundle</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">Width</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[55px] border-b border-blue-100">Thickness</th>
+                      <th className="px-3 py-2 text-left text-sm font-medium text-blue-700 w-[60px] border-b border-blue-100">Weight</th>
+                      <th className="px-3 py-2 text-center text-sm font-medium text-blue-700 w-[40px] border-b border-blue-100">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -446,7 +446,7 @@ export default function InvoicePage() {
                               className="w-full px-2 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900"
                               required
                             >
-                              <option value="">انتخاب...</option>
+                              <option value="">Select...</option>
                               {cutTypes.map((type) => (
                                 <option key={type.id} value={type.id}>{type.label}</option>
                               ))}
@@ -531,26 +531,26 @@ export default function InvoicePage() {
                 onClick={addRow}
                 className="w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold rounded-lg transition border border-dashed border-blue-300"
               >
-                + اضافه کردن ردیف جدید
+                + Add New Row
               </button>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  توضیحات (اختیاری)
+                  Notes (Optional)
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="مثلاً: برش مخصوص پروژه، توضیحات فنی، یادداشت برای انبار..."
+                  placeholder="E.g.: project-specific cuts, technical notes, warehouse remarks..."
                   rows={3}
                   className="w-full px-4 py-3 text-sm bg-white border border-slate-200 rounded-lg focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 resize-none placeholder:text-slate-400"
                 />
               </div>
 
               <div className="bg-blue-50 rounded-xl p-4 text-center border border-blue-200">
-                <p className="text-sm text-slate-500">وزن کل انتخاب شده</p>
+                <p className="text-sm text-slate-500">Selected Total Weight</p>
                 <p className="text-2xl font-bold text-blue-600">{totalWeightInvoices} kg</p>
-                <p className="text-sm text-slate-500 mt-1">مجموع بندل‌ها: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
+                <p className="text-sm text-slate-500 mt-1">Total bundles: <span className="text-blue-600 font-bold">{totalBundle}</span></p>
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -563,30 +563,30 @@ export default function InvoicePage() {
                       : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md'
                   }`}
                 >
-                  {submitting ? 'در حال ثبت...' : 'ثبت صورت‌برش'}
+                  {submitting ? 'Saving...' : 'Save Cutting Invoice'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
                   className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition border border-slate-200"
                 >
-                  انصراف
+                  Cancel
                 </button>
               </div>
 
               {totalWeightInvoices > remainingWeight && (
                 <p className="text-red-500 text-sm text-center">
-                  ⚠️ وزن کل ({totalWeightInvoices} kg) از وزن باقی‌مانده ({remainingWeight} kg) بیشتر است!
+                  ⚠️ Total weight ({totalWeightInvoices} kg) exceeds remaining weight ({remainingWeight} kg)!
                 </p>
               )}
               {totalWeightInvoices <= 0 && (
                 <p className="text-amber-500 text-sm text-center">
-                  ⚠️ لطفاً حداقل یک ردیف با وزن بیشتر از صفر وارد کنید
+                  ⚠️ Please enter at least one row with weight greater than zero
                 </p>
               )}
               {totalBundle < 1 && totalWeightInvoices > 0 && (
                 <p className="text-red-500 text-sm text-center">
-                  ⚠️ مجموع بندل‌ها باید حداقل 1 باشد (مقدار فعلی: {totalBundle})
+                  ⚠️ Total bundles must be at least 1 (current: {totalBundle})
                 </p>
               )}
             </form>

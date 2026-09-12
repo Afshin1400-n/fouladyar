@@ -29,26 +29,26 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-// ============ نام فارسی انواع برش ============
+// ============ Cut Type Labels ============
 const CUT_TYPE_LABELS = {
-  flat_thin: 'ورق صاف نازک',
-  flat_thick: 'ورق صاف ضخیم',
-  shutter_small: 'کرکره کوچک',
-  shutter_big: 'کرکره بزرگ',
-  shutter_a: 'کرکره A',
-  shutter_b: 'کرکره B',
-  shutter_c: 'کرکره C',
-  bend: 'خم',
-  cut: 'برش ساده',
-  custom: 'سفارشی',
-  trapezoidal: 'ذوزنقه',
+  flat_thin: 'Flat Sheet - Thin',
+  flat_thick: 'Flat Sheet - Thick',
+  shutter_small: 'Shutter - Small',
+  shutter_big: 'Shutter - Large',
+  shutter_a: 'Shutter A',
+  shutter_b: 'Shutter B',
+  shutter_c: 'Shutter C',
+  bend: 'Bend',
+  cut: 'Simple Cut',
+  custom: 'Custom',
+  trapezoidal: 'Trapezoidal',
 };
 
 const getCutTypeLabel = (cutType) => {
   return CUT_TYPE_LABELS[cutType] || cutType || '---';
 };
 
-// ============ کامپوننت اصلی ============
+// ============ Main Component ============
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -67,14 +67,14 @@ export default function AdminDashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
-  // محافظت از صفحه
+  // Route protection
   useEffect(() => {
     if (!isAdminAuthenticated) {
       router.push('/adminLogin');
     }
   }, [isAdminAuthenticated, router]);
 
-  // گرفتن دیتا
+  // Fetch data
   useEffect(() => {
     if (isAdminAuthenticated) {
       fetchAdminData();
@@ -87,7 +87,7 @@ export default function AdminDashboardPage() {
   };
 
   // ============================================================
-  // ✅ محاسبه مجموع وزن برش همه‌ی صورت‌برش‌های یک حواله
+  // ✅ Calculate total cut weight of all invoices for an order
   // ============================================================
   const getOrderTotalCutWeight = (orderId) => {
     return allInvoices
@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
   };
 
   // ============================================================
-  // ✅ ثبت نهایی صورت‌برش
+  // ✅ Finalize Invoice
   // ============================================================
   const handleFinalizeInvoice = async (invoice, order) => {
     const totalCutWeight = getOrderTotalCutWeight(order.id);
@@ -129,25 +129,25 @@ export default function AdminDashboardPage() {
       if (updatedInvoice?.status === 'ثبت نهایی') {
         alert(
           remaining <= 50
-            ? `✅ حواله ${order.orderNumber} تکمیل و بایگانی شد!`
-            : `✅ صورت‌برش ثبت نهایی و بایگانی شد.`
+            ? `✅ Order ${order.orderNumber} completed and archived!`
+            : `✅ Invoice finalized and archived.`
         );
       } else {
-        console.warn('⚠️ سرور دیتا رو ذخیره نکرده!');
+        console.warn('⚠️ Server did not save the data!');
         alert(
-          '⚠️ ثبت انجام شد اما سرور دیتا رو ذخیره نکرده.\n' +
-            'لطفاً json-server رو بررسی کن و db.json رو چک کن.'
+          '⚠️ Save was successful but the server did not persist the data.\n' +
+            'Please check json-server and db.json.'
         );
       }
     } catch (error) {
       console.error('❌ Error finalizing invoice:', error);
-      alert('❌ خطا در ثبت نهایی');
+      alert('❌ Error finalizing invoice');
     }
   };
 
   if (!isAdminAuthenticated) return null;
 
-  // 📊 آمار
+  // 📊 Stats
   const totalCustomers = allCustomers.length;
   const totalInvoices = allInvoices.filter((inv) => inv.status !== 'ثبت نهایی').length;
   const totalOrdersWeight = allOrders.reduce(
@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
   );
   const remainingWeight = Math.max(0, totalOrdersWeight - totalCutWeight);
 
-  // 🔍 فیلترها
+  // 🔍 Filters
   const filteredCustomers = allCustomers.filter(
     (c) =>
       c.name?.includes(searchTerm) ||
@@ -187,10 +187,10 @@ export default function AdminDashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950" dir="rtl">
+    <div className="min-h-screen bg-slate-950">
       {/* Background */}
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent_50%)]" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.10),transparent_50%)]" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15),transparent_50%)]" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(37,99,235,0.10),transparent_50%)]" />
 
       {/* Header */}
       <header className="relative bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-20">
@@ -200,23 +200,23 @@ export default function AdminDashboardPage() {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">پنل مدیریت</h1>
-              <p className="text-xs text-slate-400">فولادیار کوروش</p>
+              <h1 className="text-lg font-bold text-white">Admin Panel</h1>
+              <p className="text-xs text-slate-400">Fouladyar Kourosh</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex flex-col text-left">
+            <div className="hidden sm:flex flex-col text-right">
               <p className="text-sm font-medium text-white">{adminUser?.name}</p>
-              <p className="text-[11px] text-blue-400">مدیر سیستم</p>
+              <p className="text-[11px] text-blue-400">System Admin</p>
             </div>
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-sm font-bold">
-              {adminUser?.name?.charAt(0) || 'م'}
+              {adminUser?.name?.charAt(0) || 'A'}
             </div>
             <Link
               href="/"
               className="p-2.5 hover:bg-slate-800 rounded-xl transition"
-              title="صفحه اصلی"
+              title="Home"
             >
               <Home className="w-5 h-5 text-slate-400" />
             </Link>
@@ -225,7 +225,7 @@ export default function AdminDashboardPage() {
               className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl text-sm font-medium transition"
             >
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">خروج</span>
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
@@ -235,10 +235,10 @@ export default function AdminDashboardPage() {
       <main className="relative max-w-7xl mx-auto px-6 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <StatCard icon={Users} label="کل مشتریان" value={totalCustomers} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/20" />
-          <StatCard icon={FileText} label="صورت‌برش‌های فعال" value={totalInvoices} color="from-emerald-500 to-emerald-600" shadow="shadow-emerald-500/20" />
-          <StatCard icon={TrendingUp} label="وزن کل (kg)" value={Math.round(totalOrdersWeight)} color="from-amber-500 to-amber-600" shadow="shadow-amber-500/20" />
-          <StatCard icon={Clock} label="وزن باقی‌مانده (kg)" value={Math.round(remainingWeight)} color="from-blue-600 to-blue-700" shadow="shadow-blue-500/20" />
+          <StatCard icon={Users} label="Total Customers" value={totalCustomers} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/20" />
+          <StatCard icon={FileText} label="Active Invoices" value={totalInvoices} color="from-emerald-500 to-emerald-600" shadow="shadow-emerald-500/20" />
+          <StatCard icon={TrendingUp} label="Total Weight (kg)" value={Math.round(totalOrdersWeight)} color="from-amber-500 to-amber-600" shadow="shadow-amber-500/20" />
+          <StatCard icon={Clock} label="Remaining Weight (kg)" value={Math.round(remainingWeight)} color="from-blue-600 to-blue-700" shadow="shadow-blue-500/20" />
         </div>
 
         {/* Tabs + Search */}
@@ -255,7 +255,7 @@ export default function AdminDashboardPage() {
                   }`}
                 >
                   <Users className="w-4 h-4" />
-                  مشتریان
+                  Customers
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'customers' ? 'bg-white/20' : 'bg-slate-700'}`}>
                     {totalCustomers}
                   </span>
@@ -270,7 +270,7 @@ export default function AdminDashboardPage() {
                   }`}
                 >
                   <FileText className="w-4 h-4" />
-                  صورت‌برش‌ها
+                  Invoices
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'invoices' ? 'bg-white/20' : 'bg-slate-700'}`}>
                     {activeInvoices.length}
                   </span>
@@ -285,7 +285,7 @@ export default function AdminDashboardPage() {
                   }`}
                 >
                   <Archive className="w-4 h-4" />
-                  بایگانی
+                  Archive
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'archive' ? 'bg-white/20' : 'bg-slate-700'}`}>
                     {archivedInvoices.length}
                   </span>
@@ -293,19 +293,19 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="relative flex-1 max-w-xs min-w-[200px]">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={
                     activeTab === 'customers'
-                      ? 'جستجو در نام، کد ملی، تلفن...'
+                      ? 'Search by name, National ID, phone...'
                       : activeTab === 'invoices'
-                      ? 'جستجو در شماره حواله، مشتری، توضیحات...'
-                      : 'جستجو در بایگانی...'
+                      ? 'Search by order #, customer, notes...'
+                      : 'Search archive...'
                   }
-                  className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl py-2.5 pr-10 pl-4 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                  className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl py-2.5 pl-10 pr-4 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition"
                 />
               </div>
               <RefreshButton onRefresh={fetchAdminData} className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700" />
@@ -315,26 +315,26 @@ export default function AdminDashboardPage() {
           {adminLoading ? (
             <div className="p-12 text-center">
               <div className="inline-block w-8 h-8 border-3 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
-              <p className="text-slate-400 mt-3 text-sm">در حال بارگذاری...</p>
+              <p className="text-slate-400 mt-3 text-sm">Loading...</p>
             </div>
           ) : (
             <>
-              {/* مشتریان */}
+              {/* Customers */}
               {activeTab === 'customers' && (
                 <div className="overflow-x-auto">
                   {filteredCustomers.length === 0 ? (
-                    <EmptyState icon={Users} title={searchTerm ? 'مشتری‌ای یافت نشد' : 'هیچ مشتری‌ای ثبت نشده'} />
+                    <EmptyState icon={Users} title={searchTerm ? 'No customers found' : 'No customers registered'} />
                   ) : (
                     <table className="w-full">
                       <thead className="bg-slate-800/50">
                         <tr>
-                          <Th>ردیف</Th>
-                          <Th>نام</Th>
-                          <Th>کد ملی</Th>
-                          <Th>تلفن</Th>
-                          <Th>آدرس</Th>
-                          <Th>تعداد حواله</Th>
-                          <Th>تاریخ عضویت</Th>
+                          <Th>#</Th>
+                          <Th>Name</Th>
+                          <Th>National ID</Th>
+                          <Th>Phone</Th>
+                          <Th>Address</Th>
+                          <Th>Orders</Th>
+                          <Th>Join Date</Th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
@@ -346,7 +346,7 @@ export default function AdminDashboardPage() {
                               <Td>
                                 <div className="flex items-center gap-3">
                                   <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                    {customer.name?.charAt(0) || '؟'}
+                                    {customer.name?.charAt(0) || '?'}
                                   </div>
                                   <span className="font-semibold text-white">{customer.name}</span>
                                 </div>
@@ -367,11 +367,11 @@ export default function AdminDashboardPage() {
                               <Td>
                                 <span className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs px-2.5 py-1 rounded-full">
                                   <Package className="w-3 h-3" />
-                                  {customerOrders.length} حواله
+                                  {customerOrders.length} orders
                                 </span>
                               </Td>
                               <Td className="text-slate-500 text-xs">
-                                {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('fa-IR') : '---'}
+                                {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-US') : '---'}
                               </Td>
                             </tr>
                           );
@@ -382,36 +382,36 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
-              {/* صورت‌برش‌ها */}
+              {/* Invoices */}
               {activeTab === 'invoices' && (
                 <div className="overflow-x-auto">
                   {filteredInvoices.length === 0 ? (
-                    <EmptyState icon={FileText} title={searchTerm ? 'صورت‌برشی یافت نشد' : 'هیچ صورت‌برش فعالی ثبت نشده'} />
+                    <EmptyState icon={FileText} title={searchTerm ? 'No invoices found' : 'No active invoices'} />
                   ) : (
                     <table className="w-full">
                       <thead className="bg-slate-800/50">
                         <tr>
-                          <Th>تاریخ</Th>
-                          <Th>شماره حواله</Th>
-                          <Th>مشتری</Th>
-                          <Th>تعداد آیتم</Th>
-                          <Th>وزن برش</Th>
-                          <Th>توضیحات</Th>
-                          <Th>وضعیت</Th>
-                          <Th>عملیات</Th>
+                          <Th>Date</Th>
+                          <Th>Order #</Th>
+                          <Th>Customer</Th>
+                          <Th>Items</Th>
+                          <Th>Cut Weight</Th>
+                          <Th>Notes</Th>
+                          <Th>Status</Th>
+                          <Th>Actions</Th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
                         {filteredInvoices.map((invoice) => (
                           <tr key={invoice.id} className="hover:bg-slate-800/30 transition">
                             <Td className="text-slate-500 text-xs">
-                              {new Date(invoice.date).toLocaleDateString('fa-IR')}
+                              {new Date(invoice.date).toLocaleDateString('en-US')}
                             </Td>
                             <Td className="font-mono text-blue-400 font-semibold">{invoice.orderNumber}</Td>
                             <Td className="text-white font-medium">{invoice.customerName}</Td>
                             <Td>
                               <span className="inline-flex items-center gap-1 bg-slate-700/50 text-slate-300 text-xs px-2.5 py-1 rounded-full">
-                                {invoice.totalItems} آیتم
+                                {invoice.totalItems} items
                               </span>
                             </Td>
                             <Td className="text-red-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
@@ -442,7 +442,7 @@ export default function AdminDashboardPage() {
                                 className="inline-flex items-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
                               >
                                 <Eye className="w-3.5 h-3.5" />
-                                جزئیات
+                                Details
                               </button>
                             </Td>
                           </tr>
@@ -453,23 +453,23 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
-              {/* بایگانی */}
+              {/* Archive */}
               {activeTab === 'archive' && (
                 <div className="overflow-x-auto">
                   {filteredArchived.length === 0 ? (
-                    <EmptyState icon={Archive} title={searchTerm ? 'صورت‌برشی یافت نشد' : 'بایگانی خالی است'} />
+                    <EmptyState icon={Archive} title={searchTerm ? 'No invoices found' : 'Archive is empty'} />
                   ) : (
                     <table className="w-full">
                       <thead className="bg-slate-800/50">
                         <tr>
-                          <Th>تاریخ ثبت نهایی</Th>
-                          <Th>شماره حواله</Th>
-                          <Th>مشتری</Th>
-                          <Th>تعداد آیتم</Th>
-                          <Th>وزن نهایی</Th>
-                          <Th>توضیحات</Th>
-                          <Th>وضعیت</Th>
-                          <Th>عملیات</Th>
+                          <Th>Finalized Date</Th>
+                          <Th>Order #</Th>
+                          <Th>Customer</Th>
+                          <Th>Items</Th>
+                          <Th>Final Weight</Th>
+                          <Th>Notes</Th>
+                          <Th>Status</Th>
+                          <Th>Actions</Th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
@@ -477,14 +477,14 @@ export default function AdminDashboardPage() {
                           <tr key={invoice.id} className="hover:bg-slate-800/30 transition">
                             <Td className="text-slate-500 text-xs">
                               {invoice.finalizedAt
-                                ? new Date(invoice.finalizedAt).toLocaleDateString('fa-IR')
-                                : new Date(invoice.date).toLocaleDateString('fa-IR')}
+                                ? new Date(invoice.finalizedAt).toLocaleDateString('en-US')
+                                : new Date(invoice.date).toLocaleDateString('en-US')}
                             </Td>
                             <Td className="font-mono text-blue-400 font-semibold">{invoice.orderNumber}</Td>
                             <Td className="text-white font-medium">{invoice.customerName}</Td>
                             <Td>
                               <span className="inline-flex items-center gap-1 bg-slate-700/50 text-slate-300 text-xs px-2.5 py-1 rounded-full">
-                                {invoice.totalItems} آیتم
+                                {invoice.totalItems} items
                               </span>
                             </Td>
                             <Td className="text-emerald-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
@@ -506,7 +506,7 @@ export default function AdminDashboardPage() {
                             <Td>
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
                                 <CheckCircle2 className="w-3 h-3" />
-                                ثبت نهایی
+                                Finalized
                               </span>
                             </Td>
                             <Td>
@@ -515,7 +515,7 @@ export default function AdminDashboardPage() {
                                 className="inline-flex items-center gap-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
                               >
                                 <Eye className="w-3.5 h-3.5" />
-                                مشاهده
+                                View
                               </button>
                             </Td>
                           </tr>
@@ -530,11 +530,11 @@ export default function AdminDashboardPage() {
         </div>
 
         <p className="text-center text-xs text-slate-600 mt-8">
-          گروه فولادیار کوروش © ۱۴۰۵ — پنل مدیریت
+          Fouladyar Kourosh Group © 2026 — Admin Panel
         </p>
       </main>
 
-      {/* مودال جزئیات */}
+      {/* Detail Modal */}
       {selectedInvoice && (
         <InvoiceDetailModal
           invoice={selectedInvoice}
@@ -548,7 +548,7 @@ export default function AdminDashboardPage() {
   );
 }
 
-// ============ کامپوننت‌های کمکی ============
+// ============ Helper Components ============
 
 function StatCard({ icon: Icon, label, value, color, shadow }) {
   return (
@@ -567,7 +567,7 @@ function StatCard({ icon: Icon, label, value, color, shadow }) {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );
@@ -588,7 +588,7 @@ function EmptyState({ icon: Icon, title }) {
   );
 }
 
-// ============ مودال جزئیات صورت‌برش ============
+// ============ Invoice Detail Modal ============
 
 function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, onFinalize }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -610,21 +610,21 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
       border: 'border-emerald-500/30',
       text: 'text-emerald-400',
       bar: 'bg-emerald-500',
-      label: 'قابل تکمیل',
+      label: 'Ready to Finalize',
     };
     if (remaining <= 200) return {
       bg: 'bg-amber-500/10',
       border: 'border-amber-500/30',
       text: 'text-amber-400',
       bar: 'bg-amber-500',
-      label: 'نزدیک به تکمیل',
+      label: 'Close to Complete',
     };
     return {
       bg: 'bg-red-500/10',
       border: 'border-red-500/30',
       text: 'text-red-400',
       bar: 'bg-red-500',
-      label: 'باقی‌مانده زیاد',
+      label: 'High Remaining',
     };
   };
 
@@ -641,7 +641,6 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       onClick={onClose}
-      dir="rtl"
     >
       <div
         className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col"
@@ -654,9 +653,9 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
               <ClipboardList className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">صورت‌برش حواله {invoice.orderNumber}</h3>
+              <h3 className="text-lg font-bold text-white">Cutting Invoice — Order {invoice.orderNumber}</h3>
               <p className="text-xs text-slate-400">
-                {invoice.customerName} — {new Date(invoice.date).toLocaleDateString('fa-IR')}
+                {invoice.customerName} — {new Date(invoice.date).toLocaleDateString('en-US')}
               </p>
             </div>
           </div>
@@ -669,16 +668,16 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
         <div className="p-5 border-b border-slate-800 bg-slate-950/30 space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center">
-              <p className="text-xs text-slate-500 mb-1">وزن کل حواله</p>
+              <p className="text-xs text-slate-500 mb-1">Order Total Weight</p>
               <p className="text-lg font-bold text-white">{Math.round(orderWeight)} kg</p>
             </div>
             <div className="text-center border-x border-slate-800">
-              <p className="text-xs text-slate-500 mb-1">مجموع وزن برش</p>
+              <p className="text-xs text-slate-500 mb-1">Total Cut Weight</p>
               <p className="text-lg font-bold text-red-400">{Math.round(totalCutWeight)} kg</p>
               <p className="text-[10px] text-red-400/70 mt-0.5">{cutPercent}%</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-slate-500 mb-1">وزن باقی‌مانده</p>
+              <p className="text-xs text-slate-500 mb-1">Remaining Weight</p>
               <p className={`text-lg font-bold ${colors.text}`}>{remaining} kg</p>
               <p className={`text-[10px] mt-0.5 ${colors.text} opacity-70`}>{remainingPercent}%</p>
             </div>
@@ -686,7 +685,7 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-slate-500">پیشرفت برش</span>
+              <span className="text-slate-500">Cutting Progress</span>
               <span className={colors.text}>{cutPercent}%</span>
             </div>
             <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
@@ -701,10 +700,10 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
             </div>
             <div className="text-[11px] text-slate-400">
               {isArchived
-                ? '📚 این صورت‌برش در بایگانی است'
+                ? '📚 This invoice is archived'
                 : canFinalize
-                ? '✅ قابل تکمیل و بستن'
-                : '❌ برای تکمیل باید باقی‌مانده ≤ ۵۰ کیلو باشه'}
+                ? '✅ Ready to finalize and close'
+                : '❌ To finalize, remaining must be ≤ 50 kg'}
             </div>
           </div>
 
@@ -713,7 +712,7 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
               <div className="flex items-start gap-2">
                 <MessageSquare className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-xs font-bold text-amber-400 mb-1">توضیحات:</p>
+                  <p className="text-xs font-bold text-amber-400 mb-1">Notes:</p>
                   <p className="text-sm text-amber-200/90 leading-relaxed whitespace-pre-wrap">
                     {invoice.notes}
                   </p>
@@ -729,16 +728,16 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
             <table className="w-full text-sm">
               <thead className="bg-slate-800/50 rounded-lg">
                 <tr>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">#</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">محصول</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">برند</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">ضخامت</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">عرض</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">طول</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">تعداد</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">بندیل</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">وزن</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500">نوع برش</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">#</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Product</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Brand</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Thickness</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Width</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Length</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Quantity</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Bundle</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Weight</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500">Cut Type</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
@@ -763,8 +762,8 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
               </tbody>
               <tfoot className="bg-slate-800/30">
                 <tr>
-                  <td colSpan="8" className="px-3 py-3 text-left text-xs font-semibold text-slate-400">
-                    مجموع وزن:
+                  <td colSpan="8" className="px-3 py-3 text-right text-xs font-semibold text-slate-400">
+                    Total Weight:
                   </td>
                   <td className="px-3 py-3 text-white font-bold">{invoice.totalWeightInvoices} kg</td>
                   <td></td>
@@ -780,17 +779,17 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
             {isArchived ? (
               <div className="flex items-center gap-1.5 text-xs text-emerald-400">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>این صورت‌برش ثبت نهایی شده و در بایگانی است</span>
+                <span>This invoice is finalized and archived</span>
               </div>
             ) : canFinalize ? (
               <div className="flex items-center gap-1.5 text-xs text-emerald-400">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>آماده ثبت نهایی</span>
+                <span>Ready to finalize</span>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 text-xs text-amber-400">
                 <AlertCircle className="w-4 h-4" />
-                <span>باقی‌مانده: {remaining} kg (باید ≤ 50 بشه)</span>
+                <span>Remaining: {remaining} kg (must be ≤ 50)</span>
               </div>
             )}
           </div>
@@ -800,7 +799,7 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
               onClick={onClose}
               className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition"
             >
-              بستن
+              Close
             </button>
 
             {!isArchived && (
@@ -816,13 +815,12 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    در حال ثبت...
+                    Saving...
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    ثبت نهایی
-                    {canFinalize ? ' و بستن حواله' : ''}
+                    Finalize{canFinalize ? ' & Close Order' : ''}
                   </>
                 )}
               </button>

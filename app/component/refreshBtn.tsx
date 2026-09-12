@@ -8,7 +8,7 @@ import { RefreshCw } from 'lucide-react';
 export default function RefreshButton({
   onRefresh,
   className = '',
-  label = 'بروزرسانی',
+  label = 'Refresh',
   showLabel = true,
 }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -19,7 +19,7 @@ export default function RefreshButton({
     try {
       await onRefresh();
     } finally {
-      // یه تأخیر کوچیک برای اینکه انیمیشن دیده بشه
+      // Small delay so the animation is visible
       setTimeout(() => setIsRefreshing(false), 500);
     }
   };
@@ -36,7 +36,7 @@ export default function RefreshButton({
           isRefreshing ? 'animate-spin' : ''
         }`}
       />
-      {showLabel && <span>{isRefreshing ? 'در حال بروزرسانی...' : label}</span>}
+      {showLabel && <span>{isRefreshing ? 'Refreshing...' : label}</span>}
     </button>
   );
 }

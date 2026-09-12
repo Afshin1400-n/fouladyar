@@ -32,22 +32,22 @@ export default function RegisterPage() {
     setSuccess('');
 
     if (!name || !nationalId || !phone || !address || !password) {
-      setError('❌ لطفاً تمام فیلدها را پر کنید');
+      setError('❌ Please fill in all fields');
       return;
     }
 
     if (password.length < 4) {
-      setError('❌ رمز عبور باید حداقل ۴ کاراکتر باشد');
+      setError('❌ Password must be at least 4 characters');
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('❌ رمز عبور و تکرار آن مطابقت ندارند');
+      setError('❌ Passwords do not match');
       return;
     }
 
     if (nationalId.length !== 4) {
-      setError('❌ کد ملی باید ۴ رقم باشد');
+      setError('❌ National ID must be 4 digits');
       return;
     }
 
@@ -58,7 +58,7 @@ export default function RegisterPage() {
       const existingUser = res.data.find((u) => u.nationalId === nationalId);
 
       if (existingUser) {
-        setError('❌ این کد ملی قبلاً ثبت شده است');
+        setError('❌ This National ID is already registered');
         setLoading(false);
         return;
       }
@@ -75,7 +75,7 @@ export default function RegisterPage() {
 
       await axios.post('http://localhost:4000/customers', newUser);
 
-      setSuccess('✅ ثبت‌نام با موفقیت انجام شد');
+      setSuccess('✅ Registration successful');
       setLoading(false);
 
       setTimeout(() => {
@@ -84,26 +84,26 @@ export default function RegisterPage() {
 
     } catch (error) {
       console.error('Error:', error);
-      setError('❌ خطا در ارتباط با سرور');
+      setError('❌ Server connection error');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
+    <div className="min-h-screen bg-slate-50">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-blue-400/10 -z-10" />
       
       {/* Floating Shapes */}
-      <div className="absolute top-20 right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-20 left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-400/5 rounded-full blur-3xl" />
       
       <div className="relative min-h-screen flex items-center justify-center p-6 py-10">
         {/* Back Button */}
         <Link 
           href="/" 
-          className="absolute top-6 right-6 p-2.5 hover:bg-slate-100 rounded-xl transition-colors"
+          className="absolute top-6 left-6 p-2.5 hover:bg-slate-100 rounded-xl transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-slate-500" />
         </Link>
@@ -114,8 +114,8 @@ export default function RegisterPage() {
             <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg shadow-blue-500/30 mb-4">
               <Building2 className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-slate-900">فولادیار کوروش</h1>
-            <p className="text-sm text-slate-500 mt-1">ایجاد حساب کاربری</p>
+            <h1 className="text-xl font-bold text-slate-900">Fouladyar Kourosh</h1>
+            <p className="text-sm text-slate-500 mt-1">Create Account</p>
           </div>
 
           {/* Card */}
@@ -123,7 +123,7 @@ export default function RegisterPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
               <Sparkles className="w-3 h-3 text-blue-600" />
-              <span className="text-[10px] font-medium text-blue-700">ثبت‌نام جدید</span>
+              <span className="text-[10px] font-medium text-blue-700">New Registration</span>
             </div>
 
             {error && (
@@ -144,10 +144,10 @@ export default function RegisterPage() {
               {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  نام کامل
+                  Full Name
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <User className="w-4 h-4" />
                   </div>
                   <input
@@ -155,8 +155,8 @@ export default function RegisterPage() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="علی محمدی"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    placeholder="John Doe"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -165,18 +165,18 @@ export default function RegisterPage() {
               {/* National ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  کد ملی
+                  National ID
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <User className="w-4 h-4" />
                   </div>
                   <input
                     type="text"
                     value={nationalId}
                     onChange={(e) => setNationalId(e.target.value)}
-                    placeholder="۱۲۳۴"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    placeholder="1234"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -185,18 +185,18 @@ export default function RegisterPage() {
               {/* Phone */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  تلفن
+                  Phone
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <Phone className="w-4 h-4" />
                   </div>
                   <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="۰۹۱۲۱۲۳۴۵۶۷"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    placeholder="+98 912 123 4567"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -205,18 +205,18 @@ export default function RegisterPage() {
               {/* Address */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  آدرس
+                  Address
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-3.5 text-slate-400">
+                  <div className="absolute left-3 top-3.5 text-slate-400">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <input
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="تهران، خیابان آزادی"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    placeholder="Tehran, Azadi St."
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -225,10 +225,10 @@ export default function RegisterPage() {
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  رمز عبور
+                  Password
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -245,10 +245,10 @@ export default function RegisterPage() {
               {/* Confirm Password */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  تکرار رمز عبور
+                  Confirm Password
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -256,7 +256,7 @@ export default function RegisterPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -271,10 +271,10 @@ export default function RegisterPage() {
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    در حال ثبت‌نام...
+                    Registering...
                   </div>
                 ) : (
-                  'ثبت‌نام'
+                  'Register'
                 )}
               </button>
             </form>
@@ -282,12 +282,12 @@ export default function RegisterPage() {
             {/* Footer Links */}
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-500">
-                قبلاً ثبت‌نام کردید؟{' '}
+                Already have an account?{' '}
                 <Link 
                   href="./login" 
                   className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition"
                 >
-                  ورود
+                  Sign In
                 </Link>
               </p>
             </div>
@@ -295,7 +295,7 @@ export default function RegisterPage() {
 
           {/* Footer */}
           <p className="text-center text-[11px] text-slate-400 mt-6">
-            گروه فولادیار کوروش © ۱۴۰۵
+            Fouladyar Kourosh Group © 2026
           </p>
         </div>
       </div>

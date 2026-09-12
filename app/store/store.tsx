@@ -7,30 +7,30 @@ import axios from 'axios';
 const API_URL = 'http://localhost:4000';
 
 const useStore = create((set, get) => ({
-  // ==================== حالت اولیه ====================
+  // ==================== Initial State ====================
   
-  // کاربر عادی
+  // Regular user
   users: [],
   currentUser: null,
   isAuthenticated: false,
 
-  // ادمین
+  // Admin
   adminUser: null,
   isAdminAuthenticated: false,
 
-  // دیتای ادمین
+  // Admin data
   allCustomers: [],
   allOrders: [],
   allInvoices: [],
   adminLoading: false,
 
-  // عمومی
+  // General
   loading: false,
   error: null,
 
-  // ==================== کاربر عادی ====================
+  // ==================== Regular User ====================
 
-  // گرفتن همه کاربران
+  // Fetch all users
   fetchUsers: async () => {
     set({ loading: true, error: null });
     try {
@@ -41,7 +41,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // لاگین کاربر عادی
+  // Regular user login
   login: async (nationalId, password) => {
     set({ loading: true, error: null });
 
@@ -53,12 +53,12 @@ const useStore = create((set, get) => ({
 
       if (!user) {
         set({ loading: false });
-        return { success: false, message: '❌ کاربری با این کد ملی یافت نشد' };
+        return { success: false, message: '❌ No user found with this National ID' };
       }
 
       if (user.password !== password) {
         set({ loading: false });
-        return { success: false, message: '❌ رمز عبور اشتباه است' };
+        return { success: false, message: '❌ Incorrect password' };
       }
 
       set({
@@ -70,18 +70,18 @@ const useStore = create((set, get) => ({
 
       localStorage.setItem('user', JSON.stringify(user));
 
-      return { success: true, message: '✅ ورود موفق' };
+      return { success: true, message: '✅ Login successful' };
 
     } catch (error) {
       set({
         loading: false,
-        error: 'خطا در ارتباط با سرور'
+        error: 'Server connection error'
       });
-      return { success: false, message: '❌ خطا در ارتباط با سرور' };
+      return { success: false, message: '❌ Server connection error' };
     }
   },
 
-  // خروج کاربر عادی
+  // Regular user logout
   logout: () => {
     set({
       currentUser: null,
@@ -90,14 +90,14 @@ const useStore = create((set, get) => ({
     localStorage.removeItem('user');
   },
 
-  // تنظیم کاربر
+  // Set current user
   setCurrentUser: (user) => {
     set({ currentUser: user, isAuthenticated: true });
   },
 
-  // ==================== ادمین ====================
+  // ==================== Admin ====================
 
-  // 🔐 لاگین ادمین
+  // 🔐 Admin login
   adminLogin: async (nationalId, password) => {
     set({ loading: true, error: null });
 
@@ -105,19 +105,19 @@ const useStore = create((set, get) => ({
       const res = await axios.get(`${API_URL}/users`);
       const admins = res.data;
 
-      // فقط کاربر با role === 'admin' مجاز هست
+      // Only users with role === 'admin' are allowed
       const admin = admins.find(
         (u) => u.nationalId === nationalId && u.role === 'admin'
       );
 
       if (!admin) {
         set({ loading: false });
-        return { success: false, message: '❌ ادمینی با این کد ملی یافت نشد' };
+        return { success: false, message: '❌ No admin found with this National ID' };
       }
 
       if (admin.password !== password) {
         set({ loading: false });
-        return { success: false, message: '❌ رمز عبور اشتباه است' };
+        return { success: false, message: '❌ Incorrect password' };
       }
 
       set({
@@ -129,18 +129,18 @@ const useStore = create((set, get) => ({
 
       localStorage.setItem('admin', JSON.stringify(admin));
 
-      return { success: true, message: '✅ ورود ادمین موفق' };
+      return { success: true, message: '✅ Admin login successful' };
 
     } catch (error) {
       set({
         loading: false,
-        error: 'خطا در ارتباط با سرور'
+        error: 'Server connection error'
       });
-      return { success: false, message: '❌ خطا در ارتباط با سرور' };
+      return { success: false, message: '❌ Server connection error' };
     }
   },
 
-  // 🔐 خروج ادمین
+  // 🔐 Admin logout
   adminLogout: () => {
     set({
       adminUser: null,
@@ -152,9 +152,9 @@ const useStore = create((set, get) => ({
     localStorage.removeItem('admin');
   },
 
-  // ==================== دیتای ادمین ====================
+  // ==================== Admin Data ====================
 
-  // 📊 گرفتن همه دیتای سیستم (مشتری‌ها + حواله‌ها + صورت‌برش‌ها)
+  // 📊 Fetch all system data (customers + orders + invoices)
   fetchAdminData: async () => {
     set({ adminLoading: true });
     try {

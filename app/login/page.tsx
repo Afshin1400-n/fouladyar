@@ -41,20 +41,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
+    <div className="min-h-screen bg-slate-50">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-blue-400/10 -z-10" />
       
       {/* Floating Shapes */}
-      <div className="absolute top-20 right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 left-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-20 left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-400/5 rounded-full blur-3xl" />
       
       <div className="relative min-h-screen flex items-center justify-center p-6">
         {/* Back Button */}
         <Link 
           href="/" 
-          className="absolute top-6 right-6 p-2.5 hover:bg-slate-100 rounded-xl transition-colors"
+          className="absolute top-6 left-6 p-2.5 hover:bg-slate-100 rounded-xl transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-slate-500" />
         </Link>
@@ -65,8 +65,8 @@ export default function LoginPage() {
             <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg shadow-blue-500/30 mb-4">
               <Building2 className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-slate-900">فولادیار کوروش</h1>
-            <p className="text-sm text-slate-500 mt-1">ورود به سامانه مدیریت</p>
+            <h1 className="text-xl font-bold text-slate-900">Fouladyar Kourosh</h1>
+            <p className="text-sm text-slate-500 mt-1">Sign in to Management System</p>
           </div>
 
           {/* Card */}
@@ -74,7 +74,7 @@ export default function LoginPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
               <Sparkles className="w-3 h-3 text-blue-600" />
-              <span className="text-[10px] font-medium text-blue-700">ورود کاربران</span>
+              <span className="text-[10px] font-medium text-blue-700">User Login</span>
             </div>
 
             {error && (
@@ -88,10 +88,10 @@ export default function LoginPage() {
               {/* National ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  کد ملی
+                  National ID
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <User className="w-4 h-4" />
                   </div>
                   <input
@@ -100,7 +100,7 @@ export default function LoginPage() {
                     value={nationalId}
                     onChange={(e) => setNationalId(e.target.value)}
                     placeholder="•••••••••"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -109,10 +109,10 @@ export default function LoginPage() {
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  رمز عبور
+                  Password
                 </label>
                 <div className="relative">
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -120,7 +120,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pr-10 pl-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition text-slate-900 placeholder:text-slate-400"
                     required
                   />
                 </div>
@@ -135,10 +135,10 @@ export default function LoginPage() {
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    در حال بررسی...
+                    Signing in...
                   </div>
                 ) : (
-                  'ورود به حساب'
+                  'Sign In'
                 )}
               </button>
             </form>
@@ -146,12 +146,12 @@ export default function LoginPage() {
             {/* Footer Links */}
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-500">
-                حساب کاربری ندارید؟{' '}
+                Don't have an account?{' '}
                 <Link 
                   href="/register" 
                   className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition"
                 >
-                  ثبت‌نام
+                  Register
                 </Link>
               </p>
             </div>
@@ -159,7 +159,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="text-center text-[11px] text-slate-400 mt-6">
-            گروه فولادیار کوروش © ۱۴۰۵
+            Fouladyar Kourosh Group © 2026
           </p>
         </div>
       </div>

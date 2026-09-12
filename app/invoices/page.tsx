@@ -85,14 +85,14 @@ export default function InvoicesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
+    <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-              ف
+              F
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">گروه فولادیار کوروش</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Fouladyar Kourosh Group</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -102,11 +102,11 @@ export default function InvoicesPage() {
                 className="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-full hover:bg-blue-100 transition border border-blue-100"
               >
                 <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  {currentUser?.name?.charAt(0) || 'م'}
+                  {currentUser?.name?.charAt(0) || 'U'}
                 </div>
-                <div className="hidden sm:block text-right">
+                <div className="hidden sm:block text-left">
                   <p className="text-sm font-semibold text-slate-900">{currentUser?.name}</p>
-                  <p className="text-xs text-slate-500">{currentUser?.phone || 'شماره ثبت نشده'}</p>
+                  <p className="text-xs text-slate-500">{currentUser?.phone || 'No phone registered'}</p>
                 </div>
                 <svg
                   className={`w-4 h-4 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
@@ -119,19 +119,19 @@ export default function InvoicesPage() {
               </button>
 
               {showUserMenu && (
-                <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-xl shadow-slate-900/5 border border-slate-200 py-2 z-20">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl shadow-slate-900/5 border border-slate-200 py-2 z-20">
                   <div className="px-4 py-3 border-b border-slate-100">
                     <p className="text-sm font-bold text-slate-900">{currentUser?.name}</p>
-                    <p className="text-xs text-slate-500">کد ملی: {currentUser?.nationalId}</p>
-                    <p className="text-xs text-slate-500">تلفن: {currentUser?.phone || '---'}</p>
-                    <p className="text-xs text-slate-500">آدرس: {currentUser?.address || '---'}</p>
+                    <p className="text-xs text-slate-500">National ID: {currentUser?.nationalId}</p>
+                    <p className="text-xs text-slate-500">Phone: {currentUser?.phone || '---'}</p>
+                    <p className="text-xs text-slate-500">Address: {currentUser?.address || '---'}</p>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-right px-4 py-3 text-red-600 hover:bg-red-50 transition font-medium text-sm flex items-center gap-2"
+                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition font-medium text-sm flex items-center gap-2"
                   >
                     <span>🚪</span>
-                    خروج از حساب
+                    Sign Out
                   </button>
                 </div>
               )}
@@ -154,11 +154,11 @@ export default function InvoicesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-slate-200 transition">
-              <p className="text-sm text-slate-500">تعداد صورت‌برش‌ها</p>
+              <p className="text-sm text-slate-500">Total Invoices</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalInvoices}</p>
             </div>
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-slate-200 transition">
-              <p className="text-sm text-slate-500">وزن کل</p>
+              <p className="text-sm text-slate-500">Total Weight</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalWeight.toFixed(0)} kg</p>
             </div>
           </div>
@@ -170,11 +170,11 @@ export default function InvoicesPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="🔍 جستجو در شماره حواله، نوع محصول، برند، شماره صورت‌برش..."
-              className="w-full px-6 py-4 pr-12 border border-slate-200 text-slate-900 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition shadow-sm hover:shadow-md bg-white placeholder:text-slate-400"
+              placeholder="🔍 Search by order #, product type, brand, invoice #..."
+              className="w-full px-6 py-4 pl-12 border border-slate-200 text-slate-900 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition shadow-sm hover:shadow-md bg-white placeholder:text-slate-400"
             />
             <svg
-              className="absolute left-4 top-4 w-6 h-6 text-slate-400"
+              className="absolute right-4 top-4 w-6 h-6 text-slate-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -191,27 +191,27 @@ export default function InvoicesPage() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50/50">
-            <h3 className="text-xl font-bold text-slate-900">📋 صورت‌برش‌ها</h3>
+            <h3 className="text-xl font-bold text-slate-900">📋 Cutting Invoices</h3>
             <div className="flex items-center gap-4">
               <span className="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
-                {filteredInvoices.length} مورد
+                {filteredInvoices.length} items
               </span>
               <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
-                ← بازگشت به داشبورد
+                ← Back to Dashboard
               </Link>
             </div>
           </div>
 
           {loading ? (
-            <div className="p-8 text-center text-slate-500">در حال بارگذاری...</div>
+            <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : filteredInvoices.length === 0 ? (
             <div className="p-12 text-center text-slate-500">
               <p className="text-lg">
-                {searchTerm ? '🔍 هیچ صورت‌برشی با این جستجو یافت نشد' : '📭 هیچ صورت‌برشی ثبت نشده است'}
+                {searchTerm ? '🔍 No invoices found for this search' : '📭 No invoices registered'}
               </p>
               {!searchTerm && (
                 <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm mt-3 inline-block font-medium">
-                  ← بازگشت به داشبورد
+                  ← Back to Dashboard
                 </Link>
               )}
             </div>
@@ -220,13 +220,13 @@ export default function InvoicesPage() {
               <table className="w-full">
                 <thead className="bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">شماره صورت‌برش</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">تاریخ ثبت برش</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">شماره حواله</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">تعداد ابعاد</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">وزن</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">توضیحات</th>
-                    <th className="px-4 py-3 text-right text-sm font-medium text-slate-500">عملیات</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-slate-500">Invoice #</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-slate-500">Cut Date</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-slate-500">Order #</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-slate-500">Items</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-slate-500">Weight</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-slate-500">Notes</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-slate-500">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -236,7 +236,7 @@ export default function InvoicesPage() {
                         {invoice.invoiceNumber || invoice.id}
                       </td>
                       <td className="px-4 py-3 text-sm text-slate-500">
-                        {new Date(invoice.date).toLocaleDateString('fa-IR')}
+                        {new Date(invoice.date).toLocaleDateString('en-US')}
                       </td>
                       <td className="px-4 py-3 text-sm text-blue-600 font-bold">
                         {invoice.orderNumber}
@@ -261,7 +261,7 @@ export default function InvoicesPage() {
                           href={`/invoice-view/${invoice.orderNumber}`}
                           className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
                         >
-                          مشاهده
+                          View
                         </Link>
                       </td>
                     </tr>
