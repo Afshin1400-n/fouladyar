@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import useStore from '../store/store';
 import axios from 'axios';
-
+import Header from '../component/header';
+import StatCard from '../component/statCard';
 
 export default function InvoicesPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function InvoicesPage() {
       setFilteredInvoices(userInvoices);
 
       const totalInvoices = userInvoices.length;
-      const totalWeight = userInvoices.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
+      const totalWeight = userInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
 
       setStats({
         totalInvoices,
@@ -86,59 +87,10 @@ export default function InvoicesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-              F
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">Fouladyar Kourosh Group</h1>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-full hover:bg-blue-100 transition border border-blue-100"
-              >
-                <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  {currentUser?.name?.charAt(0) || 'U'}
-                </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-sm font-semibold text-slate-900">{currentUser?.name}</p>
-                  <p className="text-xs text-slate-500">{currentUser?.phone || 'No phone registered'}</p>
-                </div>
-                <svg
-                  className={`w-4 h-4 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl shadow-slate-900/5 border border-slate-200 py-2 z-20">
-                  <div className="px-4 py-3 border-b border-slate-100">
-                    <p className="text-sm font-bold text-slate-900">{currentUser?.name}</p>
-                    <p className="text-xs text-slate-500">National ID: {currentUser?.nationalId}</p>
-                    <p className="text-xs text-slate-500">Phone: {currentUser?.phone || '---'}</p>
-                    <p className="text-xs text-slate-500">Address: {currentUser?.address || '---'}</p>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition font-medium text-sm flex items-center gap-2"
-                  >
-                    <span>🚪</span>
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+    <Header 
+           currentUser={currentUser} 
+           onLogout={handleLogout} 
+         />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
 
@@ -153,15 +105,9 @@ export default function InvoicesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-slate-200 transition">
-              <p className="text-sm text-slate-500">Total Invoices</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalInvoices}</p>
-            </div>
-            <div className="bg-white rounded-xl shadow-sm hover:shadow-md p-6 border border-slate-200 transition">
-              <p className="text-sm text-slate-500">Total Weight</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.totalWeight.toFixed(0)} kg</p>
-            </div>
-          </div>
+  <StatCard label="Total Invoices" value={stats.totalInvoices} color="blue" />
+  <StatCard label="Total Weight" value={stats.totalWeight.toFixed(0)} suffix="kg" color="blue" />
+</div>
         )}
 
         <div className="mb-8">

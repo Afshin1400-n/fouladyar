@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
 import useStore from '../store/store';
+import StatCard from '../component/statCard';
 import Logo from '../component/logo';
 import {
   Shield,
@@ -554,7 +555,7 @@ export default function AdminDashboardPage() {
 
 // ============ Helper Components ============
 
-function StatCard({ icon: Icon, label, value, color, shadow }) {
+function StatsCard({ icon: Icon, label, value, color, shadow }) {
   return (
     <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition">
       <div className="flex items-center justify-between mb-3">
@@ -669,62 +670,12 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
         </div>
 
         {/* Summary */}
-        <div className="p-5 border-b border-slate-800 bg-slate-950/30 space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center">
-              <p className="text-xs text-slate-500 mb-1">Order Total Weight</p>
-              <p className="text-lg font-bold text-white">{Math.round(orderWeight)} kg</p>
-            </div>
-            <div className="text-center border-x border-slate-800">
-              <p className="text-xs text-slate-500 mb-1">Total Cut Weight</p>
-              <p className="text-lg font-bold text-red-400">{Math.round(totalCutWeight)} kg</p>
-              <p className="text-[10px] text-red-400/70 mt-0.5">{cutPercent}%</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xs text-slate-500 mb-1">Remaining Weight</p>
-              <p className={`text-lg font-bold ${colors.text}`}>{remaining} kg</p>
-              <p className={`text-[10px] mt-0.5 ${colors.text} opacity-70`}>{remainingPercent}%</p>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-slate-500">Cutting Progress</span>
-              <span className={colors.text}>{cutPercent}%</span>
-            </div>
-            <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden">
-              <div className={`h-full ${colors.bar} transition-all duration-500`} style={{ width: `${cutPercent}%` }} />
-            </div>
-          </div>
-
-          <div className={`flex items-center justify-between p-3 rounded-xl border ${colors.bg} ${colors.border}`}>
-            <div className="flex items-center gap-2">
-              <AlertCircle className={`w-4 h-4 ${colors.text}`} />
-              <span className={`text-xs font-medium ${colors.text}`}>{colors.label}</span>
-            </div>
-            <div className="text-[11px] text-slate-400">
-              {isArchived
-                ? '📚 This invoice is archived'
-                : canFinalize
-                ? '✅ Ready to finalize and close'
-                : '❌ To finalize, remaining must be ≤ 50 kg'}
-            </div>
-          </div>
-
-          {invoice.notes && invoice.notes.trim() !== '' && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
-              <div className="flex items-start gap-2">
-                <MessageSquare className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-xs font-bold text-amber-400 mb-1">Notes:</p>
-                  <p className="text-sm text-amber-200/90 leading-relaxed whitespace-pre-wrap">
-                    {invoice.notes}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  <StatCard label="Total Customers" value={totalCustomers} icon={Users} color="blue" variant="dark" />
+  <StatCard label="Active Invoices" value={totalInvoices} icon={FileText} color="emerald" variant="dark" />
+  <StatCard label="Total Weight" value={Math.round(totalOrdersWeight)} suffix="kg" icon={TrendingUp} color="amber" variant="dark" />
+  <StatCard label="Remaining Weight" value={Math.round(remainingWeight)} suffix="kg" icon={Clock} color="blue" variant="dark" />
+</div>
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5">

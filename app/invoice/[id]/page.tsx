@@ -3,21 +3,21 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import useStore from '../../store/store';
 import axios from 'axios';
-import RefreshButton from '../../component/refreshBtn';
+import useStore from '../../store/store';
+import Header from '../../component/header';
 
 export default function InvoicePage() {
   const params = useParams();
   const router = useRouter();
-  const { currentUser, isAuthenticated, logout } = useStore();
+    const { currentUser, isAuthenticated, logout } = useStore();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [remainingWeight, setRemainingWeight] = useState(0);
   const [notes, setNotes] = useState('');
-  const { fetchAdminData } = useStore()
+ 
 
   const [rows, setRows] = useState([
     { id: 1, length: '', width: '', thickness: '', quantity: '', bundle: '', cutType: '' }
@@ -298,32 +298,10 @@ export default function InvoicePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-sm bg-white/95">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
-              F
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">Fouladyar Kourosh Group</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
-              <span className="text-blue-600 text-sm font-medium hidden sm:inline">
-                {currentUser?.name}
-              </span>
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                {currentUser?.name?.charAt(0) || 'U'}
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition text-sm font-medium"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+    <Header 
+           currentUser={currentUser} 
+           onLogout={handleLogout} 
+         />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
