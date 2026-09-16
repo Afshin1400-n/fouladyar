@@ -8,6 +8,7 @@ import axios from 'axios';
 import RefreshButton from '../component/refreshBtn';
 import Header from '../component/header';
 import StatCard from '../component/statCard';
+import EmptyState from '../component/empty';
 
 // ============ Status Translation ============
 const translateStatus = (status) => {
@@ -206,16 +207,15 @@ export default function DashboardPage() {
           {loading ? (
             <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : filteredOrders.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">
-              <p className="text-lg">
-                {searchTerm ? '🔍 No orders found for this search' : '📭 No orders registered'}
-              </p>
-              {!searchTerm && (
-                <Link href="/orders/new" className="text-blue-600 hover:text-blue-700 text-sm mt-3 inline-block font-medium">
-                  + Create first order
-                </Link>
-              )}
-            </div>
+      <EmptyState
+    emoji="📭"
+    title="No orders registered"
+    action={
+      <Link href="/orders/new" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+        + Create first order
+      </Link>
+    }
+  />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">

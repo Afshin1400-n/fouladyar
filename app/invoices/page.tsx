@@ -9,6 +9,7 @@ import useStore from '../store/store';
 import axios from 'axios';
 import Header from '../component/header';
 import StatCard from '../component/statCard';
+import EmptyState from '../component/empty';
 
 export default function InvoicesPage() {
   const router = useRouter();
@@ -151,16 +152,17 @@ export default function InvoicesPage() {
           {loading ? (
             <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : filteredInvoices.length === 0 ? (
-            <div className="p-12 text-center text-slate-500">
-              <p className="text-lg">
-                {searchTerm ? '🔍 No invoices found for this search' : '📭 No invoices registered'}
-              </p>
-              {!searchTerm && (
-                <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm mt-3 inline-block font-medium">
-                  ← Back to Dashboard
-                </Link>
-              )}
-            </div>
+            <EmptyState
+    emoji="📭"
+    title={searchTerm ? 'No invoices found for this search' : 'No invoices registered'}
+    action={
+      !searchTerm && (
+        <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+          ← Back to Dashboard
+        </Link>
+      )
+    }
+  />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
