@@ -1,5 +1,4 @@
-// src/app/invoices/page.js
-
+// app/invoices/page.tsx
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -11,14 +10,37 @@ import Header from '../component/header';
 import StatCard from '../component/statCard';
 import EmptyState from '../component/empty';
 
+// ============ Types ============
+interface InvoiceItem {
+  productType: string;
+  brand: string;
+  weight: number;
+}
+
+interface Invoice {
+  id: string;
+  invoiceNumber?: string;
+  orderId: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  date: string;
+  status: string;
+  items: InvoiceItem[];
+  totalItems: number;
+  totalWeightInvoices: number;
+  notes?: string | null;
+  createdAt?: string;
+  finalizedAt?: string;
+}
+
 export default function InvoicesPage() {
   const router = useRouter();
   const { currentUser, isAuthenticated, logout } = useStore();
-  const [invoices, setInvoices] = useState([]);
-  const [filteredInvoices, setFilteredInvoices] = useState([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const [stats, setStats] = useState({
     totalInvoices: 0,
     totalWeight: 0,
@@ -26,18 +48,21 @@ export default function InvoicesPage() {
 
   const fetchInvoices = async () => {
     if (!currentUser) return;
-    
+
     try {
       const res = await axios.get('http://localhost:4000/invoice');
-      const allInvoices = res.data;
-      
+      const allInvoices: Invoice[] = res.data;
+
       const userInvoices = allInvoices.filter((inv) => inv.customerId === currentUser.id);
-      
+
       setInvoices(userInvoices);
       setFilteredInvoices(userInvoices);
 
       const totalInvoices = userInvoices.length;
-      const totalWeight = userInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
+      const totalWeight = userInvoices.reduce(
+        (sum, inv) => sum + (inv.totalWeightInvoices || 0),
+        0
+      );
 
       setStats({
         totalInvoices,
@@ -50,28 +75,32 @@ export default function InvoicesPage() {
     }
   };
 
+  // Route protection
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('./login');
+      router.push('/login');
     }
   }, [isAuthenticated, router]);
 
+  // Fetch invoices
   useEffect(() => {
     if (isAuthenticated && currentUser) {
       fetchInvoices();
     }
   }, [isAuthenticated, currentUser]);
 
+  // Search filter
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredInvoices(invoices);
     } else {
-      const filtered = invoices.filter((invoice) =>
-        invoice.orderNumber?.includes(searchTerm) ||
-        invoice.productType?.includes(searchTerm) ||
-        invoice.brand?.includes(searchTerm) ||
-        invoice.customerName?.includes(searchTerm) ||
-        invoice.invoiceNumber?.includes(searchTerm)
+      const filtered = invoices.filter(
+        (invoice) =>
+          invoice.orderNumber?.includes(searchTerm) ||
+          invoice.invoiceNumber?.includes(searchTerm) ||
+          invoice.customerName?.includes(searchTerm) ||
+          invoice.items?.[0]?.productType?.includes(searchTerm) ||
+          invoice.items?.[0]?.brand?.includes(searchTerm)
       );
       setFilteredInvoices(filtered);
     }
@@ -79,7 +108,7 @@ export default function InvoicesPage() {
 
   const handleLogout = () => {
     logout();
-    router.push('./login');
+    router.push('/login');
   };
 
   if (!isAuthenticated) {
@@ -88,37 +117,44 @@ export default function InvoicesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-    <Header 
-           currentUser={currentUser} 
-           onLogout={handleLogout} 
-         />
+      <Header currentUser={currentUser} onLogout={handleLogout} />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
 
+        {/* Stats */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 animate-pulse"
+              >
                 <div className="h-4 bg-slate-200 rounded w-20 mb-2"></div>
                 <div className="h-8 bg-slate-200 rounded w-16"></div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-  <StatCard label="Total Invoices" value={stats.totalInvoices} color="blue" />
-  <StatCard label="Total Weight" value={stats.totalWeight.toFixed(0)} suffix="kg" color="blue" />
-</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <StatCard label="Total Invoices" value={stats.totalInvoices} color="blue" />
+            <StatCard
+              label="Total Weight"
+              value={stats.totalWeight}
+              suffix="kg"
+              color="blue"
+            />
+          </div>
         )}
 
+        {/* Search */}
         <div className="mb-8">
           <div className="relative">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="🔍 Search by order #, product type, brand, invoice #..."
-              className="w-full px-6 py-4 pl-12 border border-slate-200 text-slate-900 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition shadow-sm hover:shadow-md bg-white placeholder:text-slate-400"
+              placeholder="Search by order #, product type, brand, invoice #..."
+              className="w-full px-6 py-4 pr-12 border border-slate-200 text-slate-900 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition shadow-sm hover:shadow-md bg-white placeholder:text-slate-400"
             />
             <svg
               className="absolute right-4 top-4 w-6 h-6 text-slate-400"
@@ -136,6 +172,7 @@ export default function InvoicesPage() {
           </div>
         </div>
 
+        {/* Invoices Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50/50">
             <h3 className="text-xl font-bold text-slate-900">📋 Cutting Invoices</h3>
@@ -143,7 +180,10 @@ export default function InvoicesPage() {
               <span className="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
                 {filteredInvoices.length} items
               </span>
-              <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline">
+              <Link
+                href="/dashboard"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium hover:underline"
+              >
                 ← Back to Dashboard
               </Link>
             </div>
@@ -153,16 +193,23 @@ export default function InvoicesPage() {
             <div className="p-8 text-center text-slate-500">Loading...</div>
           ) : filteredInvoices.length === 0 ? (
             <EmptyState
-    emoji="📭"
-    title={searchTerm ? 'No invoices found for this search' : 'No invoices registered'}
-    action={
-      !searchTerm && (
-        <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-          ← Back to Dashboard
-        </Link>
-      )
-    }
-  />
+              emoji="📭"
+              title={
+                searchTerm
+                  ? 'No invoices found for this search'
+                  : 'No invoices registered'
+              }
+              action={
+                !searchTerm && (
+                  <Link
+                    href="/dashboard"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  >
+                    ← Back to Dashboard
+                  </Link>
+                )
+              }
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -178,7 +225,7 @@ export default function InvoicesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filteredInvoices.slice(0, 20).map((invoice) => (
+                  {filteredInvoices.map((invoice) => (
                     <tr key={invoice.id} className="hover:bg-slate-50 transition">
                       <td className="px-4 py-3 text-sm text-blue-600 font-bold">
                         {invoice.invoiceNumber || invoice.id}
@@ -189,7 +236,9 @@ export default function InvoicesPage() {
                       <td className="px-4 py-3 text-sm text-blue-600 font-bold">
                         {invoice.orderNumber}
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-900">{invoice.totalItems}</td>
+                      <td className="px-4 py-3 text-sm text-slate-900">
+                        {invoice.totalItems}
+                      </td>
                       <td className="px-4 py-3 text-sm text-slate-900">
                         {Math.round(invoice.totalWeightInvoices || 0)} kg
                       </td>

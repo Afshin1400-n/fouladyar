@@ -1,16 +1,22 @@
-// src/components/RefreshButton.js
-
+// app/component/refreshBtn.tsx
 "use client"
 
 import { useState } from 'react';
 import { RefreshCw } from 'lucide-react';
+
+interface RefreshButtonProps {
+  onRefresh: () => void | Promise<void>;
+  className?: string;
+  label?: string;
+  showLabel?: boolean;
+}
 
 export default function RefreshButton({
   onRefresh,
   className = '',
   label = 'Refresh',
   showLabel = true,
-}) {
+}: RefreshButtonProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleClick = async () => {
@@ -18,6 +24,8 @@ export default function RefreshButton({
     setIsRefreshing(true);
     try {
       await onRefresh();
+    } catch (error) {
+      console.error('Refresh error:', error);
     } finally {
       // Small delay so the animation is visible
       setTimeout(() => setIsRefreshing(false), 500);
@@ -28,7 +36,7 @@ export default function RefreshButton({
     <button
       onClick={handleClick}
       disabled={isRefreshing}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${className}`}
       title={label}
     >
       <RefreshCw

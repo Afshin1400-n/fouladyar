@@ -1,10 +1,11 @@
+// app/adminLogin/page.tsx
 "use client"
 
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import useStore from '../store/store';
-import { Shield, Lock, User, ArrowLeft } from 'lucide-react';
+import { Shield, Lock, User, ArrowLeft, AlertCircle } from 'lucide-react';
 import Footer from '../component/footer';
 import Logo from '../component/logo';
 
@@ -15,19 +16,21 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const { adminLogin, isAdminAuthenticated, loading } = useStore();
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAdminAuthenticated) {
-      router.push('/adminDashboard');
+      router.push('/admin/dashboard');
     }
   }, [isAdminAuthenticated, router]);
 
+  // Auto-focus first input
   useEffect(() => {
-    if (inputRef.current) inputRef.current.focus();
+    inputRef.current?.focus();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -41,13 +44,15 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="relative min-h-screen bg-slate-950 overflow-hidden">
+
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.10),transparent_70%)]" />
       <div className="absolute top-20 left-20 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl animate-pulse" />
 
       <div className="relative min-h-screen flex items-center justify-center p-6">
+
         {/* Back Button */}
         <Link
           href="/"
@@ -57,10 +62,12 @@ export default function AdminLoginPage() {
         </Link>
 
         <div className="w-full max-w-md">
+
           {/* Logo */}
-         <div className="relative w-full h-32 mb-10">
-           <Logo />
-         </div>
+          <div className="relative w-32 h-20 mx-auto mb-8">
+            <Logo />
+          </div>
+
           {/* Card */}
           <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl shadow-blue-500/5 p-8">
 
@@ -70,14 +77,16 @@ export default function AdminLoginPage() {
               <span className="text-[10px] font-medium text-blue-300">Restricted Access</span>
             </div>
 
+            {/* Error */}
             {error && (
               <div className="mb-5 p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm flex items-center gap-2">
-                <span className="text-lg">⚠️</span>
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
+
               {/* National ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -123,7 +132,7 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 text-white font-semibold rounded-xl transition-all duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 text-white font-semibold rounded-xl transition-all duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -137,8 +146,8 @@ export default function AdminLoginPage() {
             </form>
           </div>
 
-
-        <Footer />
+          {/* Footer */}
+          <Footer />
         </div>
       </div>
     </div>

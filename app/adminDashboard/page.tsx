@@ -1,3 +1,4 @@
+// app/admin/dashboard/page.tsx
 "use client"
 
 import { useEffect, useState } from 'react';
@@ -15,7 +16,6 @@ import {
   Package,
   FileText,
   Search,
-  BarChart3,
   Phone,
   MapPin,
   TrendingUp,
@@ -31,8 +31,57 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
+// ============ Types ============
+interface Customer {
+  id: string;
+  name: string;
+  nationalId: string;
+  phone?: string;
+  address?: string;
+  createdAt?: string;
+}
+
+interface Order {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  totalWeight: number;
+  status: string;
+}
+
+interface InvoiceItem {
+  row: number;
+  productType: string;
+  brand: string;
+  thickness: number;
+  width: number;
+  length: string;
+  quantity: string;
+  bundle: string;
+  weight: number;
+  cutType: string;
+}
+
+interface Invoice {
+  id: string;
+  invoiceNumber?: string;
+  orderId: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  date: string;
+  status: string;
+  items: InvoiceItem[];
+  totalItems: number;
+  totalWeightInvoices: number;
+  notes?: string | null;
+  createdAt?: string;
+  finalizedAt?: string;
+}
+
 // ============ Cut Type Labels ============
-const CUT_TYPE_LABELS = {
+const CUT_TYPE_LABELS: Record<string, string> = {
   flat_thin: 'Flat Sheet - Thin',
   flat_thick: 'Flat Sheet - Thick',
   shutter_small: 'Shutter - Small',
@@ -46,7 +95,7 @@ const CUT_TYPE_LABELS = {
   trapezoidal: 'Trapezoidal',
 };
 
-const getCutTypeLabel = (cutType) => {
+const getCutTypeLabel = (cutType: string) => {
   return CUT_TYPE_LABELS[cutType] || cutType || '---';
 };
 
@@ -65,9 +114,9 @@ export default function AdminDashboardPage() {
     fetchAdminData,
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState('customers');
+  const [activeTab, setActiveTab] = useState<'customers' | 'invoices' | 'archive'>('customers');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   // Route protection
   useEffect(() => {
@@ -81,6 +130,7 @@ export default function AdminDashboardPage() {
     if (isAdminAuthenticated) {
       fetchAdminData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdminAuthenticated]);
 
   const handleLogout = () => {
@@ -88,23 +138,19 @@ export default function AdminDashboardPage() {
     router.push('/adminLogin');
   };
 
-  // ============================================================
-  // ✅ Calculate total cut weight of all invoices for an order
-  // ============================================================
-  const getOrderTotalCutWeight = (orderId) => {
+  // Calculate total cut weight of all invoices for an order
+  const getOrderTotalCutWeight = (orderId: string): number => {
     return allInvoices
       .filter((inv) => inv.orderId === orderId)
       .reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
   };
 
-  // ============================================================
-  // ✅ Finalize Invoice
-  // ============================================================
-  const handleFinalizeInvoice = async (invoice, order) => {
+  // Finalize Invoice
+  const handleFinalizeInvoice = async (invoice: Invoice, order: Order) => {
     const totalCutWeight = getOrderTotalCutWeight(order.id);
     const orderWeight = order?.totalWeight || 0;
     const remaining = Math.max(0, Math.round(orderWeight - totalCutWeight));
-    const newStatus = remaining <= 50 ? 'تکمیل شده' : 'باز';
+    const newStatus = remaining <= 50 ? 'Completed' : 'Open';
 
     try {
       await axios.patch(`http://localhost:4000/orders/${order.id}`, {
@@ -114,7 +160,7 @@ export default function AdminDashboardPage() {
       });
 
       await axios.patch(`http://localhost:4000/invoice/${invoice.id}`, {
-        status: 'ثبت نهایی',
+        status: 'Finalized',
         finalizedAt: new Date().toISOString(),
       });
 
@@ -125,44 +171,37 @@ export default function AdminDashboardPage() {
         .getState()
         .allInvoices.find((inv) => inv.id === invoice.id);
 
-      console.log('🔵 Invoice ID:', invoice.id);
-      console.log('🟢 Status after fetch:', updatedInvoice?.status);
-
-      if (updatedInvoice?.status === 'ثبت نهایی') {
+      if (updatedInvoice?.status === 'Finalized') {
         alert(
           remaining <= 50
-            ? `✅ Order ${order.orderNumber} completed and archived!`
-            : `✅ Invoice finalized and archived.`
+            ? `Order ${order.orderNumber} completed and archived!`
+            : `Invoice finalized and archived.`
         );
       } else {
-        console.warn('⚠️ Server did not save the data!');
         alert(
-          '⚠️ Save was successful but the server did not persist the data.\n' +
+          'Save was successful but the server did not persist the data.\n' +
             'Please check json-server and db.json.'
         );
       }
     } catch (error) {
-      console.error('❌ Error finalizing invoice:', error);
-      alert('❌ Error finalizing invoice');
+      console.error('Error finalizing invoice:', error);
+      alert('Error finalizing invoice');
     }
   };
 
   if (!isAdminAuthenticated) return null;
 
-  // 📊 Stats
+  // Stats
   const totalCustomers = allCustomers.length;
-  const totalInvoices = allInvoices.filter((inv) => inv.status !== 'ثبت نهایی').length;
-  const totalOrdersWeight = allOrders.reduce(
-    (sum, o) => sum + (o.totalWeight || 0),
-    0
-  );
+  const totalInvoices = allInvoices.filter((inv) => inv.status !== 'Finalized').length;
+  const totalOrdersWeight = allOrders.reduce((sum, o) => sum + (o.totalWeight || 0), 0);
   const totalCutWeight = allInvoices.reduce(
     (sum, inv) => sum + (inv.totalWeightInvoices || 0),
     0
   );
   const remainingWeight = Math.max(0, totalOrdersWeight - totalCutWeight);
 
-  // 🔍 Filters
+  // Filters
   const filteredCustomers = allCustomers.filter(
     (c) =>
       c.name?.includes(searchTerm) ||
@@ -170,8 +209,8 @@ export default function AdminDashboardPage() {
       c.phone?.includes(searchTerm)
   );
 
-  const activeInvoices = allInvoices.filter((inv) => inv.status !== 'ثبت نهایی');
-  const archivedInvoices = allInvoices.filter((inv) => inv.status === 'ثبت نهایی');
+  const activeInvoices = allInvoices.filter((inv) => inv.status !== 'Finalized');
+  const archivedInvoices = allInvoices.filter((inv) => inv.status === 'Finalized');
 
   const filteredInvoices = activeInvoices.filter(
     (inv) =>
@@ -196,13 +235,14 @@ export default function AdminDashboardPage() {
 
       {/* Header */}
       <header className="relative bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Logo className='w-full h-32'/>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+          <Logo className="h-12 w-auto" />
+
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
               <Shield className="w-6 h-6 text-white" />
             </div>
-            <div>
+            <div className="hidden md:block">
               <h1 className="text-lg font-bold text-white">Admin Panel</h1>
               <p className="text-xs text-slate-400">Fouladyar Kourosh</p>
             </div>
@@ -212,9 +252,8 @@ export default function AdminDashboardPage() {
             <div className="hidden sm:flex flex-col text-right">
               <p className="text-sm font-medium text-white">{adminUser?.name}</p>
               <p className="text-[11px] text-blue-400">System Admin</p>
-              
             </div>
-            
+
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-sm font-bold">
               {adminUser?.name?.charAt(0) || 'A'}
             </div>
@@ -227,7 +266,7 @@ export default function AdminDashboardPage() {
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl text-sm font-medium transition"
+              className="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
@@ -240,10 +279,36 @@ export default function AdminDashboardPage() {
       <main className="relative max-w-7xl mx-auto px-6 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <StatCard icon={Users} label="Total Customers" value={totalCustomers} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/20" />
-          <StatCard icon={FileText} label="Active Invoices" value={totalInvoices} color="from-emerald-500 to-emerald-600" shadow="shadow-emerald-500/20" />
-          <StatCard icon={TrendingUp} label="Total Weight (kg)" value={Math.round(totalOrdersWeight)} color="from-amber-500 to-amber-600" shadow="shadow-amber-500/20" />
-          <StatCard icon={Clock} label="Remaining Weight (kg)" value={Math.round(remainingWeight)} color="from-blue-600 to-blue-700" shadow="shadow-blue-500/20" />
+          <StatCard
+            label="Total Customers"
+            value={totalCustomers}
+            icon={Users}
+            color="blue"
+            variant="dark"
+          />
+          <StatCard
+            label="Active Invoices"
+            value={totalInvoices}
+            icon={FileText}
+            color="emerald"
+            variant="dark"
+          />
+          <StatCard
+            label="Total Weight"
+            value={Math.round(totalOrdersWeight)}
+            suffix="kg"
+            icon={TrendingUp}
+            color="amber"
+            variant="dark"
+          />
+          <StatCard
+            label="Remaining Weight"
+            value={Math.round(remainingWeight)}
+            suffix="kg"
+            icon={Clock}
+            color="blue"
+            variant="dark"
+          />
         </div>
 
         {/* Tabs + Search */}
@@ -252,8 +317,11 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-between flex-wrap gap-3 p-4">
               <div className="flex gap-1 bg-slate-800/50 p-1 rounded-xl">
                 <button
-                  onClick={() => { setActiveTab('customers'); setSearchTerm(''); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  onClick={() => {
+                    setActiveTab('customers');
+                    setSearchTerm('');
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
                     activeTab === 'customers'
                       ? 'bg-blue-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
@@ -261,14 +329,21 @@ export default function AdminDashboardPage() {
                 >
                   <Users className="w-4 h-4" />
                   Customers
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'customers' ? 'bg-white/20' : 'bg-slate-700'}`}>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                      activeTab === 'customers' ? 'bg-white/20' : 'bg-slate-700'
+                    }`}
+                  >
                     {totalCustomers}
                   </span>
                 </button>
 
                 <button
-                  onClick={() => { setActiveTab('invoices'); setSearchTerm(''); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  onClick={() => {
+                    setActiveTab('invoices');
+                    setSearchTerm('');
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
                     activeTab === 'invoices'
                       ? 'bg-blue-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
@@ -276,14 +351,21 @@ export default function AdminDashboardPage() {
                 >
                   <FileText className="w-4 h-4" />
                   Invoices
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'invoices' ? 'bg-white/20' : 'bg-slate-700'}`}>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                      activeTab === 'invoices' ? 'bg-white/20' : 'bg-slate-700'
+                    }`}
+                  >
                     {activeInvoices.length}
                   </span>
                 </button>
 
                 <button
-                  onClick={() => { setActiveTab('archive'); setSearchTerm(''); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  onClick={() => {
+                    setActiveTab('archive');
+                    setSearchTerm('');
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
                     activeTab === 'archive'
                       ? 'bg-slate-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
@@ -291,7 +373,11 @@ export default function AdminDashboardPage() {
                 >
                   <Archive className="w-4 h-4" />
                   Archive
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === 'archive' ? 'bg-white/20' : 'bg-slate-700'}`}>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                      activeTab === 'archive' ? 'bg-white/20' : 'bg-slate-700'
+                    }`}
+                  >
                     {archivedInvoices.length}
                   </span>
                 </button>
@@ -313,13 +399,16 @@ export default function AdminDashboardPage() {
                   className="w-full bg-slate-800/50 border border-slate-700 text-white rounded-xl py-2.5 pl-10 pr-4 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition"
                 />
               </div>
-              <RefreshButton onRefresh={fetchAdminData} className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700" />
+              <RefreshButton
+                onRefresh={fetchAdminData}
+                className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+              />
             </div>
           </div>
 
           {adminLoading ? (
             <div className="p-12 text-center">
-              <div className="inline-block w-8 h-8 border-3 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+              <div className="inline-block w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
               <p className="text-slate-400 mt-3 text-sm">Loading...</p>
             </div>
           ) : (
@@ -328,7 +417,10 @@ export default function AdminDashboardPage() {
               {activeTab === 'customers' && (
                 <div className="overflow-x-auto">
                   {filteredCustomers.length === 0 ? (
-                    <EmptyState icon={Users} title={searchTerm ? 'No customers found' : 'No customers registered'} />
+                    <EmptyState
+                      icon={Users}
+                      title={searchTerm ? 'No customers found' : 'No customers registered'}
+                    />
                   ) : (
                     <table className="w-full">
                       <thead className="bg-slate-800/50">
@@ -344,7 +436,9 @@ export default function AdminDashboardPage() {
                       </thead>
                       <tbody className="divide-y divide-slate-800">
                         {filteredCustomers.map((customer, idx) => {
-                          const customerOrders = allOrders.filter((o) => o.customerId === customer.id);
+                          const customerOrders = allOrders.filter(
+                            (o) => o.customerId === customer.id
+                          );
                           return (
                             <tr key={customer.id} className="hover:bg-slate-800/30 transition">
                               <Td className="text-slate-500">{idx + 1}</Td>
@@ -353,7 +447,9 @@ export default function AdminDashboardPage() {
                                   <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                     {customer.name?.charAt(0) || '?'}
                                   </div>
-                                  <span className="font-semibold text-white">{customer.name}</span>
+                                  <span className="font-semibold text-white">
+                                    {customer.name}
+                                  </span>
                                 </div>
                               </Td>
                               <Td className="font-mono text-blue-400">{customer.nationalId}</Td>
@@ -376,7 +472,9 @@ export default function AdminDashboardPage() {
                                 </span>
                               </Td>
                               <Td className="text-slate-500 text-xs">
-                                {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('en-US') : '---'}
+                                {customer.createdAt
+                                  ? new Date(customer.createdAt).toLocaleDateString('en-US')
+                                  : '---'}
                               </Td>
                             </tr>
                           );
@@ -391,7 +489,10 @@ export default function AdminDashboardPage() {
               {activeTab === 'invoices' && (
                 <div className="overflow-x-auto">
                   {filteredInvoices.length === 0 ? (
-                    <EmptyState icon={FileText} title={searchTerm ? 'No invoices found' : 'No active invoices'} />
+                    <EmptyState
+                      icon={FileText}
+                      title={searchTerm ? 'No invoices found' : 'No active invoices'}
+                    />
                   ) : (
                     <table className="w-full">
                       <thead className="bg-slate-800/50">
@@ -412,14 +513,18 @@ export default function AdminDashboardPage() {
                             <Td className="text-slate-500 text-xs">
                               {new Date(invoice.date).toLocaleDateString('en-US')}
                             </Td>
-                            <Td className="font-mono text-blue-400 font-semibold">{invoice.orderNumber}</Td>
+                            <Td className="font-mono text-blue-400 font-semibold">
+                              {invoice.orderNumber}
+                            </Td>
                             <Td className="text-white font-medium">{invoice.customerName}</Td>
                             <Td>
                               <span className="inline-flex items-center gap-1 bg-slate-700/50 text-slate-300 text-xs px-2.5 py-1 rounded-full">
                                 {invoice.totalItems} items
                               </span>
                             </Td>
-                            <Td className="text-red-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
+                            <Td className="text-red-400 font-semibold">
+                              {invoice.totalWeightInvoices} kg
+                            </Td>
 
                             <Td className="max-w-[150px]">
                               {invoice.notes ? (
@@ -444,7 +549,7 @@ export default function AdminDashboardPage() {
                             <Td>
                               <button
                                 onClick={() => setSelectedInvoice(invoice)}
-                                className="inline-flex items-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
+                                className="inline-flex items-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap cursor-pointer"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                                 Details
@@ -462,7 +567,10 @@ export default function AdminDashboardPage() {
               {activeTab === 'archive' && (
                 <div className="overflow-x-auto">
                   {filteredArchived.length === 0 ? (
-                    <EmptyState icon={Archive} title={searchTerm ? 'No invoices found' : 'Archive is empty'} />
+                    <EmptyState
+                      icon={Archive}
+                      title={searchTerm ? 'No invoices found' : 'Archive is empty'}
+                    />
                   ) : (
                     <table className="w-full">
                       <thead className="bg-slate-800/50">
@@ -485,14 +593,18 @@ export default function AdminDashboardPage() {
                                 ? new Date(invoice.finalizedAt).toLocaleDateString('en-US')
                                 : new Date(invoice.date).toLocaleDateString('en-US')}
                             </Td>
-                            <Td className="font-mono text-blue-400 font-semibold">{invoice.orderNumber}</Td>
+                            <Td className="font-mono text-blue-400 font-semibold">
+                              {invoice.orderNumber}
+                            </Td>
                             <Td className="text-white font-medium">{invoice.customerName}</Td>
                             <Td>
                               <span className="inline-flex items-center gap-1 bg-slate-700/50 text-slate-300 text-xs px-2.5 py-1 rounded-full">
                                 {invoice.totalItems} items
                               </span>
                             </Td>
-                            <Td className="text-emerald-400 font-semibold">{invoice.totalWeightInvoices} kg</Td>
+                            <Td className="text-emerald-400 font-semibold">
+                              {invoice.totalWeightInvoices} kg
+                            </Td>
 
                             <Td className="max-w-[150px]">
                               {invoice.notes ? (
@@ -517,7 +629,7 @@ export default function AdminDashboardPage() {
                             <Td>
                               <button
                                 onClick={() => setSelectedInvoice(invoice)}
-                                className="inline-flex items-center gap-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
+                                className="inline-flex items-center gap-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-slate-300 text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap cursor-pointer"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                                 View
@@ -555,22 +667,7 @@ export default function AdminDashboardPage() {
 
 // ============ Helper Components ============
 
-function StatsCard({ icon: Icon, label, value, color, shadow }) {
-  return (
-    <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition">
-      <div className="flex items-center justify-between mb-3">
-        <div className={`w-11 h-11 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center shadow-lg ${shadow}`}>
-          <Icon className="w-5 h-5 text-white" />
-        </div>
-        <BarChart3 className="w-4 h-4 text-slate-700" />
-      </div>
-      <p className="text-xs text-slate-400 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-white">{value}</p>
-    </div>
-  );
-}
-
-function Th({ children }) {
+function Th({ children }: { children: React.ReactNode }) {
   return (
     <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
       {children}
@@ -578,11 +675,17 @@ function Th({ children }) {
   );
 }
 
-function Td({ children, className = '' }) {
+function Td({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return <td className={`px-4 py-3 text-sm whitespace-nowrap ${className}`}>{children}</td>;
 }
 
-function EmptyState({ icon: Icon, title }) {
+function EmptyState({ icon: Icon, title }: { icon: any; title: string }) {
   return (
     <div className="p-12 text-center">
       <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-800/50 rounded-2xl mb-4">
@@ -595,48 +698,31 @@ function EmptyState({ icon: Icon, title }) {
 
 // ============ Invoice Detail Modal ============
 
-function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, onFinalize }) {
+function InvoiceDetailModal({
+  invoice,
+  order,
+  totalCutWeightOfOrder,
+  onClose,
+  onFinalize,
+}: {
+  invoice: Invoice;
+  order: Order | undefined;
+  totalCutWeightOfOrder: number;
+  onClose: () => void;
+  onFinalize: (invoice: Invoice, order: Order) => Promise<void>;
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const isArchived = invoice.status === 'ثبت نهایی';
+  const isArchived = invoice.status === 'Finalized';
 
   const totalCutWeight = totalCutWeightOfOrder || 0;
   const orderWeight = order?.totalWeight || 0;
   const remaining = Math.max(0, Math.round(orderWeight - totalCutWeight));
 
-  const cutPercent = orderWeight > 0
-    ? Math.min(100, Math.round((totalCutWeight / orderWeight) * 100))
-    : 0;
-  const remainingPercent = 100 - cutPercent;
-
-  const getRemainingColor = () => {
-    if (remaining <= 50) return {
-      bg: 'bg-emerald-500/10',
-      border: 'border-emerald-500/30',
-      text: 'text-emerald-400',
-      bar: 'bg-emerald-500',
-      label: 'Ready to Finalize',
-    };
-    if (remaining <= 200) return {
-      bg: 'bg-amber-500/10',
-      border: 'border-amber-500/30',
-      text: 'text-amber-400',
-      bar: 'bg-amber-500',
-      label: 'Close to Complete',
-    };
-    return {
-      bg: 'bg-red-500/10',
-      border: 'border-red-500/30',
-      text: 'text-red-400',
-      bar: 'bg-red-500',
-      label: 'High Remaining',
-    };
-  };
-
-  const colors = getRemainingColor();
   const canFinalize = remaining <= 50;
 
   const handleFinalize = async () => {
+    if (!order) return;
     setIsSubmitting(true);
     await onFinalize(invoice, order);
     setIsSubmitting(false);
@@ -658,24 +744,43 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
               <ClipboardList className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Cutting Invoice — Order {invoice.orderNumber}</h3>
+              <h3 className="text-lg font-bold text-white">
+                Cutting Invoice — Order {invoice.orderNumber}
+              </h3>
               <p className="text-xs text-slate-400">
                 {invoice.customerName} — {new Date(invoice.date).toLocaleDateString('en-US')}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-xl transition">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-800 rounded-xl transition cursor-pointer"
+          >
             <X className="w-5 h-5 text-slate-400" />
           </button>
         </div>
 
         {/* Summary */}
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-  <StatCard label="Total Customers" value={totalCustomers} icon={Users} color="blue" variant="dark" />
-  <StatCard label="Active Invoices" value={totalInvoices} icon={FileText} color="emerald" variant="dark" />
-  <StatCard label="Total Weight" value={Math.round(totalOrdersWeight)} suffix="kg" icon={TrendingUp} color="amber" variant="dark" />
-  <StatCard label="Remaining Weight" value={Math.round(remainingWeight)} suffix="kg" icon={Clock} color="blue" variant="dark" />
-</div>
+        <div className="grid grid-cols-3 gap-4 p-5 border-b border-slate-800 bg-slate-950/30">
+          <div>
+            <p className="text-xs text-slate-500 mb-1">Order Weight</p>
+            <p className="text-lg font-bold text-white">{Math.round(orderWeight)} kg</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 mb-1">Cut Weight</p>
+            <p className="text-lg font-bold text-blue-400">{Math.round(totalCutWeight)} kg</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 mb-1">Remaining</p>
+            <p
+              className={`text-lg font-bold ${
+                canFinalize ? 'text-emerald-400' : 'text-amber-400'
+              }`}
+            >
+              {remaining} kg
+            </p>
+          </div>
+        </div>
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5">
@@ -717,10 +822,15 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
               </tbody>
               <tfoot className="bg-slate-800/30">
                 <tr>
-                  <td colSpan="8" className="px-3 py-3 text-right text-xs font-semibold text-slate-400">
+                  <td
+                    colSpan={8}
+                    className="px-3 py-3 text-right text-xs font-semibold text-slate-400"
+                  >
                     Total Weight:
                   </td>
-                  <td className="px-3 py-3 text-white font-bold">{invoice.totalWeightInvoices} kg</td>
+                  <td className="px-3 py-3 text-white font-bold">
+                    {invoice.totalWeightInvoices} kg
+                  </td>
                   <td></td>
                 </tr>
               </tfoot>
@@ -752,7 +862,7 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition"
+              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition cursor-pointer"
             >
               Close
             </button>
@@ -760,8 +870,8 @@ function InvoiceDetailModal({ invoice, order, totalCutWeightOfOrder, onClose, on
             {!isArchived && (
               <button
                 onClick={handleFinalize}
-                disabled={isSubmitting}
-                className={`px-5 py-2.5 text-sm font-medium rounded-xl transition flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${
+                disabled={isSubmitting || !order}
+                className={`px-5 py-2.5 text-sm font-medium rounded-xl transition flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer ${
                   canFinalize
                     ? 'bg-emerald-600 hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/30 text-white'
                     : 'bg-amber-600 hover:bg-amber-500 hover:shadow-lg hover:shadow-amber-500/30 text-white'

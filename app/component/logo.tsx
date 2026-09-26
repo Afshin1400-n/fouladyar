@@ -1,22 +1,33 @@
-// src/components/Logo.jsx
+// app/component/logo.tsx
+"use client"
 
 import Image from 'next/image';
+
+interface LogoProps {
+  src?: string;
+  alt?: string;
+  className?: string;
+  width?: number;
+  height?: number;
+  priority?: boolean;
+}
 
 export default function Logo({
   src = '/logo.jpg',
   alt = 'Fouladyar Kourosh Logo',
   className = '',
-  ...props
-}) {
+  width = 160,
+  height = 80,
+  priority = true,
+}: LogoProps) {
   return (
     <Image
       src={src}
       alt={alt}
-      fill
-      sizes="200px"
+      width={width}
+      height={height}
       className={`object-contain ${className}`}
-      priority
-      {...props}
+      priority={priority}
     />
   );
 }

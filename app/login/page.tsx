@@ -1,10 +1,11 @@
+// app/login/page.tsx
 "use client"
 
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import useStore from '../store/store';
-import { Building2, Lock, User, ArrowLeft, Sparkles } from 'lucide-react';
+import { Lock, User, ArrowLeft, Sparkles, AlertCircle } from 'lucide-react';
 import Footer from '../component/footer';
 import Logo from '../component/logo';
 
@@ -14,22 +15,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login, isAuthenticated, loading } = useStore();
-  
-  const inputRef = useRef(null);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       router.push('/dashboard');
     }
   }, [isAuthenticated, router]);
 
+  // Auto-focus the first input
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    inputRef.current?.focus();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -43,46 +44,52 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="relative min-h-screen bg-slate-50 overflow-hidden">
+
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-blue-400/10 -z-10" />
-      
+
       {/* Floating Shapes */}
       <div className="absolute top-20 left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-400/5 rounded-full blur-3xl" />
-      
+
       <div className="relative min-h-screen flex items-center justify-center p-6">
+
         {/* Back Button */}
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="absolute top-6 left-6 p-2.5 hover:bg-slate-100 rounded-xl transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-slate-500" />
         </Link>
 
         <div className="w-full max-w-md">
-          {/* Logo & Brand */}
-      <div className="relative w-full h-32 mb-10">
-        <Logo />
-      </div>
+
+          {/* Logo */}
+          <div className="relative w-32 h-20 mx-auto mb-8">
+            <Logo />
+          </div>
 
           {/* Card */}
           <div className="bg-white rounded-2xl shadow-xl shadow-slate-900/5 border border-slate-200 p-8">
+
             {/* Badge */}
             <div className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
               <Sparkles className="w-3 h-3 text-blue-600" />
               <span className="text-[10px] font-medium text-blue-700">User Login</span>
             </div>
 
+            {/* Error */}
             {error && (
               <div className="mb-5 p-3.5 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm flex items-center gap-2">
-                <span className="text-lg">⚠️</span>
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
+
               {/* National ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -124,11 +131,11 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25 text-white font-semibold rounded-xl transition-all duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25 text-white font-semibold rounded-xl transition-all duration-200 text-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
@@ -141,12 +148,12 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Footer Links */}
+            {/* Footer Link */}
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-500">
                 Don't have an account?{' '}
-                <Link 
-                  href="/register" 
+                <Link
+                  href="/register"
                   className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition"
                 >
                   Register
