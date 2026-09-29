@@ -1,4 +1,3 @@
-// src/app/invoice/[id]/page.js
 
 "use client"
 
@@ -57,6 +56,7 @@ export default function InvoicePage() {
 
           const invoiceRes = await axios.get(`http://localhost:4000/invoice?orderId=${foundOrder.id}`);
           const orderInvoices = invoiceRes.data;
+ console.log(orderInvoices);
 
           const totalCutWeight = orderInvoices.reduce((sum, inv) => sum + (inv.totalWeightInvoices || 0), 0);
           const remaining = Math.round((foundOrder.totalWeight || 0) - totalCutWeight);
@@ -85,6 +85,7 @@ export default function InvoicePage() {
 
     if (isAuthenticated) {
       fetchOrder();
+      
     }
   }, [params.id, isAuthenticated]);
 

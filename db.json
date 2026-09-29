@@ -36,23 +36,23 @@
       "customerId": "1",
       "customerName": "حسین گل محمدی",
       "date": "2026-08-15T00:00:00.000Z",
-      "status": "تکمیل شده",
+      "status": "صورت برش شده",
       "productType": "ورق سیاه",
       "brand": "مبارکه",
       "thickness": 0.5,
       "width": 1.25,
       "unit": "برگ",
       "totalWeight": 500,
-      "cutWeight": 500,
-      "remainingWeight": 0,
+      "cutWeight": 172,
+      "remainingWeight": 328,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1789166543424",
-      "invoiceDate": "2026-09-11T22:42:23.472Z",
+      "invoiceNumber": "INV-1790660973330",
+      "invoiceDate": "2026-09-29T05:49:33.372Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-09-11T22:43:19.379Z"
@@ -72,8 +72,8 @@
       "width": 1.25,
       "unit": "رول",
       "totalWeight": 1000,
-      "cutWeight": 983,
-      "remainingWeight": 17,
+      "cutWeight": 0,
+      "remainingWeight": 1000,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
@@ -101,8 +101,8 @@
       "width": 1.25,
       "unit": "رول",
       "totalWeight": 1000,
-      "cutWeight": 183,
-      "remainingWeight": 817,
+      "cutWeight": 0,
+      "remainingWeight": 1000,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
@@ -118,418 +118,70 @@
   ],
   "invoice": [
     {
-      "id": "0XFmDrHfIto",
+      "id": "AoL3s_TWyNA",
       "orderId": "1",
       "orderNumber": "140505135",
       "customerId": "1",
       "customerName": "حسین گل محمدی",
-      "date": "2026-09-11T22:31:58.024Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سیاه",
-          "brand": "مبارکه",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "1",
-          "quantity": "3",
-          "bundle": "1",
-          "weight": 15,
-          "cutType": "flat_thin"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 15,
-      "notes": null,
-      "createdAt": "2026-09-11T22:31:58.024Z",
-      "finalizedAt": "2026-09-11T22:39:55.275Z"
-    },
-    {
-      "id": "HqClrub--qA",
-      "orderId": "1",
-      "orderNumber": "140505135",
-      "customerId": "1",
-      "customerName": "حسین گل محمدی",
-      "date": "2026-09-11T22:40:21.118Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سیاه",
-          "brand": "مبارکه",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "2",
-          "quantity": "5",
-          "bundle": "1",
-          "weight": 49,
-          "cutType": "shutter_b"
-        },
-        {
-          "row": 2,
-          "productType": "ورق سیاه",
-          "brand": "مبارکه",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "1",
-          "quantity": "3",
-          "bundle": "",
-          "weight": 15,
-          "cutType": "shutter_small"
-        }
-      ],
-      "totalItems": 2,
-      "totalWeightInvoices": 64,
-      "notes": null,
-      "createdAt": "2026-09-11T22:40:21.118Z",
-      "finalizedAt": "2026-09-11T22:41:04.091Z"
-    },
-    {
-      "id": "oIB9KIGVoTQ",
-      "orderId": "1",
-      "orderNumber": "140505135",
-      "customerId": "1",
-      "customerName": "حسین گل محمدی",
-      "date": "2026-09-11T22:41:35.048Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سیاه",
-          "brand": "مبارکه",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "5",
-          "quantity": "17",
-          "bundle": "1",
-          "weight": 417,
-          "cutType": "shutter_small"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 417,
-      "notes": null,
-      "createdAt": "2026-09-11T22:41:35.048Z",
-      "finalizedAt": "2026-09-11T22:41:48.948Z"
-    },
-    {
-      "id": "OKYKMzOUxVQ",
-      "orderId": "1",
-      "orderNumber": "140505135",
-      "customerId": "1",
-      "customerName": "حسین گل محمدی",
-      "date": "2026-09-11T22:42:23.424Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سیاه",
-          "brand": "مبارکه",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.8",
-          "quantity": "1",
-          "bundle": "1",
-          "weight": 4,
-          "cutType": "trapezoidal"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 4,
-      "notes": null,
-      "createdAt": "2026-09-11T22:42:23.424Z",
-      "finalizedAt": "2026-09-11T22:43:19.427Z"
-    },
-    {
-      "id": "j-LoBQ_8icQ",
-      "orderId": "2",
-      "orderNumber": "140504123",
-      "customerId": "1",
-      "customerName": "حسین گل محمدی",
-      "date": "2026-09-11T22:44:25.798Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.25",
-          "quantity": "1",
-          "bundle": "1",
-          "weight": 1,
-          "cutType": "shutter_b"
-        },
-        {
-          "row": 2,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.25",
-          "quantity": "1",
-          "bundle": "",
-          "weight": 1,
-          "cutType": "flat_thin"
-        }
-      ],
-      "totalItems": 2,
-      "totalWeightInvoices": 2,
-      "notes": null,
-      "createdAt": "2026-09-11T22:44:25.798Z",
-      "finalizedAt": "2026-09-11T22:45:08.162Z"
-    },
-    {
-      "id": "b1fWsa7zUJA",
-      "orderId": "2",
-      "orderNumber": "140504123",
-      "customerId": "1",
-      "customerName": "حسین گل محمدی",
-      "date": "2026-09-11T22:45:48.391Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "20",
-          "quantity": "10",
-          "bundle": "2",
-          "weight": 981,
-          "cutType": "trapezoidal"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 981,
-      "notes": null,
-      "createdAt": "2026-09-11T22:45:48.391Z",
-      "finalizedAt": "2026-09-11T22:46:19.653Z"
-    },
-    {
-      "id": "KmnXHZCTiOM",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T22:55:04.433Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.25",
-          "quantity": "1",
-          "bundle": "1",
-          "weight": 1,
-          "cutType": "shutter_small"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 1,
-      "notes": null,
-      "createdAt": "2026-09-11T22:55:04.433Z",
-      "finalizedAt": "2026-09-11T22:55:16.987Z"
-    },
-    {
-      "id": "tNEHU7VAWbg",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T22:55:34.584Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.25",
-          "quantity": "6",
-          "bundle": "1",
-          "weight": 7,
-          "cutType": "shutter_b"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 7,
-      "notes": null,
-      "createdAt": "2026-09-11T22:55:34.584Z",
-      "finalizedAt": "2026-09-11T22:56:55.199Z"
-    },
-    {
-      "id": "eM-TYkkhmjA",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T22:57:12.780Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.47",
-          "quantity": "1",
-          "bundle": "1",
-          "weight": 2,
-          "cutType": "trapezoidal"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 2,
-      "notes": null,
-      "createdAt": "2026-09-11T22:57:12.780Z",
-      "finalizedAt": "2026-09-11T22:57:44.976Z"
-    },
-    {
-      "id": "D65y-njg5Lc",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T22:57:24.596Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "10",
-          "quantity": "2",
-          "bundle": "1",
-          "weight": 98,
-          "cutType": "shutter_small"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 98,
-      "notes": null,
-      "createdAt": "2026-09-11T22:57:24.596Z",
-      "finalizedAt": "2026-09-11T23:03:38.756Z"
-    },
-    {
-      "id": "ThO-gwU_-QQ",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T23:06:12.331Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "2",
-          "quantity": "3",
-          "bundle": "1",
-          "weight": 29,
-          "cutType": "shutter_small"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 29,
-      "notes": null,
-      "createdAt": "2026-09-11T23:06:12.331Z",
-      "finalizedAt": "2026-09-11T23:06:22.665Z"
-    },
-    {
-      "id": "9hneZjsrko4",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T23:06:34.860Z",
-      "status": "ثبت نهایی",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.25",
-          "quantity": "1",
-          "bundle": "1",
-          "weight": 1,
-          "cutType": "shutter_small"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 1,
-      "notes": null,
-      "createdAt": "2026-09-11T23:06:34.860Z",
-      "finalizedAt": "2026-09-11T23:06:41.739Z"
-    },
-    {
-      "id": "wpIQUO8glnE",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T23:08:05.884Z",
+      "date": "2026-09-29T05:49:02.267Z",
       "status": "ثبت صورت برش",
       "items": [
         {
           "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
-          "thickness": 0.5,
-          "width": 1.25,
-          "length": "0.25",
-          "quantity": "1",
-          "bundle": "1",
-          "weight": 1,
-          "cutType": "shutter_b"
-        }
-      ],
-      "totalItems": 1,
-      "totalWeightInvoices": 1,
-      "notes": "کرکره نذارید",
-      "createdAt": "2026-09-11T23:08:05.884Z"
-    },
-    {
-      "id": "q_4Qx_HffNM",
-      "orderId": "4",
-      "orderNumber": "140503000",
-      "customerId": "2",
-      "customerName": "علی رضایی",
-      "date": "2026-09-11T23:11:32.300Z",
-      "status": "ثبت صورت برش",
-      "items": [
-        {
-          "row": 1,
-          "productType": "ورق سرد",
-          "brand": "چین",
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
           "thickness": 0.5,
           "width": 1.25,
           "length": "3",
-          "quantity": "5",
+          "quantity": "10",
           "bundle": "1",
-          "weight": 74,
-          "cutType": "shutter_small"
+          "weight": 147,
+          "cutType": "shutter_b"
         }
       ],
       "totalItems": 1,
-      "totalWeightInvoices": 74,
-      "notes": "کرکره نذارید لطفا",
-      "createdAt": "2026-09-11T23:11:32.300Z"
+      "totalWeightInvoices": 147,
+      "notes": null,
+      "createdAt": "2026-09-29T05:49:02.267Z"
+    },
+    {
+      "id": "lWK95xmYFug",
+      "orderId": "1",
+      "orderNumber": "140505135",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "date": "2026-09-29T05:49:33.330Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "1",
+          "quantity": "1",
+          "bundle": "1",
+          "weight": 5,
+          "cutType": "flat_thin"
+        },
+        {
+          "row": 2,
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "2",
+          "quantity": "2",
+          "bundle": "",
+          "weight": 20,
+          "cutType": "flat_thin"
+        }
+      ],
+      "totalItems": 2,
+      "totalWeightInvoices": 25,
+      "notes": null,
+      "createdAt": "2026-09-29T05:49:33.330Z"
     }
   ],
   "users": [
