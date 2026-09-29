@@ -43,16 +43,16 @@
       "width": 1.25,
       "unit": "برگ",
       "totalWeight": 500,
-      "cutWeight": 172,
-      "remainingWeight": 328,
+      "cutWeight": 500,
+      "remainingWeight": 0,
       "unitPrice": 45000,
       "paid": false,
       "paymentDate": null,
       "shipped": false,
       "shippedDate": null,
       "invoiceIssued": true,
-      "invoiceNumber": "INV-1790660973330",
-      "invoiceDate": "2026-09-29T05:49:33.372Z",
+      "invoiceNumber": "INV-1790661140676",
+      "invoiceDate": "2026-09-29T05:52:20.738Z",
       "notes": "ورق نازک برای پروژه ساختمانی",
       "createdAt": "2026-08-15T00:00:00.000Z",
       "updatedAt": "2026-09-11T22:43:19.379Z"
@@ -182,6 +182,60 @@
       "totalWeightInvoices": 25,
       "notes": null,
       "createdAt": "2026-09-29T05:49:33.330Z"
+    },
+    {
+      "id": "2aIYziEO8M4",
+      "orderId": "1",
+      "orderNumber": "140505135",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "date": "2026-09-29T05:51:28.597Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "5",
+          "quantity": "13",
+          "bundle": "1",
+          "weight": 319,
+          "cutType": "flat_thin"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 319,
+      "notes": null,
+      "createdAt": "2026-09-29T05:51:28.597Z"
+    },
+    {
+      "id": "96kTFJenL1s",
+      "orderId": "1",
+      "orderNumber": "140505135",
+      "customerId": "1",
+      "customerName": "حسین گل محمدی",
+      "date": "2026-09-29T05:52:20.676Z",
+      "status": "ثبت صورت برش",
+      "items": [
+        {
+          "row": 1,
+          "productType": "ورق سیاه",
+          "brand": "مبارکه",
+          "thickness": 0.5,
+          "width": 1.25,
+          "length": "0.91",
+          "quantity": "2",
+          "bundle": "1",
+          "weight": 9,
+          "cutType": "shutter_b"
+        }
+      ],
+      "totalItems": 1,
+      "totalWeightInvoices": 9,
+      "notes": null,
+      "createdAt": "2026-09-29T05:52:20.676Z"
     }
   ],
   "users": [
