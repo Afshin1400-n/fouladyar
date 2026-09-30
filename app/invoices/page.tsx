@@ -17,11 +17,7 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [stats, setStats] = useState({
-    totalInvoices: 0,
-    totalWeight: 0,
-   
-  });
+  const [stats, setStats] = useState({ totalInvoices: 0,totalWeight: 0,});
 
 
   const fetchInvoices = async () => {
@@ -34,12 +30,15 @@ export default function InvoicesPage() {
       const userInvoices = allInvoices.filter((inv) => inv.customerId === currentUser.id);
       
       
-      
       setInvoices(userInvoices);
       setFilteredInvoices(userInvoices);
 
+
       const totalInvoices = userInvoices.length;
-      const totalWeight = userInvoices.reduce((sum, inv) => sum + (inv.totalWeight || 0), 0);
+      const totalWeight = userInvoices.reduce(
+      (sum, inv) => sum + (Number(inv.totalWeightInvoices) || 0),
+      0
+    );
      
 
       setStats({
